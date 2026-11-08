@@ -318,8 +318,40 @@
   }
 
   .prompt-target-char {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.14em;
     font-size: 1.12em;
     font-weight: 700;
+  }
+
+  .prompt-word-char {
+    display: inline-block;
+    transition: transform 0.18s ease, opacity 0.18s ease;
+
+    &.is-typed {
+      opacity: 1;
+    }
+
+    &.is-current {
+      text-decoration: underline;
+      text-decoration-thickness: 0.12em;
+      text-underline-offset: 0.1em;
+    }
+
+    &.is-pending {
+      opacity: 0.45;
+    }
+  }
+
+  .prompt-bonus-tag {
+    font-size: 0.48em;
+    padding: 0.14em 0.5em;
+    margin-inline-end: 0.25em;
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    background: #ffe03b;
+    vertical-align: middle;
   }
 
   .buzz-feedback {
@@ -338,7 +370,7 @@
     inset: auto;
     inset-block-start: 4.2rem;
     inset-inline-start: 1rem;
-    inline-size: min(19rem, 90dvw);
+    inline-size: min(20rem, 90dvw);
     padding: 1.1rem;
     border: 3.5px solid var(--ink);
     border-radius: 1rem;
@@ -349,17 +381,13 @@
     transition:
       opacity 0.18s ease-out,
       transform 0.18s ease-out,
-      display 0.18s allow-discrete,
-      overlay 0.18s allow-discrete;
+      display 0.18s,
+      overlay 0.18s;
+    transition-behavior: allow-discrete;
 
     &:popover-open {
       opacity: 1;
       transform: translateY(0) scale(1);
-
-      @starting-style {
-        opacity: 0;
-        transform: translateY(-8px) scale(0.97);
-      }
     }
   }
 
@@ -517,11 +545,23 @@
     pointer-events: none;
   }
 
+  .shared-svg-defs {
+    position: absolute;
+    inline-size: 0;
+    block-size: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
   .paper-letter-svg {
     inline-size: 80%;
-    max-block-size: 62%;
+    max-block-size: 56%;
     overflow: visible;
     transition: transform 0.42s cubic-bezier(0.24, 1.48, 0.42, 1);
+
+    &[hidden] {
+      display: none;
+    }
   }
 
   .paper-letter-text {
@@ -543,9 +583,131 @@
     transition: opacity 0.2s ease;
   }
 
+  /* 3-Letter & 4-Letter Bonus Word Slots on Paper */
+  .paper-word-slots {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35cqi;
+    inline-size: 94%;
+    max-block-size: 56%;
+    margin-block-start: 4%;
+    margin-block-end: 2%;
+    transition: transform 0.42s cubic-bezier(0.24, 1.48, 0.42, 1);
+
+    &[hidden] {
+      display: none;
+    }
+  }
+
+  .word-slot-svg {
+    flex: 1 1 0;
+    min-inline-size: 0;
+    max-inline-size: 31%;
+    aspect-ratio: 110 / 138;
+    overflow: visible;
+
+    &.is-just-stamped {
+      animation: word-letter-stamp 0.28s cubic-bezier(0.22, 1.5, 0.4, 1);
+    }
+  }
+
+  .paper-word-slots.is-four-letter .word-slot-svg {
+    max-inline-size: 24.5%;
+  }
+
+  .word-slot-text {
+    font-family: var(--font-display);
+    font-weight: 700;
+    paint-order: stroke fill;
+    fill: #ffffff;
+    stroke: var(--ink);
+    stroke-width: 9px;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    transition: fill 0.2s ease;
+  }
+
+  .word-slot-svg.is-typed .word-slot-text {
+    fill: #262624;
+  }
+
+  .word-slot-shadow {
+    font-family: var(--font-display);
+    font-weight: 700;
+    fill: var(--ink);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .word-slot-underline {
+    opacity: 0;
+    stroke: var(--ink);
+    stroke-width: 9px;
+    stroke-linecap: round;
+  }
+
+  .word-slot-svg.is-active .word-slot-underline {
+    opacity: 1;
+    animation: underline-bob 0.8s ease-in-out infinite alternate;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+
+  /* Countable Stars / Hero Badge reflecting Number 0-9 on Answer Screen */
+  .paper-count-badges {
+    display: flex;
+    flex-wrap: wrap;
+    flex-wrap: balance;
+    justify-content: center;
+    align-items: center;
+    gap: clamp(0.14rem, 0.55cqi, 0.34rem);
+    max-inline-size: 92%;
+    margin-block-start: -0.2rem;
+    margin-block-end: 0.2rem;
+    opacity: 0;
+    transform: scale(0.8);
+    transition:
+      opacity 0.25s ease 0.05s,
+      transform 0.36s cubic-bezier(0.24, 1.48, 0.42, 1) 0.05s;
+
+    &[hidden] {
+      display: none;
+    }
+  }
+
+  .count-star {
+    display: inline-grid;
+    place-items: center;
+    inline-size: clamp(1rem, 2.55cqi, 1.55rem);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: #ffe03b;
+    border: 2px solid var(--ink);
+    box-shadow: 0 2px 0 var(--ink);
+    font-size: clamp(0.62rem, 1.65cqi, 1rem);
+    line-height: 1;
+    color: #ff2e4c;
+  }
+
+  .zero-hero-pill {
+    padding: 0.12rem 0.6rem;
+    border: 2.2px solid var(--ink);
+    border-radius: 999px;
+    background: #ffe03b;
+    box-shadow: 0 2px 0 var(--ink);
+    font-size: clamp(0.72rem, 1.9cqi, 1.05rem);
+    font-weight: 700;
+    color: var(--ink);
+  }
+
   .paper-phrase {
-    margin-block-start: -0.25rem;
-    font-size: clamp(0.95rem, 3.1cqi, 1.8rem);
+    margin-block-start: -0.1rem;
+    max-inline-size: 96%;
+    font-size: clamp(0.84rem, 2.55cqi, 1.52rem);
+    line-height: 1.15;
     font-weight: 700;
     text-align: center;
     color: var(--ink);
@@ -779,49 +941,42 @@
     }
   }
 
-  /* INTERACTIVE ROUND VINTAGE TYPEWRITER KEYS ON HERMES' DECK */
+  /* INTERACTIVE PERMANENT 4-ROW VINTAGE TYPEWRITER KEYS ON HERMES' DECK */
   .typewriter-keys {
     position: absolute;
-    inset-inline: 23.5%;
-    inset-block: 60% 10.5%;
+    inset-inline: 23%;
+    inset-block: 55.8% 9.4%;
+    pointer-events: none;
+  }
+
+  .key-rows-mount {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
-    gap: 0.25cqi;
-    padding-block: 0.1rem;
-    pointer-events: none;
-
-    &.has-number-row {
-      gap: 0.12cqi;
-      & .tw-key {
-        inline-size: clamp(0.85rem, 3.2cqi, 1.78rem);
-        font-size: clamp(0.44rem, 1.32cqi, 0.76rem);
-      }
-      & .tw-spacebar {
-        block-size: clamp(0.46rem, 1.35cqi, 0.78rem);
-      }
-    }
+    inline-size: 100%;
+    block-size: 100%;
+    gap: 0.1cqi;
   }
 
   .key-row {
     display: flex;
     justify-content: center;
-    gap: clamp(0.12rem, 0.65cqi, 0.38rem);
+    gap: clamp(0.1rem, 0.58cqi, 0.34rem);
     inline-size: 100%;
   }
 
   .tw-key {
     pointer-events: auto;
     position: relative;
-    inline-size: clamp(1rem, 4.05cqi, 2.22rem);
+    inline-size: clamp(0.86rem, 3.28cqi, 1.82rem);
     aspect-ratio: 1;
     padding: 0;
-    border: 2.3px solid var(--ink);
+    border: 2.2px solid var(--ink);
     border-radius: 50%;
     background: radial-gradient(circle at 35% 30%, #ffffff, #d5d5d0);
     box-shadow: 0 3px 0 var(--ink);
-    font-size: clamp(0.5rem, 1.65cqi, 0.92rem);
+    font-size: clamp(0.45rem, 1.35cqi, 0.78rem);
     font-weight: 700;
     line-height: 1;
     color: var(--ink);
@@ -830,8 +985,9 @@
     cursor: pointer;
     transition:
       transform 0.08s ease,
-      background 0.3s ease,
-      box-shadow 0.08s ease;
+      background 0.28s ease,
+      box-shadow 0.18s ease,
+      outline-color 0.25s ease;
 
     &:hover:not(:disabled) {
       background: #ffffff;
@@ -843,6 +999,7 @@
       box-shadow: 0 0 0 var(--ink);
     }
 
+    /* 0s - 5s: Animated Black & White key prompt */
     &.is-hint {
       background: #ffffff;
       outline: 3px solid var(--ink);
@@ -852,15 +1009,96 @@
 
       @media (prefers-reduced-motion: reduce) {
         animation: none;
-        background: #ffe03b;
+        outline-width: 4px;
       }
+    }
+
+    /* After 5s: Turns to vibrant Colour right on Hermes' B&W keyboard! */
+    &.is-color-hint {
+      background: radial-gradient(circle at 35% 30%, #fff475, #ff7a24);
+      color: var(--ink);
+      outline: 3px solid #ff1e38;
+      outline-offset: 2px;
+      box-shadow:
+        0 3px 0 var(--ink),
+        0 0 16px rgb(255 122 36 / 0.9);
+      z-index: 4;
+      animation: key-color-pulse 0.74s ease-in-out infinite;
+
+      @media (prefers-reduced-motion: reduce) {
+        animation: none;
+      }
+    }
+  }
+
+  /* After 10s: Bold Comic Red Arrow pointing directly at the target key! */
+  .key-red-arrow {
+    position: absolute;
+    inset-inline-start: var(--arrow-x, 50%);
+    inset-block-start: var(--arrow-y, 0px);
+    translate: -50% calc(-100% - 0.3rem);
+    inline-size: clamp(1.85rem, 6.2cqi, 3.3rem);
+    aspect-ratio: 64 / 78;
+    z-index: 15;
+    pointer-events: none;
+    opacity: 1;
+    scale: 1;
+    filter: drop-shadow(0 4px 0 rgb(24 24 24 / 0.32));
+    transition:
+      display 0.22s,
+      opacity 0.22s ease-out,
+      scale 0.24s cubic-bezier(0.22, 1.5, 0.38, 1);
+    transition-behavior: allow-discrete;
+  }
+
+  @supports (anchor-name: --hint-target-key) {
+    .tw-key.is-arrow-target {
+      anchor-name: --hint-target-key;
+    }
+
+    .key-red-arrow {
+      inset: auto;
+      position-anchor: --hint-target-key;
+      inset-block-end: calc(anchor(top) + 0.3rem);
+      inset-inline-start: anchor(center);
+      translate: -50% 0;
+    }
+  }
+
+  .key-red-arrow:where([hidden], [data-closing]) {
+    opacity: 0;
+    scale: 0.4;
+  }
+
+  .key-red-arrow[hidden] {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .key-red-arrow {
+      transition-duration: 0.1s;
+    }
+    .key-red-arrow:where([hidden], [data-closing]) {
+      scale: 1;
+    }
+  }
+
+  .red-arrow-svg {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+    overflow: visible;
+    animation: red-arrow-point 0.56s ease-in-out infinite alternate;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
     }
   }
 
   .tw-spacebar {
     inline-size: 46%;
-    block-size: clamp(0.58rem, 1.75cqi, 1.02rem);
-    border: 2.5px solid var(--ink);
+    block-size: clamp(0.46rem, 1.38cqi, 0.8rem);
+    border: 2.3px solid var(--ink);
     border-radius: 999px;
     background: #cfcfca;
     box-shadow: 0 3px 0 var(--ink);
@@ -988,6 +1226,28 @@
 
     & .paper-letter-shadow {
       opacity: 1;
+    }
+
+    & .paper-word-slots {
+      transform: translateX(-6%) scale(1.04) rotate(-2deg);
+    }
+
+    & .word-slot-text {
+      fill: url(#rainbow-letter-grad);
+      stroke-width: 10px;
+    }
+
+    & .word-slot-shadow {
+      opacity: 1;
+    }
+
+    & .word-slot-underline {
+      opacity: 0;
+    }
+
+    & .paper-count-badges {
+      opacity: 1;
+      transform: scale(1);
     }
 
     & .paper-phrase {
@@ -1119,6 +1379,31 @@
   }
 }
 
+/* Top-level @starting-style rules for entry transitions */
+@starting-style {
+  .options-popover:popover-open {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.97);
+  }
+
+  .key-red-arrow {
+    opacity: 0;
+    scale: 0.4;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @starting-style {
+    .options-popover:popover-open {
+      transform: none;
+    }
+
+    .key-red-arrow {
+      scale: 1;
+    }
+  }
+}
+
 /* =========================================================
    KEYFRAMES (Compositor-friendly transform & opacity)
    ========================================================= */
@@ -1169,6 +1454,43 @@
   }
   50% {
     transform: translateY(-3px) scale(1.16);
+  }
+}
+
+@keyframes key-color-pulse {
+  0%,
+  100% {
+    transform: translateY(-1px) scale(1.08);
+  }
+  50% {
+    transform: translateY(-4px) scale(1.24);
+  }
+}
+
+@keyframes red-arrow-point {
+  from {
+    transform: translateY(-9px);
+  }
+  to {
+    transform: translateY(2px);
+  }
+}
+
+@keyframes word-letter-stamp {
+  0% {
+    transform: scale(1.32);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes underline-bob {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-3px);
   }
 }
 

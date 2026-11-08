@@ -89,18 +89,19 @@
   <div id="parent-options" class="options-popover" popover="auto">
     <h2 class="options-title">Parent Options</h2>
     <div class="options-group">
-      <label class="options-label" for="mode-select">Practice Set</label>
+      <label class="options-label" for="mode-select">Practice Mode</label>
       <select id="mode-select" class="options-select">
         <option value="letters" selected>Letters (A – Z)</option>
-        <option value="numbers">Numbers (0 – 9)</option>
+        <option value="numbers">Numbers (0 – 9 Aussie 12 Days)</option>
         <option value="both">Letters &amp; Numbers</option>
+        <option value="words">3-Letter Words (+ Bonus JUMP)</option>
       </select>
     </div>
     <div class="options-group">
-      <label class="options-label" for="order-select">Letter Order</label>
+      <label class="options-label" for="order-select">Prompt Order</label>
       <select id="order-select" class="options-select">
         <option value="shuffle" selected>Fun Shuffle</option>
-        <option value="sequential">In Order (A → Z)</option>
+        <option value="sequential">In Order</option>
       </select>
     </div>
     <div class="options-group options-row">
@@ -108,11 +109,11 @@
       <input type="checkbox" id="voice-checkbox" class="options-check" checked>
     </div>
     <div class="options-group options-row">
-      <label class="options-label" for="hint-checkbox">Highlight Key on Hermes</label>
+      <label class="options-label" for="hint-checkbox">Highlight Key Immediately</label>
       <input type="checkbox" id="hint-checkbox" class="options-check" checked>
     </div>
     <button type="button" id="skip-letter-btn" class="skip-btn">
-      Next Letter →
+      Next Prompt →
     </button>
   </div>
 
@@ -197,11 +198,8 @@
       <!-- UPPER STAGE: PAPER EMERGING FROM PLATEN + LEAPING CRITTER -->
       <div class="paper-stage">
         <div id="paper-sheet" class="paper-sheet">
-          <!-- Folded top-right dog-ear corner -->
-          <span class="paper-dogear" aria-hidden="true"></span>
-
-          <!-- Crisp SVG Outlined / Rainbow Letter -->
-          <svg class="paper-letter-svg" aria-hidden="true" viewBox="0 0 240 215">
+          <!-- Shared rainbow gradient (always rendered so both single & word SVGs resolve it) -->
+          <svg class="shared-svg-defs" width="0" height="0" aria-hidden="true">
             <defs>
               <linearGradient id="rainbow-letter-grad" x1="0%" y1="0%" x2="95%" y2="100%">
                 <stop offset="0%" stop-color="#ff3352"/>
@@ -212,6 +210,13 @@
                 <stop offset="100%" stop-color="#a259ff"/>
               </linearGradient>
             </defs>
+          </svg>
+
+          <!-- Folded top-right dog-ear corner -->
+          <span class="paper-dogear" aria-hidden="true"></span>
+
+          <!-- Crisp SVG Outlined / Rainbow Single Letter or Number -->
+          <svg id="paper-single-svg" class="paper-letter-svg" aria-hidden="true" viewBox="0 0 240 215">
             <!-- Subtle extruded comic shadow in celebration mode -->
             <text
               id="paper-letter-shadow"
@@ -231,6 +236,12 @@
               text-anchor="middle"
             >D</text>
           </svg>
+
+          <!-- Multi-Letter Word Slots (3-Letter Words + 4-Letter Bonus JUMP) -->
+          <div id="paper-word-slots" class="paper-word-slots" hidden aria-hidden="true"></div>
+
+          <!-- Countable Number Tokens reflecting 0-9 on the Answer Sheet -->
+          <div id="paper-count-badges" class="paper-count-badges" hidden aria-hidden="true"></div>
 
           <p id="paper-phrase" class="paper-phrase">D is for Dog!</p>
         </div>
@@ -265,27 +276,27 @@
             </g>
           </g>
 
-          <!-- MAIN VINTAGE HERMES BODY CHASSIS -->
+          <!-- MAIN VINTAGE HERMES BODY CHASSIS (Includes Permanent 4-Row Number + QWERTY Deck!) -->
           <g stroke="#181818" stroke-width="5.2" stroke-linejoin="round" stroke-linecap="round">
             <!-- Red/Dark Base Trim Cushion -->
-            <rect x="144" y="408" width="572" height="26" rx="13" class="tw-base-pad"/>
+            <rect x="144" y="410" width="572" height="24" rx="12" class="tw-base-pad"/>
             <!-- Outer Lower Chassis Shell -->
-            <path d="M174,154 C180,104 222,92 276,92 L584,92 C638,92 680,104 686,154 L728,368 C734,404 712,418 674,418 L186,418 C148,418 126,404 132,368 Z" class="tw-body-main"/>
+            <path d="M174,154 C180,104 222,92 276,92 L584,92 C638,92 680,104 686,154 L728,370 C734,406 712,420 674,420 L186,420 C148,420 126,406 132,370 Z" class="tw-body-main"/>
             <!-- Upper Hood Crown Highlight -->
-            <path d="M196,156 C204,114 236,102 284,102 L576,102 C624,102 656,114 664,156 C666,176 648,192 616,192 L244,192 C212,192 194,176 196,156 Z" class="tw-body-hood"/>
+            <path d="M196,156 C204,114 236,102 284,102 L576,102 C624,102 656,114 664,156 C666,176 648,190 616,190 L244,190 C212,190 194,176 196,156 Z" class="tw-body-hood"/>
             <!-- Typebar Basket Cutout Arc behind Nose -->
             <path d="M336,138 C366,116 494,116 524,138 C504,154 356,154 336,138 Z" class="tw-platen"/>
             <!-- Front Ribbon Cover Panel & HERMES Script Emblem -->
-            <rect x="196" y="196" width="468" height="58" rx="16" class="tw-front-panel"/>
+            <rect x="196" y="192" width="468" height="48" rx="14" class="tw-front-panel"/>
             <!-- Left & Right Chrome Latches -->
-            <rect x="222" y="208" width="12" height="34" rx="5" class="tw-metal"/>
-            <rect x="626" y="208" width="12" height="34" rx="5" class="tw-metal"/>
-            <!-- Recessed Dark Keyboard Well -->
-            <path d="M184,264 L676,264 L702,392 C704,402 694,406 680,406 L180,406 C166,406 156,402 158,392 Z" class="tw-keywell"/>
+            <rect x="222" y="202" width="12" height="28" rx="5" class="tw-metal"/>
+            <rect x="626" y="202" width="12" height="28" rx="5" class="tw-metal"/>
+            <!-- Recessed Dark 4-Row Keyboard Well (Numbers 1-0 + Letters Q-M + Spacebar) -->
+            <path d="M182,246 L678,246 L704,398 C706,406 696,410 682,410 L178,410 C164,410 154,406 156,398 Z" class="tw-keywell"/>
           </g>
 
           <!-- HERMES VINTAGE SCRIPT BADGE -->
-          <text x="430" y="236" font-size="34" text-anchor="middle" class="hermes-logo-text">HERMES</text>
+          <text x="430" y="226" font-size="31" text-anchor="middle" class="hermes-logo-text">HERMES</text>
 
           <!-- HERMES' EXPRESSIVE 1930s CARTOON FACE -->
           <g class="hermes-face" stroke="#181818" stroke-linecap="round" stroke-linejoin="round">
@@ -361,8 +372,23 @@
           </g>
         </svg>
 
-        <!-- INTERACTIVE VINTAGE ROUND QWERTY KEYBOARD OVERLAY ON HERMES' DECK -->
-        <div id="typewriter-keys" class="typewriter-keys" role="group" aria-label="On-screen typewriter keys"></div>
+        <!-- INTERACTIVE VINTAGE ROUND NUMBER + QWERTY KEYBOARD OVERLAY ON HERMES' DECK -->
+        <div id="typewriter-keys" class="typewriter-keys" role="group" aria-label="On-screen typewriter keys">
+          <div id="key-rows-mount" class="key-rows-mount"></div>
+          <!-- Timed 10-Second Bouncing Red Arrow Pointer -->
+          <div id="key-red-arrow" class="key-red-arrow" hidden aria-hidden="true">
+            <svg class="red-arrow-svg" viewBox="0 0 64 78">
+              <path
+                d="M21,4 H43 V36 H59 L32,72 L5,36 H21 Z"
+                fill="#ff1e38"
+                stroke="#181818"
+                stroke-width="5"
+                stroke-linejoin="round"
+              />
+              <path d="M26,11 V33" stroke="#ff9aa6" stroke-width="4" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </div>
       </div>
     </div>
   </main>

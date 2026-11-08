@@ -14,35 +14,68 @@
 
     _initVoices() {
       if (!('speechSynthesis' in window)) return;
-      const pickVoice = () => {
+      this._pickVoice = () => {
         const voices = window.speechSynthesis.getVoices() || [];
         if (!voices.length) return;
-        const preferredNames = [
-          'Samantha',
-          'Karen',
-          'Moira',
-          'Tessa',
-          'Ava',
-          'Allison',
-          'Google US English',
-          'Daniel'
+
+        const enVoices = voices.filter((v) => /^en(-|_|$)/i.test(v.lang));
+        const femaleExclude =
+          /\b(female|samantha|karen|catherine|moira|tessa|victoria|fiona|ava|allison|susan|zoe|nicky|serena|martha|zira|hazel|sonia|natasha|libby|clara|flo|shelley|sandy|grandma|alice|ellen|nora|veena|google us english)\b/i;
+
+        // Prioritize warm, clear male voices (Australian male voices first!)
+        const preferredMaleNames = [
+          'Lee',
+          'Gordon',
+          'Microsoft William',
+          'Microsoft Nat',
+          'Google UK English Male',
+          'Daniel',
+          'Oliver',
+          'Aaron',
+          'Arthur',
+          'Alex',
+          'Evan',
+          'Rishi',
+          'Reed',
+          'Tom',
+          'Microsoft Ryan',
+          'Microsoft Guy',
+          'Microsoft David',
+          'Microsoft Mark',
+          'Rocko',
+          'Eddy',
+          'Fred'
         ];
-        for (const name of preferredNames) {
-          const found = voices.find(
-            (v) => v.name.includes(name) && v.lang.startsWith('en')
+
+        for (const name of preferredMaleNames) {
+          const found = enVoices.find(
+            (v) => v.name.includes(name) && !/\bfemale\b/i.test(v.name)
           );
           if (found) {
             this.preferredVoice = found;
             return;
           }
         }
-        this.preferredVoice =
-          voices.find((v) => v.lang.startsWith('en') && v.localService) ||
-          voices.find((v) => v.lang.startsWith('en')) ||
-          voices[0];
+
+        // Next, check any English voice explicitly labeled "Male"
+        const labeledMale = enVoices.find(
+          (v) => /\bmale\b/i.test(v.name) && !/\bfemale\b/i.test(v.name)
+        );
+        if (labeledMale) {
+          this.preferredVoice = labeledMale;
+          return;
+        }
+
+        // Next, pick an English voice not matching known female voice names
+        const nonFemaleEn =
+          enVoices.find((v) => v.localService && !femaleExclude.test(v.name)) ||
+          enVoices.find((v) => !femaleExclude.test(v.name));
+
+        this.preferredVoice = nonFemaleEn || enVoices[0] || voices[0];
       };
-      pickVoice();
-      window.speechSynthesis.addEventListener?.('voiceschanged', pickVoice);
+
+      this._pickVoice();
+      window.speechSynthesis.addEventListener?.('voiceschanged', this._pickVoice);
     }
 
     unlock() {
@@ -71,7 +104,7 @@
       }
     }
 
-    speak(text, { rate = 0.96, pitch = 1.12, delayMs = 0, isBuzz = false } = {}) {
+    speak(text, { rate = 0.95, pitch = 0.92, delayMs = 0, isBuzz = false } = {}) {
       if (!this.soundEnabled || !this.voiceEnabled) return;
       if (!('speechSynthesis' in window)) return;
 
@@ -86,14 +119,18 @@
       const run = () => {
         if (!this.soundEnabled || !this.voiceEnabled) return;
         try {
+          if (!this.preferredVoice && this._pickVoice) {
+            this._pickVoice();
+          }
           window.speechSynthesis.cancel();
           const utter = new SpeechSynthesisUtterance(text);
           if (this.preferredVoice) {
             utter.voice = this.preferredVoice;
+            utter.lang = this.preferredVoice.lang;
           }
           utter.rate = rate;
           utter.pitch = pitch;
-          utter.volume = 0.95;
+          utter.volume = 0.96;
           window.speechSynthesis.speak(utter);
         } catch (_) {
           // Ignore speech synthesis quirks gracefully
@@ -282,11 +319,39 @@
       };
 
       switch (type) {
+        case 'kookaburra': // Iconic laughing Aussie kookaburra "Koo-koo-ka-ka!"
+          [0, 0.09, 0.18, 0.27, 0.36].forEach((dt, i) => {
+            const base = 760 + (i % 2) * 260;
+            tone(base, base * 1.32, start + dt, 0.075, 'triangle', 0.16);
+          });
+          break;
         case 'bark': // Playful "Arf! Arf!"
           tone(340, 520, start, 0.09, 'triangle', 0.2);
           tone(520, 260, start + 0.06, 0.08, 'triangle', 0.18);
           tone(380, 580, start + 0.19, 0.1, 'triangle', 0.2);
           tone(580, 280, start + 0.25, 0.09, 'triangle', 0.18);
+          break;
+        case 'oink': // Cute piglet snort-oink
+          tone(190, 145, start, 0.11, 'sawtooth', 0.12);
+          tone(210, 155, start + 0.14, 0.13, 'sawtooth', 0.12);
+          break;
+        case 'moo': // Warm friendly cow "Moooo"
+          tone(185, 165, start, 0.36, 'sawtooth', 0.11);
+          break;
+        case 'bee': // Happy honeybee buzz
+          tone(260, 295, start, 0.14, 'sawtooth', 0.1);
+          tone(295, 250, start + 0.14, 0.16, 'sawtooth', 0.1);
+          break;
+        case 'hoot': // Wise owl "Hoo-hoo!"
+          tone(460, 410, start, 0.15, 'sine', 0.18);
+          tone(440, 380, start + 0.2, 0.22, 'sine', 0.18);
+          break;
+        case 'zap': // Comic electric zap!
+          tone(1450, 220, start, 0.14, 'sawtooth', 0.14);
+          tone(1680, 310, start + 0.12, 0.16, 'sawtooth', 0.14);
+          break;
+        case 'rocket': // Rising space zoom
+          tone(220, 980, start, 0.32, 'triangle', 0.16);
           break;
         case 'splash':
         case 'bubble': // Bubbly water bloops
@@ -319,6 +384,28 @@
           });
           break;
       }
+    }
+
+    /** Crisp rising marimba ding when stamping intermediate letters of a 3/4-letter word */
+    playLetterStep(stepIndex = 0) {
+      if (!this.soundEnabled) return;
+      this.unlock();
+      if (!this.ctx) return;
+
+      const notes = [523.25, 659.25, 783.99, 987.77]; // C5 E5 G5 B5
+      const freq = notes[Math.min(stepIndex, notes.length - 1)];
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, t);
+      gain.gain.setValueAtTime(0.001, t);
+      gain.gain.linearRampToValueAtTime(0.18, t + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.2);
     }
 
     /** Extra joyful xylophone sparkle if child taps keys during celebration */
