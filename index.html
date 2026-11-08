@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Type Great Hermes — Kid's Keyboard Adventure</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-state="prompting">
+  <!-- Centralized polite live region for assistive technology -->
+  <div id="sr-announcer" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- LAYER 0: Black & White Comic Prompting Backdrop -->
+  <div class="bg-bw" aria-hidden="true">
+    <div class="halftone-vignette"></div>
+  </div>
+
+  <!-- LAYER 1: Vibrant Radial Colour Burst Backdrop (Revealed on Success!) -->
+  <div class="bg-color-burst" aria-hidden="true">
+    <div class="sunburst-rays"></div>
+    <div id="confetti-layer" class="confetti-layer"></div>
+  </div>
+
+  <!-- TOP MINIMALIST HUD -->
+  <header class="top-hud">
+    <div class="hud-left">
+      <button
+        type="button"
+        id="sound-toggle-btn"
+        class="icon-btn"
+        aria-label="Sound on"
+        aria-pressed="true"
+      >
+        <svg class="icon-svg icon-sound-on" aria-hidden="true" viewBox="0 0 24 24">
+          <path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="M16.5 8.5a5 5 0 0 1 0 7M19.5 5.5a9 9 0 0 1 0 13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+        </svg>
+        <svg class="icon-svg icon-sound-off" aria-hidden="true" viewBox="0 0 24 24">
+          <path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="M16 9l6 6M22 9l-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+        </svg>
+      </button>
+
+      <button
+        type="button"
+        id="options-btn"
+        class="icon-btn"
+        popovertarget="parent-options"
+        aria-label="Parent options"
+      >
+        <svg class="icon-svg" aria-hidden="true" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="2.2"/>
+          <path d="M12 2.8v2.4M12 18.8v2.4M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M2.8 12h2.4M18.8 12h2.4M4.9 19.1l1.7-1.7M17.4 6.6l1.7-1.7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="prompt-banner">
+      <h1 id="prompt-heading" class="prompt-heading">
+        <span id="prompt-prefix">Type:</span>
+        <span id="prompt-target" class="prompt-target-char">D</span>
+      </h1>
+      <p id="buzz-feedback" class="buzz-feedback" hidden>
+        Oops! Try again!
+      </p>
+    </div>
+
+    <div class="hud-right">
+      <button
+        type="button"
+        id="fullscreen-btn"
+        class="icon-btn fullscreen-btn"
+        aria-label="Enter full screen"
+      >
+        <svg class="icon-svg icon-fs-enter" aria-hidden="true" viewBox="0 0 24 24">
+          <path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <svg class="icon-svg icon-fs-exit" aria-hidden="true" viewBox="0 0 24 24">
+          <path d="M9 4v5H4M15 4v5h5M20 15h-5v5M4 15h5v5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Native light-dismiss Parent Settings Popover -->
+  <div id="parent-options" class="options-popover" popover="auto">
+    <h2 class="options-title">Parent Options</h2>
+    <div class="options-group">
+      <label class="options-label" for="mode-select">Practice Set</label>
+      <select id="mode-select" class="options-select">
+        <option value="letters" selected>Letters (A – Z)</option>
+        <option value="numbers">Numbers (0 – 9)</option>
+        <option value="both">Letters &amp; Numbers</option>
+      </select>
+    </div>
+    <div class="options-group">
+      <label class="options-label" for="order-select">Letter Order</label>
+      <select id="order-select" class="options-select">
+        <option value="shuffle" selected>Fun Shuffle</option>
+        <option value="sequential">In Order (A → Z)</option>
+      </select>
+    </div>
+    <div class="options-group options-row">
+      <label class="options-label" for="voice-checkbox">Read Words Aloud</label>
+      <input type="checkbox" id="voice-checkbox" class="options-check" checked>
+    </div>
+    <div class="options-group options-row">
+      <label class="options-label" for="hint-checkbox">Highlight Key on Hermes</label>
+      <input type="checkbox" id="hint-checkbox" class="options-check" checked>
+    </div>
+    <button type="button" id="skip-letter-btn" class="skip-btn">
+      Next Letter →
+    </button>
+  </div>
+
+  <!-- MAIN GAME STAGE -->
+  <main id="game-stage" class="game-stage">
+    <div id="scene-rig" class="scene-rig">
+
+      <!-- B&W Comic Starburst Lines behind the Paper -->
+      <svg class="bw-paper-burst" aria-hidden="true" viewBox="0 0 800 500">
+        <polygon
+          points="400,24 446,118 548,48 518,154 662,114 568,208 732,222 586,274 714,348 564,334 636,432 504,376 472,462 400,388 328,462 296,376 164,432 236,334 86,348 214,274 68,222 232,208 138,114 282,154 252,48 354,118"
+          fill="#ffffff"
+          stroke="#181818"
+          stroke-width="4.5"
+          stroke-linejoin="round"
+        />
+        <!-- Comic 4-point sparkles -->
+        <path d="M626,64 Q626,92 652,92 Q626,92 626,120 Q626,92 600,92 Q626,92 626,64 Z" fill="#ffffff" stroke="#181818" stroke-width="3.8"/>
+        <path d="M168,78 Q168,98 188,98 Q168,98 168,118 Q168,98 148,98 Q168,98 168,78 Z" fill="#ffffff" stroke="#181818" stroke-width="3.8"/>
+      </svg>
+
+      <!-- Colour-Burst Rainbow Arcs shooting out behind the Paper -->
+      <svg class="color-rainbow-arcs" aria-hidden="true" viewBox="0 0 900 560">
+        <!-- Top-Left Rainbow Arc -->
+        <g stroke-linecap="round" fill="none">
+          <path d="M310,250 C255,155 190,95 115,68" stroke="#ff3b4e" stroke-width="14"/>
+          <path d="M320,258 C268,168 205,112 132,86" stroke="#ff9f24" stroke-width="14"/>
+          <path d="M330,266 C280,182 220,128 148,104" stroke="#ffe03b" stroke-width="14"/>
+          <path d="M340,274 C292,196 235,145 165,122" stroke="#46d160" stroke-width="14"/>
+          <path d="M350,282 C304,210 250,162 182,140" stroke="#3ac8ff" stroke-width="14"/>
+        </g>
+        <!-- Top-Right Rainbow Arc -->
+        <g stroke-linecap="round" fill="none">
+          <path d="M590,250 C645,155 710,95 785,68" stroke="#ff3b4e" stroke-width="14"/>
+          <path d="M580,258 C632,168 695,112 768,86" stroke="#ff9f24" stroke-width="14"/>
+          <path d="M570,266 C620,182 680,128 752,104" stroke="#ffe03b" stroke-width="14"/>
+          <path d="M560,274 C608,196 665,145 735,122" stroke="#46d160" stroke-width="14"/>
+          <path d="M550,282 C596,210 650,162 718,140" stroke="#3ac8ff" stroke-width="14"/>
+        </g>
+        <!-- Mid-Left Rainbow Arc -->
+        <g stroke-linecap="round" fill="none">
+          <path d="M300,360 C235,285 168,245 92,232" stroke="#ff4d79" stroke-width="12"/>
+          <path d="M308,370 C246,300 182,262 108,250" stroke="#ffd83b" stroke-width="12"/>
+          <path d="M316,380 C258,315 196,278 124,268" stroke="#3ac8ff" stroke-width="12"/>
+        </g>
+        <!-- Mid-Right Rainbow Arc -->
+        <g stroke-linecap="round" fill="none">
+          <path d="M600,360 C665,285 732,245 808,232" stroke="#ff4d79" stroke-width="12"/>
+          <path d="M592,370 C654,300 718,262 792,250" stroke="#ffd83b" stroke-width="12"/>
+          <path d="M584,380 C642,315 704,278 776,268" stroke="#3ac8ff" stroke-width="12"/>
+        </g>
+        <!-- Comic Stars at Rainbow Tips -->
+        <polygon points="115,38 126,62 152,65 132,82 138,108 115,94 92,108 98,82 78,65 104,62" fill="#ffa826" stroke="#181818" stroke-width="4.5" stroke-linejoin="round"/>
+        <polygon points="785,38 796,62 822,65 802,82 808,108 785,94 762,108 768,82 748,65 774,62" fill="#ffe03b" stroke="#181818" stroke-width="4.5" stroke-linejoin="round"/>
+        <polygon points="92,205 101,225 122,228 106,242 110,262 92,251 74,262 78,242 62,228 83,225" fill="#ffe03b" stroke="#181818" stroke-width="4" stroke-linejoin="round"/>
+        <polygon points="808,205 817,225 838,228 822,242 826,262 808,251 790,262 794,242 778,228 799,225" fill="#ffa826" stroke="#181818" stroke-width="4" stroke-linejoin="round"/>
+      </svg>
+
+      <!-- COMIC CALLOUT STICKERS (Shown on Celebration!) -->
+      <div class="callout-badge callout-ding" aria-hidden="true">DING!</div>
+      <div class="callout-badge callout-yay" aria-hidden="true">YAY!</div>
+      <div id="callout-left" class="callout-burst callout-left" aria-hidden="true">
+        <span>WOOF!</span>
+      </div>
+      <div id="callout-right" class="callout-burst callout-right" aria-hidden="true">
+        <span>BARK!</span>
+      </div>
+      <div id="buzz-burst" class="callout-buzz" aria-hidden="true">BZZT!</div>
+
+      <!-- BACK CARRIAGE LAYER: Platen Roller, Knobs & Return Lever behind the Paper -->
+      <svg class="hermes-carriage-back" aria-hidden="true" viewBox="0 0 860 450">
+        <g class="carriage-assembly" stroke="#181818" stroke-width="4.8" stroke-linejoin="round" stroke-linecap="round">
+          <path d="M188,68 C156,64 146,32 122,22 L106,24 C104,36 122,46 138,48 C148,66 164,82 188,84 Z" class="tw-metal"/>
+          <rect x="148" y="64" width="24" height="44" rx="7" class="tw-knob"/>
+          <rect x="688" y="64" width="24" height="44" rx="7" class="tw-knob"/>
+          <rect x="172" y="72" width="18" height="28" rx="4" class="tw-metal"/>
+          <rect x="670" y="72" width="18" height="28" rx="4" class="tw-metal"/>
+          <rect x="190" y="62" width="480" height="44" rx="14" class="tw-platen"/>
+        </g>
+      </svg>
+
+      <!-- UPPER STAGE: PAPER EMERGING FROM PLATEN + LEAPING CRITTER -->
+      <div class="paper-stage">
+        <div id="paper-sheet" class="paper-sheet">
+          <!-- Folded top-right dog-ear corner -->
+          <span class="paper-dogear" aria-hidden="true"></span>
+
+          <!-- Crisp SVG Outlined / Rainbow Letter -->
+          <svg class="paper-letter-svg" aria-hidden="true" viewBox="0 0 240 215">
+            <defs>
+              <linearGradient id="rainbow-letter-grad" x1="0%" y1="0%" x2="95%" y2="100%">
+                <stop offset="0%" stop-color="#ff3352"/>
+                <stop offset="20%" stop-color="#ff9924"/>
+                <stop offset="40%" stop-color="#ffe438"/>
+                <stop offset="60%" stop-color="#44d662"/>
+                <stop offset="80%" stop-color="#2ec8ff"/>
+                <stop offset="100%" stop-color="#a259ff"/>
+              </linearGradient>
+            </defs>
+            <!-- Subtle extruded comic shadow in celebration mode -->
+            <text
+              id="paper-letter-shadow"
+              class="paper-letter-shadow"
+              x="124"
+              y="164"
+              font-size="168"
+              text-anchor="middle"
+            >D</text>
+            <!-- Main Target Letter -->
+            <text
+              id="paper-letter-text"
+              class="paper-letter-text"
+              x="118"
+              y="158"
+              font-size="168"
+              text-anchor="middle"
+            >D</text>
+          </svg>
+
+          <p id="paper-phrase" class="paper-phrase">D is for Dog!</p>
+        </div>
+
+        <!-- Dynamic Cartoon Character Bounding Onto the Paper! -->
+        <div id="critter-stage" class="critter-stage"></div>
+      </div>
+
+      <!-- LOWER STAGE: HERMES THE 1930s RUBBER-HOSE CARTOON TYPEWRITER -->
+      <div class="hermes-typewriter">
+        <svg class="hermes-svg" aria-hidden="true" viewBox="0 0 860 450">
+          <!-- CHEERING RUBBER-HOSE ARMS (Visible on Success!) -->
+          <g class="arms-celebrating">
+            <!-- Left Arm Raised High -->
+            <path d="M188,242 C112,216 86,126 76,68" fill="none" stroke="#181818" stroke-width="26" stroke-linecap="round"/>
+            <path d="M182,236 C116,210 92,128 82,74" fill="none" stroke="#4a4a4a" stroke-width="4" stroke-linecap="round"/>
+            <!-- Left Open Cheering White Cartoon Glove -->
+            <g transform="translate(68, 48) rotate(-24)" stroke="#181818" stroke-width="4.5" stroke-linejoin="round">
+              <ellipse cx="0" cy="26" rx="22" ry="12" fill="#ffffff"/>
+              <path d="M-20,20 L-38,-6 C-44,-18 -26,-26 -18,-12 L-10,4 L-14,-24 C-16,-38 4,-38 4,-22 L6,2 L16,-22 C22,-36 40,-28 32,-12 L20,8 L36,-4 C48,-12 56,6 42,16 L18,26 Z" fill="#ffffff"/>
+              <path d="M-8,10 L-10,20 M4,10 L4,20 M14,12 L12,21" fill="none" stroke-width="3.2" stroke-linecap="round"/>
+            </g>
+
+            <!-- Right Arm Raised High -->
+            <path d="M672,242 C748,216 774,126 784,68" fill="none" stroke="#181818" stroke-width="26" stroke-linecap="round"/>
+            <path d="M678,236 C744,210 768,128 778,74" fill="none" stroke="#4a4a4a" stroke-width="4" stroke-linecap="round"/>
+            <!-- Right Open Cheering White Cartoon Glove -->
+            <g transform="translate(792, 48) rotate(24) scale(-1, 1)" stroke="#181818" stroke-width="4.5" stroke-linejoin="round">
+              <ellipse cx="0" cy="26" rx="22" ry="12" fill="#ffffff"/>
+              <path d="M-20,20 L-38,-6 C-44,-18 -26,-26 -18,-12 L-10,4 L-14,-24 C-16,-38 4,-38 4,-22 L6,2 L16,-22 C22,-36 40,-28 32,-12 L20,8 L36,-4 C48,-12 56,6 42,16 L18,26 Z" fill="#ffffff"/>
+              <path d="M-8,10 L-10,20 M4,10 L4,20 M14,12 L12,21" fill="none" stroke-width="3.2" stroke-linecap="round"/>
+            </g>
+          </g>
+
+          <!-- MAIN VINTAGE HERMES BODY CHASSIS -->
+          <g stroke="#181818" stroke-width="5.2" stroke-linejoin="round" stroke-linecap="round">
+            <!-- Red/Dark Base Trim Cushion -->
+            <rect x="144" y="408" width="572" height="26" rx="13" class="tw-base-pad"/>
+            <!-- Outer Lower Chassis Shell -->
+            <path d="M174,154 C180,104 222,92 276,92 L584,92 C638,92 680,104 686,154 L728,368 C734,404 712,418 674,418 L186,418 C148,418 126,404 132,368 Z" class="tw-body-main"/>
+            <!-- Upper Hood Crown Highlight -->
+            <path d="M196,156 C204,114 236,102 284,102 L576,102 C624,102 656,114 664,156 C666,176 648,192 616,192 L244,192 C212,192 194,176 196,156 Z" class="tw-body-hood"/>
+            <!-- Typebar Basket Cutout Arc behind Nose -->
+            <path d="M336,138 C366,116 494,116 524,138 C504,154 356,154 336,138 Z" class="tw-platen"/>
+            <!-- Front Ribbon Cover Panel & HERMES Script Emblem -->
+            <rect x="196" y="196" width="468" height="58" rx="16" class="tw-front-panel"/>
+            <!-- Left & Right Chrome Latches -->
+            <rect x="222" y="208" width="12" height="34" rx="5" class="tw-metal"/>
+            <rect x="626" y="208" width="12" height="34" rx="5" class="tw-metal"/>
+            <!-- Recessed Dark Keyboard Well -->
+            <path d="M184,264 L676,264 L702,392 C704,402 694,406 680,406 L180,406 C166,406 156,402 158,392 Z" class="tw-keywell"/>
+          </g>
+
+          <!-- HERMES VINTAGE SCRIPT BADGE -->
+          <text x="430" y="236" font-size="34" text-anchor="middle" class="hermes-logo-text">HERMES</text>
+
+          <!-- HERMES' EXPRESSIVE 1930s CARTOON FACE -->
+          <g class="hermes-face" stroke="#181818" stroke-linecap="round" stroke-linejoin="round">
+            <!-- Rosy Cheeks -->
+            <ellipse cx="338" cy="158" rx="22" ry="13" class="tw-cheek" stroke="none"/>
+            <ellipse cx="522" cy="158" rx="22" ry="13" class="tw-cheek" stroke="none"/>
+
+            <!-- PROMPTING & CELEBRATING OPEN PIE-CUT EYES -->
+            <g class="eyes-open">
+              <!-- Eyebrows -->
+              <path class="brow-left" d="M362,64 Q388,48 412,62" fill="none" stroke-width="6.5"/>
+              <path class="brow-right" d="M448,62 Q472,48 498,64" fill="none" stroke-width="6.5"/>
+              <!-- Sclera Ovals -->
+              <ellipse cx="392" cy="112" rx="30" ry="42" fill="#ffffff" stroke-width="5.2"/>
+              <ellipse cx="468" cy="112" rx="30" ry="42" fill="#ffffff" stroke-width="5.2"/>
+              <!-- 1930s Pie-Cut Pupils (Shift slightly up when prompting!) -->
+              <g class="pupils-group">
+                <ellipse cx="395" cy="104" rx="15" ry="22" fill="#181818" stroke="none"/>
+                <polygon points="395,104 414,92 414,108" fill="#ffffff" stroke="none"/>
+                <ellipse cx="465" cy="104" rx="15" ry="22" fill="#181818" stroke="none"/>
+                <polygon points="465,104 484,92 484,108" fill="#ffffff" stroke="none"/>
+              </g>
+            </g>
+
+            <!-- BUZZING / OOPS SQUINTING EYES (> <) -->
+            <g class="eyes-buzz" fill="none" stroke-width="7.5">
+              <path d="M366,94 L412,114 L366,132"/>
+              <path d="M494,94 L448,114 L494,132"/>
+              <!-- Comic Sweat Drop -->
+              <path d="M538,84 C528,104 534,118 544,118 C554,118 560,104 538,84 Z" fill="#ffffff" stroke-width="4.5"/>
+            </g>
+
+            <!-- Cute Button Nose -->
+            <ellipse cx="430" cy="144" rx="12" ry="9" class="tw-nose" stroke-width="4.5"/>
+
+            <!-- Mouth State 1: Gentle Curious Prompting Smile -->
+            <g class="mouth-prompt" fill="none" stroke-width="5.2">
+              <path d="M386,162 Q430,186 474,162"/>
+              <path d="M380,156 Q384,164 392,166 M480,156 Q476,164 468,166" stroke-width="4.2"/>
+            </g>
+
+            <!-- Mouth State 2: Joyful Celebrating Laugh! -->
+            <g class="mouth-celebrate" stroke-width="5">
+              <path d="M376,154 C384,198 476,198 484,154 Q430,164 376,154 Z" fill="#701924"/>
+              <path d="M398,180 C412,166 448,166 462,180 C448,192 412,192 398,180 Z" fill="#ff758f" stroke="none"/>
+            </g>
+
+            <!-- Mouth State 3: Silly Wavy Buzz Mouth -->
+            <path class="mouth-buzz" d="M392,170 Q406,158 418,170 T444,170 T470,170" fill="none" stroke-width="5.5"/>
+          </g>
+
+          <!-- PROMPTING / POISED RUBBER-HOSE ARMS (Curved to Keyboard in B&W!) -->
+          <g class="arms-prompting">
+            <!-- Left Curved Rubber-Hose Arm -->
+            <path d="M158,248 C68,252 64,334 152,338" fill="none" stroke="#181818" stroke-width="25" stroke-linecap="round"/>
+            <path d="M154,244 C78,248 74,328 148,334" fill="none" stroke="#525252" stroke-width="3.5" stroke-linecap="round"/>
+            <!-- Left Poised Cartoon Glove -->
+            <g class="glove-left" transform="translate(154, 318)" stroke="#181818" stroke-width="4.4" stroke-linejoin="round">
+              <ellipse cx="0" cy="14" rx="14" ry="20" transform="rotate(-18)" fill="#ffffff"/>
+              <path d="M8,-2 C28,-6 48,4 54,22 C48,30 34,26 26,18 L34,34 C28,42 14,36 10,24 L10,36 C2,42 -10,34 -8,22 C-20,24 -24,10 -14,2 Z" fill="#ffffff"/>
+              <path d="M2,8 L14,12 M-2,16 L10,20" fill="none" stroke-width="3"/>
+            </g>
+
+            <!-- Right Curved Rubber-Hose Arm -->
+            <path d="M702,248 C792,252 796,334 708,338" fill="none" stroke="#181818" stroke-width="25" stroke-linecap="round"/>
+            <path d="M706,244 C782,248 786,328 712,334" fill="none" stroke="#525252" stroke-width="3.5" stroke-linecap="round"/>
+            <!-- Right Poised Cartoon Glove -->
+            <g class="glove-right" transform="translate(706, 318) scale(-1, 1)" stroke="#181818" stroke-width="4.4" stroke-linejoin="round">
+              <ellipse cx="0" cy="14" rx="14" ry="20" transform="rotate(-18)" fill="#ffffff"/>
+              <path d="M8,-2 C28,-6 48,4 54,22 C48,30 34,26 26,18 L34,34 C28,42 14,36 10,24 L10,36 C2,42 -10,34 -8,22 C-20,24 -24,10 -14,2 Z" fill="#ffffff"/>
+              <path d="M2,8 L14,12 M-2,16 L10,20" fill="none" stroke-width="3"/>
+            </g>
+          </g>
+        </svg>
+
+        <!-- INTERACTIVE VINTAGE ROUND QWERTY KEYBOARD OVERLAY ON HERMES' DECK -->
+        <div id="typewriter-keys" class="typewriter-keys" role="group" aria-label="On-screen typewriter keys"></div>
+      </div>
+    </div>
+  </main>
+
+  <script defer src="js/words.js"></script>
+  <script defer src="js/illustrations.js"></script>
+  <script defer src="js/audio.js"></script>
+  <script defer src="js/app.js"></script>
+</body>
+</html>

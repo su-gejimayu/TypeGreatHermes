@@ -1,0 +1,1263 @@
+@layer base, theme, layout, components, states, utilities;
+
+@layer theme {
+  :root {
+    --font-display: 'Fredoka', 'Arial Rounded MT Bold', 'Avenir Next Rounded',
+      'Chalkboard SE', 'Trebuchet MS', system-ui, sans-serif;
+
+    --ink: #181818;
+    --paper-bw: #fbfbf9;
+    --paper-color: #fff8e6;
+
+    --bw-bg-center: #f4f3ee;
+    --bw-bg-edge: #d8d6ce;
+
+    --hermes-mint: #7fd4be;
+    --hermes-mint-light: #abf0dc;
+    --hermes-mint-deep: #54b399;
+    --hermes-coral: #e84b3c;
+    --hermes-sun-teal: #34beb9;
+    --hermes-sun-gold: #ffd247;
+    --hermes-sun-amber: #ffab38;
+
+    --accent-hue: 36;
+
+    --in-oklab: ;
+    --in-oklch: ;
+  }
+
+  @supports (background: linear-gradient(in oklab, white, black)) {
+    :root {
+      --in-oklab: in oklab;
+      --in-oklch: in oklch;
+    }
+  }
+}
+
+@layer base {
+  html,
+  body,
+  header,
+  main,
+  div,
+  h1,
+  h2,
+  p,
+  button,
+  select,
+  input,
+  svg {
+    box-sizing: border-box;
+    margin: 0;
+  }
+
+  html,
+  body {
+    inline-size: 100%;
+    block-size: 100dvh;
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+    font-family: var(--font-display);
+    line-height: 1.2;
+    color: var(--ink);
+    background-color: var(--bw-bg-center);
+  }
+
+  button,
+  select,
+  input {
+    font: inherit;
+    color: inherit;
+  }
+
+  :where(button, select, input):focus-visible {
+    outline: 3px solid #ff245f;
+    outline-offset: 3px;
+  }
+}
+
+@layer layout {
+  /* LAYER 0: Black & White Prompting Backdrop */
+  .bg-bw {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background: radial-gradient(
+      circle at 50% 45% var(--in-oklab),
+      var(--bw-bg-center) 38%,
+      var(--bw-bg-edge) 100%
+    );
+  }
+
+  /* Vintage Ben-Day Comic Halftone Dot Corners (matches left panel of mockup!) */
+  .halftone-vignette {
+    position: absolute;
+    inset: 0;
+    --dot-gap: 0.42rem;
+    --dot-r: 0.13rem;
+    --dot-layer: radial-gradient(
+      circle,
+      rgb(24 24 24 / 0.36) var(--dot-r),
+      transparent calc(var(--dot-r) + 1px)
+    );
+    background:
+      var(--dot-layer) 0 0,
+      var(--dot-layer) var(--dot-gap) var(--dot-gap);
+    background-size: calc(var(--dot-gap) * 2) calc(var(--dot-gap) * 2);
+    mask-image: radial-gradient(
+      ellipse 72% 68% at 50% 50%,
+      transparent 52%,
+      #000 100%
+    );
+  }
+
+  /* LAYER 1: Radial Colour Burst Backdrop */
+  .bg-color-burst {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    isolation: isolate;
+    clip-path: circle(0% at 50% 40%);
+    transition: clip-path 0.58s cubic-bezier(0.16, 1, 0.3, 1);
+
+    @media (prefers-reduced-motion: reduce) {
+      clip-path: none;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+  }
+
+  .sunburst-rays {
+    position: absolute;
+    inset: -45vmax;
+    background:
+      radial-gradient(
+        circle at 50% 50% var(--in-oklab),
+        rgb(255 248 214 / 0.65) 0%,
+        transparent 42%
+      ),
+      repeating-conic-gradient(
+        from 0deg,
+        var(--hermes-sun-teal) 0deg 11.25deg,
+        var(--hermes-sun-gold) 11.25deg 22.5deg
+      );
+    animation: slow-sun-spin 36s linear infinite;
+    animation-play-state: paused;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+
+  .confetti-layer {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+
+  /* TOP MINIMALIST HUD */
+  .top-hud {
+    position: fixed;
+    inset-block-start: 0;
+    inset-inline: 0;
+    z-index: 20;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: start;
+    padding-block: clamp(0.65rem, 1.8dvh, 1.25rem);
+    padding-inline: clamp(0.75rem, 2.2dvw, 1.6rem);
+    pointer-events: none;
+  }
+
+  .hud-left,
+  .hud-right,
+  .prompt-banner {
+    pointer-events: auto;
+  }
+
+  .hud-left {
+    display: flex;
+    gap: 0.5rem;
+    justify-self: start;
+  }
+
+  .hud-right {
+    display: flex;
+    justify-self: end;
+  }
+
+  /* MAIN STAGE */
+  .game-stage {
+    position: relative;
+    z-index: 5;
+    inline-size: 100%;
+    block-size: 100dvh;
+    display: grid;
+    place-items: end center;
+    padding-block-start: clamp(3.4rem, 9dvh, 5.4rem);
+    padding-block-end: clamp(0.35rem, 1.4dvh, 1rem);
+    padding-inline: 1rem;
+  }
+
+  .scene-rig {
+    position: relative;
+    aspect-ratio: 860 / 750;
+    block-size: min(86dvh, calc(94dvw * 750 / 860), 47rem);
+    inline-size: auto;
+    container-type: size;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+  }
+}
+
+@layer components {
+  /* HUD Buttons */
+  .icon-btn {
+    display: inline-grid;
+    place-items: center;
+    min-inline-size: 2.85rem;
+    min-block-size: 2.85rem;
+    padding: 0.45rem;
+    border: 3px solid var(--ink);
+    border-radius: 0.65rem;
+    background: var(--paper-bw);
+    box-shadow: 0 3px 0 var(--ink);
+    cursor: pointer;
+    transition:
+      transform 0.14s ease,
+      background-color 0.2s ease,
+      opacity 0.2s ease;
+
+    @media (pointer: coarse) {
+      min-inline-size: 3.25rem;
+      min-block-size: 3.25rem;
+    }
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      background: #ffffff;
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 var(--ink);
+    }
+  }
+
+  /* Keep parent controls subtle so 4yo focuses on the center letter */
+  .hud-left .icon-btn {
+    opacity: 0.62;
+
+    &:hover,
+    &:focus-visible {
+      opacity: 1;
+    }
+  }
+
+  .icon-svg {
+    inline-size: 1.5rem;
+    block-size: 1.5rem;
+  }
+
+  .icon-sound-off,
+  .icon-fs-exit {
+    display: none;
+  }
+
+  #sound-toggle-btn[aria-pressed='false'] {
+    background: #ffe3e3;
+
+    & .icon-sound-on {
+      display: none;
+    }
+    & .icon-sound-off {
+      display: block;
+    }
+  }
+
+  body.is-fullscreen {
+    & .icon-fs-enter {
+      display: none;
+    }
+    & .icon-fs-exit {
+      display: block;
+    }
+  }
+
+  /* Top Prompt Heading ("Type: D") */
+  .prompt-banner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    text-align: center;
+  }
+
+  .prompt-heading {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    padding-block: 0.22rem;
+    padding-inline: 1.15rem;
+    border-radius: 999px;
+    font-size: clamp(1.75rem, 1.1rem + 2.8vmin, 3.1rem);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: var(--ink);
+    background: rgb(255 255 255 / 0.86);
+    border: 3px solid var(--ink);
+    box-shadow: 0 4px 0 var(--ink);
+    transition:
+      transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+      opacity 0.2s ease,
+      background-color 0.25s ease;
+  }
+
+  .prompt-target-char {
+    font-size: 1.12em;
+    font-weight: 700;
+  }
+
+  .buzz-feedback {
+    padding-block: 0.2rem;
+    padding-inline: 0.85rem;
+    border-radius: 999px;
+    background: var(--ink);
+    color: #ffffff;
+    font-size: clamp(0.95rem, 0.75rem + 1.1vmin, 1.35rem);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  /* Native Popover Parent Settings */
+  .options-popover {
+    inset: auto;
+    inset-block-start: 4.2rem;
+    inset-inline-start: 1rem;
+    inline-size: min(19rem, 90dvw);
+    padding: 1.1rem;
+    border: 3.5px solid var(--ink);
+    border-radius: 1rem;
+    background: #ffffff;
+    box-shadow: 0 8px 0 var(--ink), 0 16px 32px rgb(0 0 0 / 0.2);
+    opacity: 0;
+    transform: translateY(-8px) scale(0.97);
+    transition:
+      opacity 0.18s ease-out,
+      transform 0.18s ease-out,
+      display 0.18s allow-discrete,
+      overlay 0.18s allow-discrete;
+
+    &:popover-open {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+
+      @starting-style {
+        opacity: 0;
+        transform: translateY(-8px) scale(0.97);
+      }
+    }
+  }
+
+  .options-title {
+    font-size: 1.25rem;
+    margin-block-end: 0.8rem;
+    padding-block-end: 0.4rem;
+    border-block-end: 2px dashed rgb(24 24 24 / 0.2);
+  }
+
+  .options-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    margin-block-end: 0.75rem;
+  }
+
+  .options-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .options-label {
+    font-size: 0.98rem;
+    font-weight: 600;
+  }
+
+  .options-select {
+    padding: 0.42rem 0.6rem;
+    border: 2.5px solid var(--ink);
+    border-radius: 0.55rem;
+    background: #f7f7f4;
+    cursor: pointer;
+  }
+
+  .options-check {
+    inline-size: 1.35rem;
+    block-size: 1.35rem;
+    accent-color: #26a688;
+    cursor: pointer;
+  }
+
+  .skip-btn {
+    inline-size: 100%;
+    margin-block-start: 0.25rem;
+    padding: 0.55rem 0.9rem;
+    border: 2.5px solid var(--ink);
+    border-radius: 0.65rem;
+    background: var(--hermes-sun-gold);
+    box-shadow: 0 3px 0 var(--ink);
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+
+    &:hover {
+      background: #ffe066;
+    }
+    &:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 var(--ink);
+    }
+  }
+
+  /* B&W Starburst & Rainbow Arcs behind Paper */
+  .bw-paper-burst {
+    position: absolute;
+    inset-block-start: 0;
+    inline-size: 92%;
+    max-block-size: 62%;
+    z-index: 1;
+    pointer-events: none;
+    transition: opacity 0.28s ease, transform 0.35s ease;
+  }
+
+  .color-rainbow-arcs {
+    position: absolute;
+    inset-block-start: -2%;
+    inline-size: 100%;
+    max-block-size: 66%;
+    z-index: 2;
+    pointer-events: none;
+    opacity: 0;
+    transform: scale(0.6);
+    transition:
+      opacity 0.25s ease,
+      transform 0.52s cubic-bezier(0.22, 1.35, 0.4, 1);
+
+    @media (prefers-reduced-motion: reduce) {
+      transform: none;
+    }
+  }
+
+  /* Back Carriage Layer (Platen & Knobs behind Paper) */
+  .hermes-carriage-back {
+    position: absolute;
+    inset-block-end: 0;
+    inset-inline: 0;
+    inline-size: 100%;
+    aspect-ratio: 860 / 450;
+    z-index: 2;
+    pointer-events: none;
+    overflow: visible;
+  }
+
+  /* PAPER STAGE (Sandwiched in front of Platen, behind Hermes' Hood!) */
+  .paper-stage {
+    position: absolute;
+    inset-block-start: 2%;
+    inline-size: 46%;
+    block-size: 54%;
+    z-index: 3;
+    display: flex;
+    justify-content: center;
+  }
+
+  .paper-sheet {
+    position: relative;
+    inline-size: 100%;
+    block-size: 100%;
+    background: var(--paper-bw);
+    border: 4px solid var(--ink);
+    border-radius: 0.35rem 1.8rem 0.25rem 0.25rem;
+    box-shadow:
+      -6px 8px 0 rgb(24 24 24 / 0.14),
+      inset 0 -18px 24px rgb(0 0 0 / 0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding-block-start: 3%;
+    padding-inline: 0.65rem;
+    cursor: pointer;
+    transform-origin: 50% 100%;
+    transition:
+      background-color 0.35s ease,
+      transform 0.38s cubic-bezier(0.22, 1.3, 0.36, 1);
+  }
+
+  /* Folded Dog-Ear Corner at Top-Right of Paper */
+  .paper-dogear {
+    position: absolute;
+    inset-block-start: -4px;
+    inset-inline-end: -4px;
+    inline-size: clamp(1.5rem, 4.4cqi, 2.35rem);
+    block-size: clamp(1.5rem, 4.4cqi, 2.35rem);
+    background:
+      linear-gradient(
+        225deg,
+        transparent 47%,
+        var(--ink) 48% 54%,
+        #dfded8 55%
+      );
+    border-end-start-radius: 0.35rem;
+    pointer-events: none;
+  }
+
+  .paper-letter-svg {
+    inline-size: 80%;
+    max-block-size: 62%;
+    overflow: visible;
+    transition: transform 0.42s cubic-bezier(0.24, 1.48, 0.42, 1);
+  }
+
+  .paper-letter-text {
+    font-family: var(--font-display);
+    font-weight: 700;
+    paint-order: stroke fill;
+    fill: #ffffff;
+    stroke: var(--ink);
+    stroke-width: 11px;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+  }
+
+  .paper-letter-shadow {
+    font-family: var(--font-display);
+    font-weight: 700;
+    fill: var(--ink);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .paper-phrase {
+    margin-block-start: -0.25rem;
+    font-size: clamp(0.95rem, 3.1cqi, 1.8rem);
+    font-weight: 700;
+    text-align: center;
+    color: var(--ink);
+    opacity: 0;
+    transform: translateY(8px) scale(0.88);
+    transition:
+      opacity 0.25s ease 0.08s,
+      transform 0.38s cubic-bezier(0.24, 1.48, 0.42, 1) 0.08s;
+  }
+
+  /* Dynamic Cartoon Character Bounding Onto Upper-Right of Paper! */
+  .critter-stage {
+    position: absolute;
+    inset-block-start: -5%;
+    inset-inline-end: -36%;
+    inline-size: clamp(7rem, 28cqi, 15rem);
+    aspect-ratio: 1;
+    z-index: 8;
+    pointer-events: none;
+    opacity: 0;
+    transform: translate(24px, 28px) scale(0.25) rotate(12deg);
+    transition:
+      opacity 0.22s ease,
+      transform 0.5s cubic-bezier(0.22, 1.45, 0.38, 1);
+
+    @media (prefers-reduced-motion: reduce) {
+      transform: none;
+    }
+  }
+
+  .critter-svg {
+    inline-size: 100%;
+    block-size: 100%;
+    overflow: visible;
+  }
+
+  /* COMIC CALLOUT STICKERS ("DING!", "YAY!", "WOOF!", "BARK!") */
+  .callout-badge {
+    position: absolute;
+    z-index: 9;
+    pointer-events: none;
+    font-size: clamp(1.8rem, 1rem + 3.8vmin, 3.6rem);
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    -webkit-text-stroke: 6px var(--ink);
+    paint-order: stroke fill;
+    filter: drop-shadow(0 5px 0 var(--ink));
+    opacity: 0;
+    transform: scale(0.3);
+    transition:
+      opacity 0.2s ease,
+      transform 0.45s cubic-bezier(0.22, 1.5, 0.38, 1);
+
+    @media (prefers-reduced-motion: reduce) {
+      transform: none;
+    }
+  }
+
+  .callout-ding {
+    inset-block-start: 20%;
+    inset-inline-start: 4%;
+    color: #4bd6ff;
+    rotate: -14deg;
+  }
+
+  .callout-yay {
+    inset-block-start: 22%;
+    inset-inline-end: 2%;
+    color: #ff5ca8;
+    rotate: 12deg;
+  }
+
+  .callout-burst {
+    position: absolute;
+    z-index: 9;
+    pointer-events: none;
+    padding: 0.7rem 1.25rem;
+    border: 4px solid var(--ink);
+    border-radius: 999px;
+    font-size: clamp(1.25rem, 0.85rem + 2.2vmin, 2.25rem);
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    color: #ffffff;
+    -webkit-text-stroke: 4.5px var(--ink);
+    paint-order: stroke fill;
+    box-shadow: 0 5px 0 var(--ink);
+    opacity: 0;
+    transform: scale(0.3);
+    transition:
+      opacity 0.2s ease 0.1s,
+      transform 0.46s cubic-bezier(0.22, 1.5, 0.38, 1) 0.1s;
+
+    @media (prefers-reduced-motion: reduce) {
+      transform: none;
+    }
+  }
+
+  .callout-left {
+    inset-block-end: 18%;
+    inset-inline-start: 1%;
+    background: #ff6b4a;
+    color: #ffe853;
+    rotate: -15deg;
+  }
+
+  .callout-right {
+    inset-block-end: 18%;
+    inset-inline-end: 1%;
+    background: #ffa62b;
+    color: #52e3ff;
+    rotate: 14deg;
+  }
+
+  .callout-buzz {
+    position: absolute;
+    inset-block-start: 18%;
+    inset-inline-end: 10%;
+    z-index: 12;
+    pointer-events: none;
+    padding: 0.35rem 0.95rem;
+    background: #ffffff;
+    color: var(--ink);
+    border: 4px solid var(--ink);
+    border-radius: 0.65rem;
+    box-shadow: 0 4px 0 var(--ink);
+    font-size: clamp(1.3rem, 0.9rem + 2vmin, 2.1rem);
+    font-weight: 700;
+    rotate: 10deg;
+    opacity: 0;
+    transform: scale(0.4);
+    transition: opacity 0.14s ease, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /* HERMES TYPEWRITER LOWER STAGE */
+  .hermes-typewriter {
+    position: relative;
+    z-index: 5;
+    inline-size: 100%;
+    aspect-ratio: 860 / 450;
+    flex-shrink: 0;
+  }
+
+  .hermes-svg {
+    inline-size: 100%;
+    block-size: 100%;
+    display: block;
+    overflow: visible;
+    filter: drop-shadow(0 8px 0 rgb(24 24 24 / 0.18));
+  }
+
+  /* Default B&W Typewriter Fills (Prompting / Buzzing) */
+  .tw-body-main {
+    fill: #c9c9c4;
+    transition: fill 0.32s ease;
+  }
+  .tw-body-hood {
+    fill: #deded9;
+    transition: fill 0.32s ease;
+  }
+  .tw-front-panel {
+    fill: #d4d4cf;
+    transition: fill 0.32s ease;
+  }
+  .tw-knob {
+    fill: #969691;
+    transition: fill 0.32s ease;
+  }
+  .tw-metal {
+    fill: #ececea;
+  }
+  .tw-platen {
+    fill: #3b3b39;
+  }
+  .tw-keywell {
+    fill: #2c2d2c;
+  }
+  .tw-base-pad {
+    fill: #4f4f4c;
+    transition: fill 0.32s ease;
+  }
+  .tw-nose {
+    fill: #b8b8b2;
+    transition: fill 0.32s ease;
+  }
+  .tw-cheek {
+    fill: #a8a8a2;
+    opacity: 0.35;
+    transition: fill 0.32s ease, opacity 0.32s ease;
+  }
+
+  .hermes-logo-text {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-style: italic;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    fill: #8d8d88;
+    stroke: var(--ink);
+    stroke-width: 1.4px;
+    opacity: 0.55;
+    transition: fill 0.32s ease, opacity 0.32s ease;
+  }
+
+  /* Default Face & Arm Visibility (Prompting) */
+  .eyes-buzz,
+  .mouth-celebrate,
+  .mouth-buzz,
+  .arms-celebrating {
+    display: none;
+  }
+
+  .eyes-open {
+    transform-origin: 430px 112px;
+    animation: natural-blink 5.2s infinite;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+
+  .glove-left {
+    animation: glove-hover-l 2.2s ease-in-out infinite;
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+
+  .glove-right {
+    animation: glove-hover-r 2.2s ease-in-out infinite 0.4s;
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+
+  /* INTERACTIVE ROUND VINTAGE TYPEWRITER KEYS ON HERMES' DECK */
+  .typewriter-keys {
+    position: absolute;
+    inset-inline: 23.5%;
+    inset-block: 60% 10.5%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.25cqi;
+    padding-block: 0.1rem;
+    pointer-events: none;
+
+    &.has-number-row {
+      gap: 0.12cqi;
+      & .tw-key {
+        inline-size: clamp(0.85rem, 3.2cqi, 1.78rem);
+        font-size: clamp(0.44rem, 1.32cqi, 0.76rem);
+      }
+      & .tw-spacebar {
+        block-size: clamp(0.46rem, 1.35cqi, 0.78rem);
+      }
+    }
+  }
+
+  .key-row {
+    display: flex;
+    justify-content: center;
+    gap: clamp(0.12rem, 0.65cqi, 0.38rem);
+    inline-size: 100%;
+  }
+
+  .tw-key {
+    pointer-events: auto;
+    position: relative;
+    inline-size: clamp(1rem, 4.05cqi, 2.22rem);
+    aspect-ratio: 1;
+    padding: 0;
+    border: 2.3px solid var(--ink);
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #ffffff, #d5d5d0);
+    box-shadow: 0 3px 0 var(--ink);
+    font-size: clamp(0.5rem, 1.65cqi, 0.92rem);
+    font-weight: 700;
+    line-height: 1;
+    color: var(--ink);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    transition:
+      transform 0.08s ease,
+      background 0.3s ease,
+      box-shadow 0.08s ease;
+
+    &:hover:not(:disabled) {
+      background: #ffffff;
+    }
+
+    &:active:not(:disabled),
+    &.is-pressed {
+      transform: translateY(3px);
+      box-shadow: 0 0 0 var(--ink);
+    }
+
+    &.is-hint {
+      background: #ffffff;
+      outline: 3px solid var(--ink);
+      outline-offset: 2px;
+      z-index: 2;
+      animation: key-hint-pulse 0.9s ease-in-out infinite;
+
+      @media (prefers-reduced-motion: reduce) {
+        animation: none;
+        background: #ffe03b;
+      }
+    }
+  }
+
+  .tw-spacebar {
+    inline-size: 46%;
+    block-size: clamp(0.58rem, 1.75cqi, 1.02rem);
+    border: 2.5px solid var(--ink);
+    border-radius: 999px;
+    background: #cfcfca;
+    box-shadow: 0 3px 0 var(--ink);
+    transition: background-color 0.3s ease, transform 0.08s ease;
+
+    &.is-pressed {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 var(--ink);
+    }
+  }
+
+  /* Confetti & Musical Notes Particles */
+  .confetti-piece {
+    position: absolute;
+    inset-block-start: 42%;
+    inset-inline-start: 50%;
+    font-size: clamp(1.2rem, 2.8vmin, 2.2rem);
+    font-weight: 700;
+    color: var(--p-color, #ffe03b);
+    -webkit-text-stroke: 2px var(--ink);
+    paint-order: stroke fill;
+    pointer-events: none;
+    animation: confetti-fly var(--p-dur, 1.6s) cubic-bezier(0.14, 0.85, 0.32, 1) forwards;
+
+    @media (prefers-reduced-motion: reduce) {
+      display: none;
+    }
+  }
+}
+
+@layer states {
+  /* =========================================================
+     STATE: PAPER FEED ENTRANCE
+     ========================================================= */
+  .paper-sheet.is-feeding {
+    animation: paper-slide-up 0.38s cubic-bezier(0.22, 1.28, 0.36, 1);
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+
+  /* =========================================================
+     STATE: BUZZING (Incorrect Key — Black & White + Shake!)
+     ========================================================= */
+  body[data-state='buzzing'] {
+    & .scene-rig {
+      animation: comic-buzz-shake 0.42s ease-in-out;
+
+      @media (prefers-reduced-motion: reduce) {
+        animation: none;
+      }
+    }
+
+    & .prompt-heading {
+      background: #ffffff;
+      animation: comic-buzz-shake 0.4s ease-in-out;
+
+      @media (prefers-reduced-motion: reduce) {
+        animation: none;
+      }
+    }
+
+    & .eyes-open,
+    & .mouth-prompt {
+      display: none;
+    }
+
+    & .eyes-buzz,
+    & .mouth-buzz {
+      display: block;
+    }
+
+    & .callout-buzz {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  /* =========================================================
+     STATE: CELEBRATING (Correct Key — BURST OF COLOUR!)
+     ========================================================= */
+  body[data-state='celebrating'] {
+    & .bg-color-burst {
+      clip-path: circle(150% at 50% 40%);
+
+      @media (prefers-reduced-motion: reduce) {
+        opacity: 1;
+      }
+    }
+
+    & .sunburst-rays {
+      animation-play-state: running;
+    }
+
+    & .bw-paper-burst {
+      opacity: 0;
+      transform: scale(1.15);
+    }
+
+    & .color-rainbow-arcs {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    & .prompt-heading {
+      background: #ffe042;
+      transform: scale(1.06);
+    }
+
+    /* Paper & Rainbow Letter */
+    & .paper-sheet {
+      background: var(--paper-color);
+      transform: translateY(-2%) scale(1.03);
+    }
+
+    & .paper-letter-svg {
+      transform: translateX(-10%) scale(1.06) rotate(-3deg);
+    }
+
+    & .paper-letter-text {
+      fill: url(#rainbow-letter-grad);
+      stroke-width: 12px;
+    }
+
+    & .paper-letter-shadow {
+      opacity: 1;
+    }
+
+    & .paper-phrase {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    /* Leaping Critter */
+    & .critter-stage {
+      opacity: 1;
+      transform: translate(0, 0) scale(1) rotate(-4deg);
+    }
+
+    /* Comic Callouts */
+    & .callout-badge,
+    & .callout-burst {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* Hermes Seafoam-Mint Transformation! */
+    & .tw-body-main {
+      fill: var(--hermes-mint);
+    }
+    & .tw-body-hood {
+      fill: var(--hermes-mint-light);
+    }
+    & .tw-front-panel {
+      fill: #8de0c9;
+    }
+    & .tw-knob,
+    & .tw-base-pad {
+      fill: var(--hermes-coral);
+    }
+    & .tw-nose {
+      fill: var(--hermes-mint-deep);
+    }
+    & .tw-cheek {
+      fill: #ff7a8a;
+      opacity: 0.88;
+    }
+    & .hermes-logo-text {
+      fill: var(--hermes-coral);
+      opacity: 1;
+    }
+
+    /* Cheering Face & Raised Rubber-Hose Arms! */
+    & .arms-prompting,
+    & .mouth-prompt,
+    & .eyes-buzz,
+    & .mouth-buzz {
+      display: none;
+    }
+
+    & .arms-celebrating,
+    & .mouth-celebrate {
+      display: block;
+    }
+
+    & .arms-celebrating {
+      transform-origin: 430px 260px;
+      animation: arms-cheer-bounce 0.55s ease-in-out infinite alternate;
+
+      @media (prefers-reduced-motion: reduce) {
+        animation: none;
+      }
+    }
+
+    & .pupils-group {
+      transform: translateY(5px);
+    }
+
+    /* Mint Keycaps & Coral Accent Keys */
+    & .tw-key {
+      background: radial-gradient(circle at 35% 30%, #dcfff4, #8adbc4);
+    }
+    & .tw-key.is-target-celebrate {
+      background: radial-gradient(circle at 35% 30%, #ffe863, #ff7b3b);
+      transform: translateY(-2px) scale(1.14);
+    }
+    & .tw-spacebar {
+      background: #8adbc4;
+    }
+  }
+
+  /* Secondary SVG Critter Idle Animations */
+  .anim-wag {
+    animation: critter-wag 0.45s ease-in-out infinite alternate;
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+
+  .anim-flap {
+    animation: critter-flap 0.5s ease-in-out infinite alternate;
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+
+  .anim-bob {
+    animation: critter-bob 0.65s ease-in-out infinite alternate;
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+
+  .anim-twinkle {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: critter-twinkle 0.7s ease-in-out infinite alternate;
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+}
+
+@layer utilities {
+  .visually-hidden:where(:not(:focus-within, :active)) {
+    position: absolute !important;
+    clip-path: inset(50%) !important;
+    overflow: hidden !important;
+    width: 1px !important;
+    height: 1px !important;
+    margin: -1px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    white-space: nowrap !important;
+  }
+}
+
+/* =========================================================
+   KEYFRAMES (Compositor-friendly transform & opacity)
+   ========================================================= */
+@keyframes slow-sun-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes natural-blink {
+  0%,
+  93%,
+  100% {
+    transform: scaleY(1);
+  }
+  96% {
+    transform: scaleY(0.08);
+  }
+}
+
+@keyframes glove-hover-l {
+  0%,
+  100% {
+    transform: translate(154px, 318px) rotate(0deg);
+  }
+  50% {
+    transform: translate(156px, 313px) rotate(-4deg);
+  }
+}
+
+@keyframes glove-hover-r {
+  0%,
+  100% {
+    transform: translate(706px, 318px) scale(-1, 1) rotate(0deg);
+  }
+  50% {
+    transform: translate(704px, 313px) scale(-1, 1) rotate(-4deg);
+  }
+}
+
+@keyframes key-hint-pulse {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-3px) scale(1.16);
+  }
+}
+
+@keyframes paper-slide-up {
+  0% {
+    transform: translateY(28%) scale(0.95);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes comic-buzz-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  18% {
+    transform: translateX(-11px) rotate(-1.2deg);
+  }
+  36% {
+    transform: translateX(10px) rotate(1.2deg);
+  }
+  54% {
+    transform: translateX(-8px) rotate(-0.8deg);
+  }
+  72% {
+    transform: translateX(6px) rotate(0.6deg);
+  }
+}
+
+@keyframes arms-cheer-bounce {
+  from {
+    transform: translateY(0) scale(1);
+  }
+  to {
+    transform: translateY(-7px) scale(1.02);
+  }
+}
+
+@keyframes critter-wag {
+  from {
+    transform: rotate(-8deg);
+  }
+  to {
+    transform: rotate(10deg);
+  }
+}
+
+@keyframes critter-flap {
+  from {
+    transform: rotate(-6deg) translateY(0);
+  }
+  to {
+    transform: rotate(7deg) translateY(-4px);
+  }
+}
+
+@keyframes critter-bob {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-7px);
+  }
+}
+
+@keyframes critter-twinkle {
+  from {
+    transform: scale(0.82) rotate(-8deg);
+  }
+  to {
+    transform: scale(1.15) rotate(8deg);
+  }
+}
+
+@keyframes confetti-fly {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(0.3) rotate(0deg);
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--tx, 120px), var(--ty, -180px)) scale(1.05)
+      rotate(var(--rot, 220deg));
+  }
+}
