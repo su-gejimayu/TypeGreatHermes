@@ -148,21 +148,7 @@
   <main id="game-stage" class="game-stage">
     <div id="scene-rig" class="scene-rig">
 
-      <!-- B&W Comic Starburst Lines behind the Paper -->
-      <svg class="bw-paper-burst" aria-hidden="true" viewBox="0 0 800 500">
-        <polygon
-          points="400,24 446,118 548,48 518,154 662,114 568,208 732,222 586,274 714,348 564,334 636,432 504,376 472,462 400,388 328,462 296,376 164,432 236,334 86,348 214,274 68,222 232,208 138,114 282,154 252,48 354,118"
-          fill="#ffffff"
-          stroke="#181818"
-          stroke-width="4.5"
-          stroke-linejoin="round"
-        />
-        <!-- Comic 4-point sparkles -->
-        <path d="M626,64 Q626,92 652,92 Q626,92 626,120 Q626,92 600,92 Q626,92 626,64 Z" fill="#ffffff" stroke="#181818" stroke-width="3.8"/>
-        <path d="M168,78 Q168,98 188,98 Q168,98 168,118 Q168,98 148,98 Q168,98 168,78 Z" fill="#ffffff" stroke="#181818" stroke-width="3.8"/>
-      </svg>
-
-      <!-- Colour-Burst Rainbow Arcs shooting out behind the Paper -->
+      <!-- Colour-Burst Rainbow Arcs shooting out behind the Paper (Celebration Only) -->
       <svg class="color-rainbow-arcs" aria-hidden="true" viewBox="0 0 900 560">
         <!-- Top-Left Rainbow Arc -->
         <g stroke-linecap="round" fill="none">
@@ -210,31 +196,35 @@
       </div>
       <div id="buzz-burst" class="callout-buzz" aria-hidden="true">BZZT!</div>
 
-      <!-- BACK CARRIAGE LAYER: Paper Table, Return Lever, Ribbed Platen Knobs & Platen behind Paper -->
+      <!-- BACK CARRIAGE LAYER: Return Lever, Ribbed Platen Knobs, Paper Guides & Platen behind Paper -->
       <svg class="hermes-carriage-back" aria-hidden="true" viewBox="0 0 1280 612">
-        <g class="carriage-assembly" stroke="#181818" stroke-width="4.8" stroke-linejoin="round" stroke-linecap="round">
-          <!-- Tilted Back Paper Support Table -->
-          <path d="M332,30 L348,-6 C351,-13 359,-16 370,-16 L910,-16 C921,-16 929,-13 932,-6 L948,30 Z" class="tw-paper-table"/>
-          <!-- Left Paper Margin Guide Tab -->
-          <rect x="358" y="-22" width="20" height="28" rx="4" class="tw-metal"/>
-          <!-- Sweeping Chrome Carriage Return Lever -->
-          <path d="M278,40 C236,36 218,6 186,-12 L150,-16 C140,-16 136,-4 145,6 C156,18 176,24 198,24 C216,40 242,52 278,56 Z" class="tw-metal"/>
-          <path d="M152,-8 L182,-4 C208,10 226,32 258,40" fill="none" stroke="#ffffff" stroke-width="2.6"/>
+        <g class="carriage-assembly" stroke="#181818" stroke-width="4.6" stroke-linejoin="round" stroke-linecap="round">
+          <!-- Left & Right Angled Paper-Support Ears peeking behind Paper -->
+          <path d="M336,28 L350,2 L374,2 L374,30 Z" class="tw-paper-table"/>
+          <path d="M906,2 L930,2 L944,28 L906,30 Z" class="tw-paper-table"/>
+
+          <!-- Sleek Teardrop Chrome Carriage Return Lever on Left -->
+          <path d="M254,28 L212,8 L206,18 L244,36 Z" class="tw-metal"/>
+          <path d="M214,8 C196,-4 164,-6 156,6 C150,16 172,26 208,22 Z" fill="#f7f7f4"/>
+
           <!-- Right Paper-Release Lever -->
-          <path d="M998,20 L1014,-8 C1018,-14 1028,-10 1024,-2 L1012,24 Z" class="tw-metal"/>
-          <!-- Oversized Ribbed Cylindrical Platen Knobs -->
-          <rect x="202" y="10" width="44" height="54" rx="10" class="tw-knob"/>
-          <path d="M207,21 H241 M207,30 H241 M207,39 H241 M207,48 H241 M207,56 H241" fill="none" stroke-width="2.8"/>
-          <rect x="1034" y="10" width="44" height="54" rx="10" class="tw-knob"/>
-          <path d="M1039,21 H1073 M1039,30 H1073 M1039,39 H1073 M1039,48 H1073 M1039,56 H1073" fill="none" stroke-width="2.8"/>
-          <!-- Chrome Carriage End-Plates & Axle Collars -->
-          <rect x="246" y="22" width="22" height="30" rx="4" class="tw-metal"/>
-          <rect x="268" y="16" width="26" height="42" rx="6" class="tw-body-side"/>
-          <rect x="1012" y="22" width="22" height="30" rx="4" class="tw-metal"/>
-          <rect x="986" y="16" width="26" height="42" rx="6" class="tw-body-side"/>
+          <path d="M982,28 L998,-2 L1008,2 L994,30 Z" class="tw-metal"/>
+
+          <!-- Left & Right Ribbed Cylindrical Platen Knobs -->
+          <rect x="214" y="12" width="44" height="46" rx="8" class="tw-knob"/>
+          <path d="M219,21 H253 M219,29 H253 M219,37 H253 M219,45 H253" fill="none" stroke-width="2.8"/>
+          <rect x="1022" y="12" width="44" height="46" rx="8" class="tw-knob"/>
+          <path d="M1027,21 H1061 M1027,29 H1061 M1027,37 H1061 M1027,45 H1061" fill="none" stroke-width="2.8"/>
+
+          <!-- Chrome Axle Collars & Carriage End-Caps -->
+          <rect x="258" y="24" width="22" height="22" rx="3" class="tw-metal"/>
+          <rect x="278" y="16" width="28" height="40" rx="6" class="tw-body-side"/>
+          <rect x="1000" y="24" width="22" height="22" rx="3" class="tw-metal"/>
+          <rect x="974" y="16" width="28" height="40" rx="6" class="tw-body-side"/>
+
           <!-- Wide Dark Rubber Platen Roller -->
-          <rect x="292" y="12" width="696" height="50" rx="18" class="tw-platen"/>
-          <path d="M316,23 H964" fill="none" stroke="#686964" stroke-width="3.2"/>
+          <rect x="302" y="16" width="676" height="44" rx="14" class="tw-platen"/>
+          <path d="M320,25 H960" fill="none" stroke="#6d6e69" stroke-width="3"/>
         </g>
       </svg>
 
@@ -293,252 +283,290 @@
         <div id="critter-stage" class="critter-stage"></div>
       </div>
 
-      <!-- LOWER STAGE: HERMES 3000 VINTAGE CARTOON TYPEWRITER (SCULPTED CHASSIS + LARGE KEYS) -->
+      <!-- LOWER STAGE: HERMES 3000 VINTAGE CARTOON TYPEWRITER (WHISKERED MUZZLE + EYE-TRACKING + LARGE KEYS) -->
       <div class="hermes-typewriter">
-        <svg class="hermes-svg" aria-hidden="true" viewBox="0 0 1280 612">
+        <svg id="hermes-svg" class="hermes-svg" aria-hidden="true" viewBox="0 0 1280 612">
           <defs>
             <!-- Vintage 1930s Comic Ben-Day Halftone Shading Pattern -->
-            <pattern id="tw-halftone-dots" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(22)">
-              <circle cx="3" cy="3" r="1.75" fill="#181818"/>
+            <pattern id="tw-halftone-dots" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(20)">
+              <circle cx="3" cy="3" r="1.55" fill="#181818"/>
             </pattern>
+            <!-- Sclera Clip Paths so Eye-Tracking Pupils Glide Cleanly Inside Eye Outlines -->
+            <clipPath id="eye-clip-left">
+              <ellipse cx="462" cy="56" rx="26.8" ry="42.8"/>
+            </clipPath>
+            <clipPath id="eye-clip-right">
+              <ellipse cx="818" cy="56" rx="26.8" ry="42.8"/>
+            </clipPath>
           </defs>
 
           <!-- CHEERING RUBBER-HOSE ARMS (Visible on Success!) -->
           <g class="arms-celebrating">
             <!-- Left Arm Raised High -->
-            <path d="M138,244 C64,206 46,118 52,54" fill="none" stroke="#181818" stroke-width="26" stroke-linecap="round"/>
-            <path d="M132,238 C72,202 54,122 58,60" fill="none" stroke="#4a4a4a" stroke-width="4" stroke-linecap="round"/>
+            <path d="M138,264 C64,220 46,122 52,56" fill="none" stroke="#181818" stroke-width="24" stroke-linecap="round"/>
+            <path d="M132,258 C72,216 54,126 58,62" fill="none" stroke="#5a5a58" stroke-width="3.8" stroke-linecap="round"/>
             <!-- Left Open Cheering White Cartoon Glove -->
-            <g transform="translate(50, 38) rotate(-20)" stroke="#181818" stroke-width="4.5" stroke-linejoin="round">
+            <g transform="translate(50, 40) rotate(-20)" stroke="#181818" stroke-width="4.5" stroke-linejoin="round">
               <ellipse cx="0" cy="26" rx="22" ry="12" fill="#ffffff"/>
               <path d="M-20,20 L-38,-6 C-44,-18 -26,-26 -18,-12 L-10,4 L-14,-24 C-16,-38 4,-38 4,-22 L6,2 L16,-22 C22,-36 40,-28 32,-12 L20,8 L36,-4 C48,-12 56,6 42,16 L18,26 Z" fill="#ffffff"/>
               <path d="M-8,10 L-10,20 M4,10 L4,20 M14,12 L12,21" fill="none" stroke-width="3.2" stroke-linecap="round"/>
             </g>
 
             <!-- Right Arm Raised High -->
-            <path d="M1142,244 C1216,206 1234,118 1228,54" fill="none" stroke="#181818" stroke-width="26" stroke-linecap="round"/>
-            <path d="M1148,238 C1208,202 1226,122 1222,60" fill="none" stroke="#4a4a4a" stroke-width="4" stroke-linecap="round"/>
+            <path d="M1142,264 C1216,220 1234,122 1228,56" fill="none" stroke="#181818" stroke-width="24" stroke-linecap="round"/>
+            <path d="M1148,258 C1208,216 1226,126 1222,62" fill="none" stroke="#5a5a58" stroke-width="3.8" stroke-linecap="round"/>
             <!-- Right Open Cheering White Cartoon Glove -->
-            <g transform="translate(1230, 38) rotate(20) scale(-1, 1)" stroke="#181818" stroke-width="4.5" stroke-linejoin="round">
+            <g transform="translate(1230, 40) rotate(20) scale(-1, 1)" stroke="#181818" stroke-width="4.5" stroke-linejoin="round">
               <ellipse cx="0" cy="26" rx="22" ry="12" fill="#ffffff"/>
               <path d="M-20,20 L-38,-6 C-44,-18 -26,-26 -18,-12 L-10,4 L-14,-24 C-16,-38 4,-38 4,-22 L6,2 L16,-22 C22,-36 40,-28 32,-12 L20,8 L36,-4 C48,-12 56,6 42,16 L18,26 Z" fill="#ffffff"/>
               <path d="M-8,10 L-10,20 M4,10 L4,20 M14,12 L12,21" fill="none" stroke-width="3.2" stroke-linecap="round"/>
             </g>
           </g>
 
-          <!-- CHROME PAPER BAIL BAR & RUBBER ROLLERS (Clamping across Bottom of Paper!) -->
-          <g class="paper-bail" stroke="#181818" stroke-width="4.2" stroke-linejoin="round" stroke-linecap="round">
-            <rect x="332" y="31" width="616" height="9" rx="4.5" class="tw-metal"/>
-            <!-- Left & Right Rubber Bail Rollers -->
-            <rect x="408" y="22" width="38" height="25" rx="6" class="tw-platen"/>
-            <path d="M415,28 H439" fill="none" stroke="#767772" stroke-width="2.4"/>
-            <rect x="834" y="22" width="38" height="25" rx="6" class="tw-platen"/>
-            <path d="M841,28 H865" fill="none" stroke="#767772" stroke-width="2.4"/>
+          <!-- FRONT PAPER BAIL & PLATEN CLAMP BAR (Sits across bottom edge of Paper behind Eyes) -->
+          <g class="paper-bail" stroke="#181818" stroke-width="4.4" stroke-linejoin="round" stroke-linecap="round">
+            <rect x="314" y="34" width="652" height="18" rx="6" class="tw-platen"/>
+            <rect x="328" y="30" width="624" height="8" rx="4" class="tw-metal"/>
+            <path d="M342,46 H938" fill="none" stroke="#646560" stroke-width="2.4"/>
           </g>
 
           <!-- SCULPTED HERMES 3000 VINTAGE CAST-METAL BODY CHASSIS -->
-          <g stroke="#181818" stroke-width="5.2" stroke-linejoin="round" stroke-linecap="round">
-            <!-- Coral / Dark Rubber Base Cushion -->
-            <rect x="82" y="588" width="1116" height="20" rx="10" class="tw-base-pad"/>
+          <g stroke="#181818" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+            <!-- Stepped Rubber Base Molding -->
+            <rect x="92" y="588" width="1096" height="18" rx="8" class="tw-base-pad"/>
 
-            <!-- Broad 3D Angled Outer Side Fenders & Lower Skirt -->
+            <!-- Broad Angled Outer Side Fenders & Lower Chassis Skirt -->
             <path
-              d="M174,98 C186,54 232,44 298,44 L982,44 C1048,44 1094,54 1106,98 L1228,546 C1238,582 1212,598 1166,598 L114,598 C68,598 42,582 52,546 Z"
+              d="M196,94 C208,54 252,46 312,46 L968,46 C1028,46 1072,54 1084,94 L1204,552 C1212,580 1192,596 1152,596 L128,596 C88,596 68,580 76,552 Z"
               class="tw-body-side"
             />
 
             <!-- Comic Ben-Day Halftone Shading on Angled Side Fenders -->
             <path
-              d="M174,116 L204,116 L96,584 L62,576 C50,566 50,554 54,540 Z"
+              d="M196,108 L222,108 L120,584 L86,578 C76,570 76,558 80,546 Z"
               class="tw-halftone"
               stroke="none"
             />
             <path
-              d="M1106,116 L1076,116 L1184,584 L1218,576 C1230,566 1230,554 1226,540 Z"
+              d="M1084,108 L1058,108 L1160,584 L1194,578 C1204,570 1204,558 1200,546 Z"
               class="tw-halftone"
               stroke="none"
             />
 
-            <!-- Sculpted Inner Top Deck & Thick Rounded Front Chin Apron -->
+            <!-- Sculpted Inner Top Deck & Clean Recessed Lower Apron -->
             <path
-              d="M198,98 C208,58 248,48 308,48 L972,48 C1032,48 1072,58 1082,98 L1194,540 C1202,570 1180,584 1138,584 L142,584 C100,584 78,570 86,540 Z"
+              d="M220,96 C230,58 268,50 322,50 L958,50 C1012,50 1050,58 1060,96 L1172,544 C1178,568 1160,582 1124,582 L156,582 C120,582 102,568 108,544 Z"
               class="tw-body-main"
             />
 
-            <!-- Glossy Specular Bevel Along Front Chin & Side Deck Shoulders -->
+            <!-- Recessed Lower-Left & Lower-Right Metal Deck Triangles (Matches Reference Bevels) -->
             <path
-              d="M116,576 H1164"
+              d="M158,398 L124,556 Q122,566 134,566 H372 M1122,398 L1156,556 Q1158,566 1146,566 H908"
               fill="none"
-              stroke="#ffffff"
+              stroke="#efefea"
               stroke-width="3.6"
-              opacity="0.58"
+              opacity="0.72"
             />
             <path
-              d="M204,114 L102,548 M1076,114 L1178,548"
+              d="M154,574 H1126"
               fill="none"
               stroke="#ffffff"
               stroke-width="3.2"
-              opacity="0.52"
+              opacity="0.58"
             />
 
-            <!-- Sculpted Rounded Upper Hood Crown -->
+            <!-- Sculpted Rounded Upper Hood with Removable Ribbon-Cover Seams -->
             <path
-              d="M204,102 C214,60 254,48 314,48 L486,48 Q640,62 794,48 L966,48 C1026,48 1066,60 1076,102 C1082,136 1058,156 1016,156 L264,156 C222,156 198,136 204,102 Z"
+              d="M222,102 C232,60 272,50 328,50 L952,50 C1008,50 1048,60 1058,102 L1068,156 L212,156 Z"
               class="tw-body-hood"
             />
-            <!-- Removable Hood Panel Seam Lines & Glossy Shoulder Highlights -->
-            <path d="M352,50 C334,88 330,122 336,156 M928,50 C946,88 950,122 944,156" fill="none" stroke-width="4.2"/>
-            <path d="M232,96 C240,68 270,60 314,60 M1048,96 C1040,68 1010,60 966,60" fill="none" stroke="#ffffff" stroke-width="4.2" opacity="0.72"/>
-
-            <!-- Semi-Circular Typebar Basket Cutout + Fanned Mechanical Typebars! -->
-            <path d="M470,104 C518,74 762,74 810,104 C784,132 496,132 470,104 Z" class="tw-platen"/>
-            <g stroke="#9a9b95" stroke-width="2.4">
-              <line x1="504" y1="104" x2="564" y2="124"/>
-              <line x1="530" y1="96" x2="578" y2="124"/>
-              <line x1="560" y1="90" x2="594" y2="124"/>
-              <line x1="594" y1="86" x2="612" y2="124"/>
-              <line x1="640" y1="84" x2="640" y2="125"/>
-              <line x1="686" y1="86" x2="668" y2="124"/>
-              <line x1="720" y1="90" x2="686" y2="124"/>
-              <line x1="750" y1="96" x2="702" y2="124"/>
-              <line x1="776" y1="104" x2="716" y2="124"/>
-            </g>
-            <path d="M538,118 Q640,104 742,118" fill="none" stroke="#d8d8d2" stroke-width="3.2"/>
-
-            <!-- Iconic Hermes 3000 Curved Ribbon Cover Panel -->
-            <rect x="184" y="162" width="912" height="54" rx="17" class="tw-front-panel"/>
-            <path d="M206,170 H1074" fill="none" stroke="#ffffff" stroke-width="3" opacity="0.62"/>
-
-            <!-- Left & Right Slotted Chrome Hood Latches with Protruding Release Tabs -->
-            <rect x="224" y="171" width="16" height="36" rx="6" class="tw-metal"/>
-            <rect x="220" y="185" width="24" height="9" rx="3.5" class="tw-metal"/>
-            <rect x="1040" y="171" width="16" height="36" rx="6" class="tw-metal"/>
-            <rect x="1036" y="185" width="24" height="9" rx="3.5" class="tw-metal"/>
-
-            <!-- Vintage Ribbon Color Selector Switch (Red / Blue Stencil Dots) -->
-            <circle cx="992" cy="181" r="4.8" class="tw-ribbon-dot-a" stroke-width="2.6"/>
-            <circle cx="992" cy="198" r="4.8" class="tw-ribbon-dot-b" stroke-width="2.6"/>
-
-            <!-- CONTOURED STEPPED KEYWELL BEZEL RIM (Follows 10 -> 10 -> 9 -> 7 -> Spacebar Pyramid!) -->
+            <!-- Curved Hermes Hood Panel Seam Lines Framing the Face -->
+            <path d="M380,50 C358,84 354,122 362,156 M900,50 C922,84 926,122 918,156" fill="none" stroke-width="4.4"/>
+            <!-- Thick Glossy White Curved Shoulder Highlights on Left & Right Hood -->
             <path
-              d="M148,222 H1132 Q1150,222 1152,240 L1158,374 Q1158,388 1142,390 L1118,392 Q1104,394 1104,406 L1104,452 Q1104,464 1090,466 L1026,468 Q1012,470 1012,482 L1012,526 Q1012,538 996,540 L910,542 Q896,544 896,554 L896,563 Q896,573 882,573 H398 Q384,573 384,563 L384,554 Q384,544 370,542 L284,540 Q268,538 268,526 L268,482 Q268,470 254,468 L190,466 Q176,464 176,452 L176,406 Q176,394 162,392 L138,390 Q122,388 122,374 L128,240 Q130,222 148,222 Z"
+              d="M246,132 C252,76 286,66 346,66 M1034,132 C1028,76 994,66 934,66"
+              fill="none"
+              stroke="#ffffff"
+              stroke-width="7.5"
+              opacity="0.74"
+            />
+
+            <!-- Iconic Hermes 3000 Ribbon-Cover Faceplate ("=HERMES=" Trim Strip) -->
+            <rect x="206" y="160" width="868" height="54" rx="16" class="tw-front-panel"/>
+            <path d="M226,168 H1054" fill="none" stroke="#ffffff" stroke-width="3" opacity="0.62"/>
+
+            <!-- Left & Right Pill Hood Latches (Matches Reference Keyhole/Latch Icons) -->
+            <circle cx="265" cy="173" r="4" class="tw-metal" stroke-width="3.4"/>
+            <rect x="256" y="175" width="18" height="28" rx="9" class="tw-metal" stroke-width="3.8"/>
+            <path d="M256,189 H274" fill="none" stroke-width="3.6"/>
+
+            <circle cx="1015" cy="173" r="4" class="tw-metal" stroke-width="3.4"/>
+            <rect x="1006" y="175" width="18" height="28" rx="9" class="tw-metal" stroke-width="3.8"/>
+            <path d="M1006,189 H1024" fill="none" stroke-width="3.6"/>
+
+            <!-- Vintage Ribbon Color Selector Dots (Left of Right Latch) -->
+            <circle cx="972" cy="179" r="4.5" class="tw-ribbon-dot-a" stroke-width="2.8"/>
+            <circle cx="972" cy="196" r="4.5" class="tw-ribbon-dot-b" stroke-width="2.8"/>
+
+            <!-- CONTOURED DARK STEPPED KEYWELL BEZEL RIM (Follows 10 -> 10 -> 9 -> 7 -> Spacebar Pyramid!) -->
+            <path
+              d="M148,220 H1132 Q1150,220 1152,238 L1158,374 Q1158,388 1142,390 L1118,392 Q1104,394 1104,406 L1104,452 Q1104,464 1090,466 L1026,468 Q1012,470 1012,482 L1012,526 Q1012,538 996,540 L910,542 Q896,544 896,554 L896,565 Q896,575 882,575 H398 Q384,575 384,565 L384,554 Q384,544 370,542 L284,540 Q268,538 268,526 L268,482 Q268,470 254,468 L190,466 Q176,464 176,452 L176,406 Q176,394 162,392 L138,390 Q122,388 122,374 L128,238 Q130,220 148,220 Z"
               class="tw-keywell-rim"
             />
 
-            <!-- Recessed Mechanical Keybed Interior -->
+            <!-- Deep Dark Recessed Mechanical Keybed Interior -->
             <path
-              d="M154,229 H1126 Q1142,229 1144,243 L1149,370 Q1149,381 1136,383 L1108,385 Q1095,387 1095,399 L1095,446 Q1095,457 1082,459 L1018,461 Q1003,463 1003,475 L1003,520 Q1003,531 989,533 L902,535 Q887,537 887,548 L887,558 Q887,566 876,566 H404 Q393,566 393,558 L393,548 Q393,537 378,535 L291,533 Q277,531 277,520 L277,475 Q277,463 262,461 L198,459 Q185,457 185,446 L185,399 Q185,387 172,385 L144,383 Q131,381 131,370 L136,243 Q138,229 154,229 Z"
+              d="M155,228 H1125 Q1142,228 1144,242 L1149,370 Q1149,381 1136,383 L1108,385 Q1095,387 1095,399 L1095,446 Q1095,457 1082,459 L1018,461 Q1003,463 1003,475 L1003,520 Q1003,531 989,533 L902,535 Q887,537 887,548 L887,559 Q887,567 876,567 H404 Q393,567 393,559 L393,548 Q393,537 378,535 L291,533 Q277,531 277,520 L277,475 Q277,463 262,461 L198,459 Q185,457 185,446 L185,399 Q185,387 172,385 L144,383 Q131,381 131,370 L136,242 Q138,228 155,228 Z"
               class="tw-keywell"
               stroke-width="3.8"
             />
 
-            <!-- 4 Stepped Mechanical Key-Row Terrace Plates inside the Keybed -->
-            <rect x="142" y="282" width="996" height="20" rx="6" class="tw-terrace" stroke-width="3.2"/>
-            <rect x="140" y="357" width="1000" height="20" rx="6" class="tw-terrace" stroke-width="3.2"/>
-            <rect x="192" y="432" width="896" height="20" rx="6" class="tw-terrace" stroke-width="3.2"/>
-            <rect x="284" y="507" width="712" height="20" rx="6" class="tw-terrace" stroke-width="3.2"/>
+            <!-- Subtle Dark Stepped Key-Row Terrace Rails -->
+            <rect x="142" y="282" width="996" height="18" rx="6" class="tw-terrace" stroke-width="2.8"/>
+            <rect x="140" y="357" width="1000" height="18" rx="6" class="tw-terrace" stroke-width="2.8"/>
+            <rect x="192" y="432" width="896" height="18" rx="6" class="tw-terrace" stroke-width="2.8"/>
+            <rect x="284" y="507" width="712" height="18" rx="6" class="tw-terrace" stroke-width="2.8"/>
           </g>
 
-          <!-- Mechanical Plunger Stems & Spacebar Lever Arms under Keys -->
-          <g class="tw-keystem" stroke-width="5" stroke-linecap="round">
-            <!-- Row 1 Stems -->
-            <path d="M190,274 V295 M289,274 V295 M388,274 V295 M486,274 V295 M585,274 V295 M683,274 V295 M782,274 V295 M880,274 V295 M979,274 V295 M1077,274 V295"/>
-            <!-- Row 2 Stems -->
-            <path d="M203,349 V370 M301,349 V370 M400,349 V370 M498,349 V370 M597,349 V370 M695,349 V370 M794,349 V370 M893,349 V370 M991,349 V370 M1090,349 V370"/>
-            <!-- Row 3 Stems -->
-            <path d="M241,424 V445 M339,424 V445 M438,424 V445 M536,424 V445 M635,424 V445 M734,424 V445 M832,424 V445 M931,424 V445 M1029,424 V445"/>
-            <!-- Row 4 Stems -->
-            <path d="M332,499 V520 M431,499 V520 M529,499 V520 M628,499 V520 M726,499 V520 M825,499 V520 M923,499 V520"/>
-            <!-- Spacebar Lever Posts -->
-            <path d="M476,527 L466,554 M804,527 L814,554" stroke-width="6"/>
-          </g>
-
-          <!-- Sculpted Deck Corner Contour Highlights & Halftone Accents -->
-          <g fill="none" stroke="#ffffff" stroke-width="3.2" stroke-linecap="round" opacity="0.55">
-            <path d="M112,482 H242 M1038,482 H1168"/>
-            <path d="M104,548 H362 M918,548 H1176"/>
-          </g>
-
-          <!-- HERMES VINTAGE WINGED SCRIPT EMBLEM -->
+          <!-- HERMES VINTAGE WINGED SCRIPT EMBLEM ("== HERMES ==") -->
           <g class="hermes-badge-group">
-            <path d="M484,186 H552 M502,194 H552 M728,186 H796 M728,194 H778" stroke="#181818" stroke-width="2.6" stroke-linecap="round" opacity="0.45"/>
-            <text x="640" y="200" font-size="33" text-anchor="middle" class="hermes-logo-text">HERMES</text>
+            <path d="M510,183 H556 M518,191 H556 M724,183 H770 M724,191 H762" stroke="#181818" stroke-width="2.6" stroke-linecap="round" opacity="0.52"/>
+            <text x="640" y="198" font-size="32" text-anchor="middle" class="hermes-logo-text">HERMES</text>
           </g>
 
-          <!-- HERMES' EXPRESSIVE 1930s CARTOON FACE (Peeking Playfully over the Hood!) -->
+          <!-- HERMES' WHISKERED MUZZLE & WIDE-SET EYE-TRACKING 1930s PIE-CUT EYES! -->
           <g class="hermes-face" stroke="#181818" stroke-linecap="round" stroke-linejoin="round">
-            <!-- Rosy Cheeks -->
-            <ellipse cx="534" cy="126" rx="24" ry="13" class="tw-cheek" stroke="none"/>
-            <ellipse cx="746" cy="126" rx="24" ry="13" class="tw-cheek" stroke="none"/>
+            <!-- Soft Cheek Ovals under Outer Whiskers -->
+            <ellipse cx="542" cy="122" rx="34" ry="12" class="tw-cheek" stroke="none"/>
+            <ellipse cx="738" cy="122" rx="34" ry="12" class="tw-cheek" stroke="none"/>
 
-            <!-- PROMPTING & CELEBRATING OPEN PIE-CUT EYES -->
-            <g class="eyes-open">
-              <!-- Arched Comic Eyebrows -->
-              <path class="brow-left" d="M560,26 Q588,10 614,24" fill="none" stroke-width="6.5"/>
-              <path class="brow-right" d="M666,24 Q692,10 720,26" fill="none" stroke-width="6.5"/>
-              <!-- Tall 1930s Sclera Ovals -->
-              <ellipse cx="596" cy="76" rx="30" ry="41" fill="#ffffff" stroke-width="5.2"/>
-              <ellipse cx="684" cy="76" rx="30" ry="41" fill="#ffffff" stroke-width="5.2"/>
-              <!-- 1930s Pie-Cut Pupils -->
-              <g class="pupils-group">
-                <ellipse cx="599" cy="68" rx="15" ry="21" fill="#181818" stroke="none"/>
-                <polygon points="599,68 618,56 618,72" fill="#ffffff" stroke="none"/>
-                <ellipse cx="681" cy="68" rx="15" ry="21" fill="#181818" stroke="none"/>
-                <polygon points="681,68 700,56 700,72" fill="#ffffff" stroke="none"/>
-              </g>
+            <!-- Wide Dark Typebar-Basket / Whisker Cavity Recess -->
+            <path
+              d="M496,105 C536,80 744,80 784,105 C748,131 532,131 496,105 Z"
+              class="tw-muzzle-slot"
+              stroke-width="4.4"
+            />
+            <!-- Subtle Fanned Mechanical Typebars inside Recess -->
+            <g stroke="#6d6e69" stroke-width="2" opacity="0.7">
+              <line x1="528" y1="103" x2="574" y2="118"/>
+              <line x1="556" y1="95" x2="592" y2="118"/>
+              <line x1="724" y1="95" x2="688" y2="118"/>
+              <line x1="752" y1="103" x2="706" y2="118"/>
             </g>
 
-            <!-- BUZZING / OOPS SQUINTING EYES (> <) -->
-            <g class="eyes-buzz" fill="none" stroke-width="7.4">
-              <path d="M568,58 L614,78 L568,96"/>
-              <path d="M712,58 L666,78 L712,96"/>
-              <!-- Comic Sweat Drop -->
-              <path d="M756,48 C746,68 752,82 762,82 C772,82 778,68 756,48 Z" fill="#ffffff" stroke-width="4.5"/>
+            <!-- Mechanical Center Ribbon-Vibrator Type Guide (Bridge of Nose!) -->
+            <rect x="613" y="50" width="54" height="38" rx="5" class="tw-metal" stroke-width="4.2"/>
+            <path d="M619,60 H661 M622,69 H658 M624,50 V84 M656,50 V84" fill="none" stroke-width="2.8"/>
+
+            <!-- Mouth State 2 (Behind Muzzle Pads): Joyful Celebrating Laugh! -->
+            <g class="mouth-celebrate" stroke-width="4.6">
+              <path d="M604,118 C610,154 670,154 676,118 Z" fill="#701924"/>
+              <path d="M618,140 C628,131 652,131 662,140 C652,149 628,149 618,140 Z" fill="#ff758f" stroke="none"/>
             </g>
 
-            <!-- Cute Button Nose -->
-            <ellipse cx="640" cy="112" rx="13" ry="9" class="tw-nose" stroke-width="4.5"/>
+            <!-- Plump Twin Whiskered Muzzle Pads (:3 Cat / Otter Cheeks) -->
+            <path
+              d="M640,86 C616,76 575,82 574,104 C573,124 615,131 640,108 C665,131 707,124 706,104 C705,82 664,76 640,86 Z"
+              class="tw-muzzle-pad"
+              stroke-width="4.6"
+            />
 
-            <!-- Mouth State 1: Gentle Curious Prompting Smile -->
-            <g class="mouth-prompt" fill="none" stroke-width="5.2">
-              <path d="M594,128 Q640,152 686,128"/>
-              <path d="M588,122 Q592,130 600,132 M692,122 Q688,130 680,132" stroke-width="4.2"/>
+            <!-- Sculpted Dark Cartoon Animal Nose + Philtrum -->
+            <path
+              d="M640,103 C634,103 631,95 622,93 C614,91 614,79 626,78 Q640,76 654,78 C666,79 666,91 658,93 C649,95 646,103 640,103 Z"
+              class="tw-nose"
+              stroke-width="4.2"
+            />
+            <ellipse cx="634" cy="83" rx="5" ry="2.2" fill="#ffffff" stroke="none" opacity="0.45"/>
+
+            <!-- 3 Cute Whisker Freckle Dots on Each Muzzle Pad -->
+            <g fill="#181818" stroke="none">
+              <circle cx="595" cy="98" r="2.5"/>
+              <circle cx="607" cy="104" r="2.5"/>
+              <circle cx="592" cy="109" r="2.5"/>
+              <circle cx="685" cy="98" r="2.5"/>
+              <circle cx="673" cy="104" r="2.5"/>
+              <circle cx="688" cy="109" r="2.5"/>
             </g>
 
-            <!-- Mouth State 2: Joyful Celebrating Laugh! -->
-            <g class="mouth-celebrate" stroke-width="5">
-              <path d="M584,122 C592,162 688,162 696,122 Q640,132 584,122 Z" fill="#701924"/>
-              <path d="M606,146 C620,134 660,134 674,146 C660,156 620,156 606,146 Z" fill="#ff758f" stroke="none"/>
+            <!-- 3 Crisp Fanning Whiskers on Each Side -->
+            <g class="tw-whiskers" fill="none" stroke="#f2f2ec" stroke-width="3" opacity="0.92">
+              <path d="M582,102 Q540,97 503,99"/>
+              <path d="M584,108 Q542,109 507,116"/>
+              <path d="M588,114 Q552,120 523,129"/>
+              <path d="M698,102 Q740,97 777,99"/>
+              <path d="M696,108 Q738,109 773,116"/>
+              <path d="M692,114 Q728,120 757,129"/>
             </g>
+
+            <!-- Mouth State 1: Gentle Curious Lower Lip Smile under Muzzle -->
+            <path class="mouth-prompt" d="M622,135 Q640,144 658,135" fill="none" stroke-width="4.6"/>
 
             <!-- Mouth State 3: Silly Wavy Buzz Mouth -->
-            <path class="mouth-buzz" d="M598,136 Q613,124 626,136 T654,136 T682,136" fill="none" stroke-width="5.4"/>
-          </g>
+            <path class="mouth-buzz" d="M614,137 Q627,129 640,137 T666,137" fill="none" stroke-width="4.8"/>
 
-          <!-- PROMPTING / POISED RUBBER-HOSE ARMS (Mounted to Side Fender Sockets, Resting on Sculpted Deck Cheeks!) -->
-          <g class="arms-prompting">
-            <!-- Left & Right Side Fender Arm Sockets -->
-            <ellipse cx="94" cy="316" rx="13" ry="22" transform="rotate(14 94 316)" class="tw-knob" stroke="#181818" stroke-width="4.8"/>
-            <ellipse cx="1186" cy="316" rx="13" ry="22" transform="rotate(-14 1186 316)" class="tw-knob" stroke="#181818" stroke-width="4.8"/>
+            <!-- WIDE-SET 1930s PIE-CUT EYES ASTRIDE THE PLATEN (Track Next Key!) -->
+            <g class="eyes-open">
+              <!-- Left Eye Socket & Clipped Gaze-Tracking Pupil -->
+              <g id="eye-left" class="eye-unit">
+                <ellipse cx="462" cy="56" rx="29" ry="45" fill="#ffffff" stroke-width="5.2"/>
+                <g clip-path="url(#eye-clip-left)">
+                  <g id="pupil-left" class="eye-pupil">
+                    <ellipse cx="462" cy="56" rx="15" ry="22" fill="#181818" stroke="none"/>
+                    <polygon points="461,56 480,43 480,65" fill="#ffffff" stroke="none"/>
+                  </g>
+                </g>
+              </g>
 
-            <!-- Left Curved Rubber-Hose Arm -->
-            <path d="M90,316 C8,334 2,462 132,494" fill="none" stroke="#181818" stroke-width="24" stroke-linecap="round"/>
-            <path d="M86,312 C18,330 14,454 128,488" fill="none" stroke="#525252" stroke-width="3.6" stroke-linecap="round"/>
-            <!-- Left Poised Cartoon Glove on Lower-Left Metal Deck Cheek -->
-            <g class="glove-left" transform="translate(136, 480)" stroke="#181818" stroke-width="4.4" stroke-linejoin="round">
-              <ellipse cx="0" cy="14" rx="13" ry="19" transform="rotate(-18)" fill="#ffffff"/>
-              <path d="M8,-2 C28,-6 48,4 54,20 C48,28 34,24 26,16 L34,32 C28,40 14,34 10,22 L10,34 C2,40 -10,32 -8,20 C-20,22 -24,10 -14,2 Z" fill="#ffffff"/>
-              <path d="M2,8 L14,12 M-2,16 L10,20" fill="none" stroke-width="3"/>
+              <!-- Right Eye Socket & Clipped Gaze-Tracking Pupil -->
+              <g id="eye-right" class="eye-unit">
+                <ellipse cx="818" cy="56" rx="29" ry="45" fill="#ffffff" stroke-width="5.2"/>
+                <g clip-path="url(#eye-clip-right)">
+                  <g id="pupil-right" class="eye-pupil">
+                    <ellipse cx="818" cy="56" rx="15" ry="22" fill="#181818" stroke="none"/>
+                    <polygon points="817,56 836,43 836,65" fill="#ffffff" stroke="none"/>
+                  </g>
+                </g>
+              </g>
+
+              <!-- Curved Lower-Cheek / Hood Eyelid Creases tucking Eyes into the Hood -->
+              <path d="M426,104 Q462,90 492,104 L492,116 L426,116 Z" class="tw-body-hood" stroke="none"/>
+              <path d="M788,104 Q818,90 854,104 L854,116 L788,116 Z" class="tw-body-hood" stroke="none"/>
+              <path d="M426,104 Q462,90 492,104" fill="none" stroke-width="5.2"/>
+              <path d="M788,104 Q818,90 854,104" fill="none" stroke-width="5.2"/>
             </g>
 
-            <!-- Right Curved Rubber-Hose Arm -->
-            <path d="M1190,316 C1272,334 1278,462 1148,494" fill="none" stroke="#181818" stroke-width="24" stroke-linecap="round"/>
-            <path d="M1194,312 C1262,330 1266,454 1152,488" fill="none" stroke="#525252" stroke-width="3.6" stroke-linecap="round"/>
-            <!-- Right Poised Cartoon Glove on Lower-Right Metal Deck Cheek -->
-            <g class="glove-right" transform="translate(1144, 480) scale(-1, 1)" stroke="#181818" stroke-width="4.4" stroke-linejoin="round">
-              <ellipse cx="0" cy="14" rx="13" ry="19" transform="rotate(-18)" fill="#ffffff"/>
-              <path d="M8,-2 C28,-6 48,4 54,20 C48,28 34,24 26,16 L34,32 C28,40 14,34 10,22 L10,34 C2,40 -10,32 -8,20 C-20,22 -24,10 -14,2 Z" fill="#ffffff"/>
-              <path d="M2,8 L14,12 M-2,16 L10,20" fill="none" stroke-width="3"/>
+            <!-- BUZZING / OOPS SQUINTING WIDE-SET EYES (> <) -->
+            <g class="eyes-buzz" fill="none" stroke-width="7.2">
+              <path d="M436,38 L482,56 L436,74"/>
+              <path d="M844,38 L798,56 L844,74"/>
+              <!-- Comic Sweat Drop -->
+              <path d="M876,26 C866,46 872,60 882,60 C892,60 898,46 876,26 Z" fill="#ffffff" stroke-width="4.4"/>
+            </g>
+          </g>
+
+          <!-- PROMPTING / POISED RUBBER-HOSE ARMS (Mounted on Angled Side Fenders, Resting on Lower Deck Cheeks!) -->
+          <g class="arms-prompting">
+            <!-- Left & Right Side Fender Arm Sockets -->
+            <ellipse cx="114" cy="354" rx="13" ry="21" transform="rotate(14 114 354)" class="tw-knob" stroke="#181818" stroke-width="4.6"/>
+            <ellipse cx="1166" cy="354" rx="13" ry="21" transform="rotate(-14 1166 354)" class="tw-knob" stroke="#181818" stroke-width="4.6"/>
+
+            <!-- Left Curved Glossy Rubber-Hose Arm -->
+            <path d="M108,354 C28,342 20,474 152,504" fill="none" stroke="#181818" stroke-width="23" stroke-linecap="round"/>
+            <path d="M104,349 C36,340 30,466 148,498" fill="none" stroke="#666664" stroke-width="3.6" stroke-linecap="round"/>
+            <!-- Left Poised 3-Fingered White Cartoon Glove on Lower-Left Deck -->
+            <g class="glove-left" transform="translate(158, 498)" stroke="#181818" stroke-width="4.2" stroke-linejoin="round">
+              <ellipse cx="-6" cy="4" rx="8" ry="13" transform="rotate(-18 -6 4)" fill="#ffffff"/>
+              <path d="M0,-6 C18,-10 38,-2 44,10 C38,18 26,14 18,8 C24,18 16,26 6,16 C8,24 -4,26 -8,14 Z" fill="#ffffff"/>
+            </g>
+
+            <!-- Right Curved Glossy Rubber-Hose Arm -->
+            <path d="M1172,354 C1252,342 1260,474 1128,504" fill="none" stroke="#181818" stroke-width="23" stroke-linecap="round"/>
+            <path d="M1176,349 C1244,340 1250,466 1132,498" fill="none" stroke="#666664" stroke-width="3.6" stroke-linecap="round"/>
+            <!-- Right Poised 3-Fingered White Cartoon Glove on Lower-Right Deck -->
+            <g class="glove-right" transform="translate(1122, 498) scale(-1, 1)" stroke="#181818" stroke-width="4.2" stroke-linejoin="round">
+              <ellipse cx="-6" cy="4" rx="8" ry="13" transform="rotate(-18 -6 4)" fill="#ffffff"/>
+              <path d="M0,-6 C18,-10 38,-2 44,10 C38,18 26,14 18,8 C24,18 16,26 6,16 C8,24 -4,26 -8,14 Z" fill="#ffffff"/>
             </g>
           </g>
         </svg>

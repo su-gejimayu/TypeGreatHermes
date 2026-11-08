@@ -527,17 +527,7 @@
     }
   }
 
-  /* B&W Starburst & Rainbow Arcs behind Paper */
-  .bw-paper-burst {
-    position: absolute;
-    inset-block-start: -2%;
-    inline-size: 76%;
-    max-block-size: 46%;
-    z-index: 1;
-    pointer-events: none;
-    transition: opacity 0.28s ease, transform 0.35s ease;
-  }
-
+  /* Rainbow Arcs behind Paper (Celebration) */
   .color-rainbow-arcs {
     position: absolute;
     inset-block-start: -3%;
@@ -966,50 +956,46 @@
 
   /* Default B&W Typewriter Fills (Prompting / Buzzing) */
   .tw-paper-table {
-    fill: #b0b0aa;
+    fill: #a8a9a4;
     transition: fill 0.32s ease;
   }
   .tw-body-side {
-    fill: #b4b4ae;
+    fill: #aeb0ab;
     transition: fill 0.32s ease;
   }
   .tw-body-main {
-    fill: #cecec8;
+    fill: #cbcdc8;
     transition: fill 0.32s ease;
   }
   .tw-body-hood {
-    fill: #e2e2dc;
+    fill: #dddfd9;
     transition: fill 0.32s ease;
   }
   .tw-front-panel {
-    fill: #d8d8d2;
+    fill: #d0d2cc;
     transition: fill 0.32s ease;
   }
   .tw-knob {
-    fill: #969690;
+    fill: #8d8f8a;
     transition: fill 0.32s ease;
   }
   .tw-metal {
-    fill: #ededeb;
+    fill: #eeeeea;
   }
   .tw-platen {
-    fill: #393a38;
+    fill: #343533;
   }
   .tw-keywell-rim {
-    fill: #70716c;
+    fill: #525450;
     transition: fill 0.32s ease;
   }
   .tw-keywell {
-    fill: #3d3e3b;
+    fill: #292a28;
     transition: fill 0.32s ease;
   }
   .tw-terrace {
-    fill: #5b5c57;
+    fill: #3a3b38;
     transition: fill 0.32s ease;
-  }
-  .tw-keystem {
-    stroke: #a8a9a3;
-    transition: stroke 0.32s ease;
   }
   .tw-ribbon-dot-a {
     fill: #787974;
@@ -1021,19 +1007,27 @@
   }
   .tw-halftone {
     fill: url(#tw-halftone-dots);
-    opacity: 0.24;
+    opacity: 0.22;
   }
   .tw-base-pad {
-    fill: #4f4f4c;
+    fill: #4b4c49;
+    transition: fill 0.32s ease;
+  }
+  .tw-muzzle-slot {
+    fill: #323331;
+    transition: fill 0.32s ease;
+  }
+  .tw-muzzle-pad {
+    fill: #dadcd6;
     transition: fill 0.32s ease;
   }
   .tw-nose {
-    fill: #b8b8b2;
+    fill: #494a47;
     transition: fill 0.32s ease;
   }
   .tw-cheek {
-    fill: #a8a8a2;
-    opacity: 0.35;
+    fill: #9b9d97;
+    opacity: 0.34;
     transition: fill 0.32s ease, opacity 0.32s ease;
   }
 
@@ -1041,11 +1035,9 @@
     font-family: 'Georgia', 'Times New Roman', serif;
     font-style: italic;
     font-weight: 700;
-    letter-spacing: 0.09em;
-    fill: #84847f;
-    stroke: var(--ink);
-    stroke-width: 1.4px;
-    opacity: 0.72;
+    letter-spacing: 0.08em;
+    fill: #6e706b;
+    opacity: 0.85;
     transition: fill 0.32s ease, opacity 0.32s ease;
   }
 
@@ -1057,12 +1049,33 @@
     display: none;
   }
 
-  .eyes-open {
-    transform-origin: 640px 76px;
+  /* Wide-Set 1930s Eyes: Independent Blink (scale) + Subtle Socket Lean (translate) */
+  .eye-unit {
+    transform-box: fill-box;
+    transform-origin: center;
+    translate: calc(var(--pupil-x, 0px) * 0.12) calc(var(--pupil-y, 0px) * 0.1);
+    scale: 1 1;
+    transition: translate 0.28s cubic-bezier(0.22, 1.35, 0.36, 1);
     animation: natural-blink 5.2s infinite;
 
     @media (prefers-reduced-motion: reduce) {
+      transition: none;
       animation: none;
+    }
+  }
+
+  /* Pie-Cut Pupils: Smooth Saccade Tracking toward Next Key via Individual translate/scale */
+  .eye-pupil {
+    transform-box: fill-box;
+    transform-origin: center;
+    translate: var(--pupil-x, 0px) var(--pupil-y, 0px);
+    scale: 1;
+    transition:
+      translate 0.26s cubic-bezier(0.22, 1.35, 0.36, 1),
+      scale 0.22s ease;
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
     }
   }
 
@@ -1104,7 +1117,7 @@
     gap: clamp(0.18rem, 0.82vmin, 0.7rem);
     inline-size: 100%;
 
-    /* Gentle authentic QWERTY stagger aligned with Hermes' stepped terraces & stems */
+    /* Gentle authentic QWERTY stagger aligned with Hermes' stepped terraces */
     &:nth-child(1) {
       padding-inline-end: 1.2%;
     }
@@ -1127,15 +1140,14 @@
     inline-size: clamp(1.5rem, 6.2vmin, 5.8rem);
     block-size: clamp(1.5rem, 5.2vmin, 4.8rem);
     padding: 0;
-    border: 3px solid var(--ink);
-    border-radius: 40%;
-    background: radial-gradient(circle at 50% 36%, #ffffff 0%, #f3f3ed 66%, #ddddD5 100%);
-    /* Concentric vintage collar + comic-inked 3D cylindrical plunger skirt */
+    border: 3.2px solid var(--ink);
+    border-radius: 999px;
+    background: linear-gradient(180deg, #ffffff 0%, #f8f8f4 64%, #e7e7df 100%);
+    /* Plump pill-rounded keycap bevel + dark vintage 3D key skirt */
     box-shadow:
       inset 0 2px 0 #ffffff,
-      inset 0 0 0 2.5px rgb(255 255 255 / 0.78),
-      inset 0 -2.5px 0 #c6c6bd,
-      0 7px 0 -3px #85857e,
+      inset 0 -5px 0 #dcdcd4,
+      0 7px 0 -2.5px #4c4d49,
       0 7px 0 0 var(--ink);
     font-size: clamp(1.08rem, 3.1vmin, 2.68rem);
     font-weight: 700;
@@ -1156,11 +1168,11 @@
     &[data-key='J']::after {
       content: '';
       position: absolute;
-      inset-block-end: 10%;
+      inset-block-end: 11%;
       inline-size: 28%;
       block-size: 3px;
       border-radius: 999px;
-      background: rgb(24 24 24 / 0.48);
+      background: rgb(24 24 24 / 0.46);
     }
 
     &:hover:not(:disabled) {
@@ -1172,7 +1184,7 @@
       transform: translateY(5px);
       box-shadow:
         inset 0 2px 0 #ffffff,
-        0 2px 0 -3px #85857e,
+        0 2px 0 -2.5px #4c4d49,
         0 2px 0 0 var(--ink);
     }
 
@@ -1190,17 +1202,19 @@
       }
     }
 
-    /* After 5s: Turns to vibrant Colour right on Hermes' B&W keyboard! */
+    /* After 5s: Warm Golden-Amber Key with Red-Orange Halo Ring (Matches Reference!) */
     &.is-color-hint {
-      background: radial-gradient(circle at 35% 28%, #fff680, #ff7a24);
+      background: linear-gradient(180deg, #ffe76b 0%, #ffa724 100%);
       color: var(--ink);
-      outline: 4px solid #ff1e38;
-      outline-offset: 2px;
+      outline: 3.5px solid #e52521;
+      outline-offset: 3px;
       box-shadow:
         inset 0 2px 0 #fffbe0,
-        0 7px 0 -3px #c94610,
+        inset 0 -4px 0 #e68310,
+        0 7px 0 -2.5px #b64010,
         0 7px 0 0 var(--ink),
-        0 3px 20px rgb(255 122 36 / 0.92);
+        0 0 0 3px rgb(255 167 36 / 0.55),
+        0 3px 18px rgb(229 37 33 / 0.72);
       z-index: 4;
       animation: key-color-pulse 0.74s ease-in-out infinite;
 
@@ -1359,6 +1373,10 @@
     & .paper-sheet.is-feeding {
       animation-duration: 0.2s;
     }
+    & .eye-unit,
+    & .eye-pupil {
+      transition-duration: 0.15s;
+    }
     & .bg-color-burst,
     & .color-rainbow-arcs,
     & .critter-stage,
@@ -1423,11 +1441,6 @@
 
     & .sunburst-rays {
       animation-play-state: running;
-    }
-
-    & .bw-paper-burst {
-      opacity: 0;
-      transform: scale(1.15);
     }
 
     & .color-rainbow-arcs {
@@ -1524,8 +1537,11 @@
     & .tw-terrace {
       fill: #2d7464;
     }
-    & .tw-keystem {
-      stroke: #8fdcc7;
+    & .tw-muzzle-slot {
+      fill: #1d5246;
+    }
+    & .tw-muzzle-pad {
+      fill: #dcfbf0;
     }
     & .tw-ribbon-dot-a {
       fill: #ff4757;
@@ -1534,11 +1550,9 @@
       fill: #2ec8ff;
     }
     & .tw-knob,
-    & .tw-base-pad {
-      fill: var(--hermes-coral);
-    }
+    & .tw-base-pad,
     & .tw-nose {
-      fill: var(--hermes-mint-deep);
+      fill: var(--hermes-coral);
     }
     & .tw-cheek {
       fill: #ff7a8a;
@@ -1563,7 +1577,7 @@
     }
 
     & .arms-celebrating {
-      transform-origin: 640px 244px;
+      transform-origin: 640px 264px;
       animation: arms-cheer-bounce 0.55s ease-in-out infinite alternate;
 
       @media (prefers-reduced-motion: reduce) {
@@ -1571,25 +1585,26 @@
       }
     }
 
-    & .pupils-group {
-      transform: translateY(4px);
+    /* Widen pupils joyfully without overwriting their individual translate gaze! */
+    & .eye-pupil {
+      scale: 1.08;
     }
 
-    /* 3D Seafoam-Mint Keycaps & Coral Accent Target Key */
+    /* 3D Seafoam-Mint Pill Keycaps & Coral Accent Target Key */
     & .tw-key {
-      background: radial-gradient(circle at 50% 34%, #f2fffb 0%, #c4f6e5 66%, #96e4cb 100%);
+      background: linear-gradient(180deg, #f4fffc 0%, #c8f7e7 64%, #9ae5cc 100%);
       box-shadow:
         inset 0 2px 0 #ffffff,
-        inset 0 0 0 2.5px rgb(255 255 255 / 0.72),
-        inset 0 -2.5px 0 #79d4b9,
-        0 7px 0 -3px #3f9c86,
+        inset 0 -5px 0 #79d4b9,
+        0 7px 0 -2.5px #3f9c86,
         0 7px 0 0 var(--ink);
     }
     & .tw-key.is-target-celebrate {
-      background: radial-gradient(circle at 35% 30%, #ffe863, #ff7b3b);
+      background: linear-gradient(180deg, #ffe863 0%, #ff7b3b 100%);
       box-shadow:
         inset 0 2px 0 #fff9d2,
-        0 7px 0 -3px #c94610,
+        inset 0 -4px 0 #d9581a,
+        0 7px 0 -2.5px #b64010,
         0 7px 0 0 var(--ink);
       transform: translateY(-2px) scale(1.12);
     }
@@ -1689,30 +1704,30 @@
   0%,
   93%,
   100% {
-    transform: scaleY(1);
+    scale: 1 1;
   }
   96% {
-    transform: scaleY(0.08);
+    scale: 1 0.08;
   }
 }
 
 @keyframes glove-hover-l {
   0%,
   100% {
-    transform: translate(136px, 480px) rotate(0deg);
+    transform: translate(158px, 498px) rotate(0deg);
   }
   50% {
-    transform: translate(139px, 475px) rotate(-4deg);
+    transform: translate(161px, 493px) rotate(-4deg);
   }
 }
 
 @keyframes glove-hover-r {
   0%,
   100% {
-    transform: translate(1144px, 480px) scale(-1, 1) rotate(0deg);
+    transform: translate(1122px, 498px) scale(-1, 1) rotate(0deg);
   }
   50% {
-    transform: translate(1141px, 475px) scale(-1, 1) rotate(-4deg);
+    transform: translate(1119px, 493px) scale(-1, 1) rotate(-4deg);
   }
 }
 

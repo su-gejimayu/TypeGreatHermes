@@ -91,6 +91,11 @@
   const calloutLeft = document.getElementById('callout-left');
   const calloutRight = document.getElementById('callout-right');
   const confettiLayer = document.getElementById('confetti-layer');
+  const hermesSvg = document.getElementById('hermes-svg');
+  const eyeLeft = document.getElementById('eye-left');
+  const eyeRight = document.getElementById('eye-right');
+  const pupilLeft = document.getElementById('pupil-left');
+  const pupilRight = document.getElementById('pupil-right');
   const keysContainer = document.getElementById('typewriter-keys');
   const keyRowsMount = document.getElementById('key-rows-mount') || keysContainer;
   const keyRedArrow = document.getElementById('key-red-arrow');
@@ -132,6 +137,7 @@
   };
 
   const keyButtonsByChar = new Map();
+  const keySvgCoordsByChar = new Map();
   let spacebarEl = null;
   let supportsDisplayTransition;
 
@@ -335,15 +341,34 @@
     return state.currentItem.key[state.charIndex] || state.currentItem.key[0];
   }
 
-  /** Build permanent 4-row round vintage typewriter keycaps (1-0 + QWERTY + Spacebar) */
+  /** Build permanent 4-row pill-rounded vintage typewriter keycaps (1-0 + QWERTY + Spacebar) */
   function renderTypewriterKeys() {
     keyRowsMount.innerHTML = '';
     keyButtonsByChar.clear();
+    keySvgCoordsByChar.clear();
 
-    ALL_KEY_ROWS.forEach((rowKeys) => {
+    // Precompute exact 1280x612 viewBox centers per row/col as zero-layout fallback
+    const rowStaggers = [
+      { padStart: 0, padEnd: 0.012, y: 264.5 },
+      { padStart: 0.012, padEnd: 0, y: 340.5 },
+      { padStart: 0, padEnd: 0.01, y: 416.6 },
+      { padStart: 0, padEnd: 0.024, y: 492.6 }
+    ];
+    const boxX0 = 128;
+    const boxW = 1024;
+    const keyW = 88.06;
+    const gapX = 10.5;
+
+    ALL_KEY_ROWS.forEach((rowKeys, rowIdx) => {
       const rowEl = document.createElement('div');
       rowEl.className = 'key-row';
-      rowKeys.forEach((char) => {
+      const stagger = rowStaggers[rowIdx] || { padStart: 0, padEnd: 0, y: 340.5 };
+      const usableX0 = boxX0 + stagger.padStart * boxW;
+      const usableX1 = boxX0 + boxW - stagger.padEnd * boxW;
+      const rowSpan = rowKeys.length * keyW + (rowKeys.length - 1) * gapX;
+      const firstCenterX = (usableX0 + usableX1 - rowSpan) / 2 + keyW / 2;
+
+      rowKeys.forEach((char, colIdx) => {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'tw-key';
@@ -359,6 +384,10 @@
         });
         rowEl.appendChild(btn);
         keyButtonsByChar.set(char, btn);
+        keySvgCoordsByChar.set(char, {
+          x: firstCenterX + colIdx * (keyW + gapX),
+          y: stagger.y
+        });
       });
       keyRowsMount.appendChild(rowEl);
     });
@@ -372,6 +401,118 @@
     keyRowsMount.appendChild(spaceRow);
 
     updateKeyHighlights();
+  }
+
+  /** Map a target key's live rendered center into Hermes's 1280x612 SVG viewBox */
+  function getKeySvgPoint(char) {
+    const targetBtn = keyButtonsByChar.get(char);
+    if (
+      hermesSvg &&
+      targetBtn &&
+      typeof hermesSvg.getBoundingClientRect === 'function' &&
+      typeof targetBtn.getBoundingClientRect === 'function'
+    ) {
+      const svgRect = hermesSvg.getBoundingClientRect();
+      const btnRect = targetBtn.getBoundingClientRect();
+      if (
+        svgRect.width > 0 &&
+        svgRect.height > 0 &&
+        btnRect.width > 0 &&
+        Number.isFinite(svgRect.left) &&
+        Number.isFinite(svgRect.top) &&
+        Number.isFinite(btnRect.left) &&
+        Number.isFinite(btnRect.top)
+      ) {
+        return {
+          x: ((btnRect.left + btnRect.width / 2 - svgRect.left) / svgRect.width) * 1280,
+          y: ((btnRect.top + btnRect.height / 2 - svgRect.top) / svgRect.height) * 612
+        };
+      }
+    }
+    return keySvgCoordsByChar.get(char) || null;
+  }
+
+  /** Compute elliptical pupil offset (in SVG viewBox units) from an eye center to a target */
+  function computePupilOffset(eyeX, eyeY, targetX, targetY) {
+    const MAX_X = 12.6;
+    const MAX_Y = 19.6;
+    const dx = targetX - eyeX;
+    const dy = targetY - eyeY;
+
+    let nx = Math.tanh(dx / 290);
+    let ny;
+    if (dy < 0) {
+      ny = Math.max(-0.55, dy / 220);
+    } else {
+      const rowDepth = Math.max(0, Math.min(1, (dy - 190) / 265));
+      ny = 0.36 + 0.58 * rowDepth;
+    }
+
+    const mag = Math.hypot(nx, ny);
+    if (mag > 1) {
+      nx /= mag;
+      ny /= mag;
+    }
+    return {
+      x: nx * MAX_X,
+      y: ny * MAX_Y
+    };
+  }
+
+  function applyEyeOffset(eyeEl, pupilEl, offset) {
+    const px = `${offset.x.toFixed(2)}px`;
+    const py = `${offset.y.toFixed(2)}px`;
+    if (pupilEl) {
+      pupilEl.style.setProperty('--pupil-x', px);
+      pupilEl.style.setProperty('--pupil-y', py);
+    }
+    if (eyeEl) {
+      eyeEl.style.setProperty('--pupil-x', px);
+      eyeEl.style.setProperty('--pupil-y', py);
+    }
+  }
+
+  /** Animate Hermes's wide-set eyes (462,56 & 818,56) to look at the next key to press */
+  function updateEyeGaze() {
+    if (!pupilLeft || !pupilRight) return;
+
+    const LEFT_EYE = { x: 462, y: 56 };
+    const RIGHT_EYE = { x: 818, y: 56 };
+
+    if (state.phase === 'celebrating') {
+      // Look cheerfully up toward the rainbow word & bounding critter on the paper!
+      const paperTarget = { x: 640, y: -65 };
+      applyEyeOffset(
+        eyeLeft,
+        pupilLeft,
+        computePupilOffset(LEFT_EYE.x, LEFT_EYE.y, paperTarget.x, paperTarget.y)
+      );
+      applyEyeOffset(
+        eyeRight,
+        pupilRight,
+        computePupilOffset(RIGHT_EYE.x, RIGHT_EYE.y, paperTarget.x, paperTarget.y)
+      );
+      return;
+    }
+
+    const activeChar = getActiveTargetChar();
+    const targetPt = activeChar ? getKeySvgPoint(activeChar) : null;
+    if (!targetPt) {
+      applyEyeOffset(eyeLeft, pupilLeft, { x: 0, y: 0 });
+      applyEyeOffset(eyeRight, pupilRight, { x: 0, y: 0 });
+      return;
+    }
+
+    applyEyeOffset(
+      eyeLeft,
+      pupilLeft,
+      computePupilOffset(LEFT_EYE.x, LEFT_EYE.y, targetPt.x, targetPt.y)
+    );
+    applyEyeOffset(
+      eyeRight,
+      pupilRight,
+      computePupilOffset(RIGHT_EYE.x, RIGHT_EYE.y, targetPt.x, targetPt.y)
+    );
   }
 
   /** Compute fallback coordinates so #key-red-arrow points directly at the active key */
@@ -451,6 +592,7 @@
     if (!isCelebrating && state.hintStage === 'arrow') {
       syncArrowCoordinates();
     }
+    updateEyeGaze();
   }
 
   function flashKeyPress(char) {
@@ -906,9 +1048,10 @@
     }
   });
 
-  // Keep Red Arrow fallback coordinates aligned on viewport/fullscreen resize
+  // Keep eye gaze & Red Arrow fallback coordinates aligned on viewport/fullscreen resize
   if ('ResizeObserver' in window && keysContainer) {
     const ro = new ResizeObserver(() => {
+      updateEyeGaze();
       if (state.hintStage === 'arrow' && state.phase !== 'celebrating') {
         syncArrowCoordinates();
       }
