@@ -2,14 +2,97 @@
  * Web Audio API Vintage Typewriter & Cartoon Sound Synthesizer + Friendly Speech
  */
 (function () {
+  const NOTE_HZ = {
+    C3: 130.81,
+    D3: 146.83,
+    E3: 164.81,
+    F3: 174.61,
+    G3: 196.0,
+    A3: 220.0,
+    B3: 246.94,
+    C4: 261.63,
+    D4: 293.66,
+    E4: 329.63,
+    F4: 349.23,
+    G4: 392.0,
+    A4: 440.0,
+    B4: 493.88,
+    C5: 523.25,
+    D5: 587.33,
+    E5: 659.25,
+    F5: 698.46,
+    G5: 783.99,
+    A5: 880.0,
+    B5: 987.77,
+    C6: 1046.5
+  };
+
+  // Cheerful 8-bar (64 eighth-note) C-major playground marimba + pizzicato bass loop (~106 BPM)
+  const MUSIC_STEP_SEC = 60 / 106 / 2;
+  const THINKING_BARS = [
+    {
+      bass: ['C3', 'G3'],
+      chord: ['E4', 'G4'],
+      melody: ['E5', 'G5', 'A5', 'G5', 'E5', 'C5', 'D5', 'E5']
+    },
+    {
+      bass: ['A3', 'E3'],
+      chord: ['C4', 'E4'],
+      melody: ['C5', null, 'E5', 'G5', 'A5', 'G5', 'E5', null]
+    },
+    {
+      bass: ['F3', 'C3'],
+      chord: ['F4', 'A4'],
+      melody: ['F5', 'A5', 'C6', 'A5', 'G5', 'F5', 'E5', 'D5']
+    },
+    {
+      bass: ['G3', 'D3'],
+      chord: ['D4', 'G4'],
+      melody: ['G5', null, 'B5', 'A5', 'G5', null, 'D5', 'F5']
+    },
+    {
+      bass: ['C3', 'G3'],
+      chord: ['E4', 'G4'],
+      melody: ['E5', 'G5', 'C6', 'B5', 'A5', 'G5', 'E5', 'C5']
+    },
+    {
+      bass: ['E3', 'A3'],
+      chord: ['E4', 'G4'],
+      melody: ['G5', 'E5', 'D5', 'E5', 'C5', null, 'E5', 'G5']
+    },
+    {
+      bass: ['D3', 'A3'],
+      chord: ['F4', 'A4'],
+      melody: ['F5', 'D5', 'F5', 'A5', 'G5', 'E5', 'F5', 'A5']
+    },
+    {
+      bass: ['G3', 'D3'],
+      chord: ['D4', 'F4'],
+      melody: ['B5', 'G5', 'A5', 'B5', 'C6', null, 'G5', null]
+    }
+  ];
+  const TOTAL_MUSIC_STEPS = THINKING_BARS.length * 8;
+
   class HermesAudio {
     constructor() {
       this.ctx = null;
       this.soundEnabled = true;
+      this.musicEnabled = true;
       this.voiceEnabled = true;
+      this.isCelebrating = false;
+      this.isSpeechDucking = false;
       this.preferredVoice = null;
       this.lastBuzzSpeechAt = 0;
+
+      this.musicBus = null;
+      this.musicFilter = null;
+      this._musicTimer = null;
+      this._speechDuckTimer = null;
+      this._nextMusicNoteTime = 0;
+      this._musicStep = 0;
+
       this._initVoices();
+      this._initVisibilityHandling();
     }
 
     _initVoices() {
@@ -78,6 +161,17 @@
       window.speechSynthesis.addEventListener?.('voiceschanged', this._pickVoice);
     }
 
+    _initVisibilityHandling() {
+      if (typeof document === 'undefined' || !document.addEventListener) return;
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          this._stopMusicScheduler();
+        } else if (this.ctx && this.soundEnabled && this.musicEnabled) {
+          this._startMusicScheduler();
+        }
+      });
+    }
+
     unlock() {
       if (!this.ctx) {
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -88,6 +182,12 @@
       if (this.ctx && this.ctx.state === 'suspended') {
         this.ctx.resume().catch(() => {});
       }
+      if (this.ctx) {
+        this._ensureMusicBus();
+        if (this.soundEnabled && this.musicEnabled) {
+          this._startMusicScheduler();
+        }
+      }
     }
 
     setSoundEnabled(enabled) {
@@ -95,6 +195,17 @@
       if (!this.soundEnabled && 'speechSynthesis' in window) {
         window.speechSynthesis.cancel();
       }
+      this._syncMusicPlayback();
+    }
+
+    setMusicEnabled(enabled) {
+      this.musicEnabled = Boolean(enabled);
+      this._syncMusicPlayback();
+    }
+
+    setCelebrating(active) {
+      this.isCelebrating = Boolean(active);
+      this._updateMusicBusGain();
     }
 
     setVoiceEnabled(enabled) {
@@ -122,6 +233,15 @@
           if (!this.preferredVoice && this._pickVoice) {
             this._pickVoice();
           }
+          // Briefly duck happy thinking music while Hermes speaks aloud
+          this.isSpeechDucking = true;
+          this._updateMusicBusGain();
+          clearTimeout(this._speechDuckTimer);
+          this._speechDuckTimer = setTimeout(() => {
+            this.isSpeechDucking = false;
+            this._updateMusicBusGain();
+          }, 1350);
+
           window.speechSynthesis.cancel();
           const utter = new SpeechSynthesisUtterance(text);
           if (this.preferredVoice) {
@@ -131,6 +251,11 @@
           utter.rate = rate;
           utter.pitch = pitch;
           utter.volume = 0.96;
+          utter.onend = () => {
+            clearTimeout(this._speechDuckTimer);
+            this.isSpeechDucking = false;
+            this._updateMusicBusGain();
+          };
           window.speechSynthesis.speak(utter);
         } catch (_) {
           // Ignore speech synthesis quirks gracefully
@@ -448,6 +573,172 @@
         gain.connect(this.ctx.destination);
         osc.start(st);
         osc.stop(st + 0.03);
+      }
+    }
+
+    /** Create dedicated warm low-passed master bus for background thinking music */
+    _ensureMusicBus() {
+      if (!this.ctx || this.musicBus) return;
+      this.musicBus = this.ctx.createGain();
+      const initialGain =
+        this.soundEnabled && this.musicEnabled ? this._targetMusicGain() : 0.0001;
+      this.musicBus.gain.setValueAtTime(initialGain, this.ctx.currentTime);
+
+      if (typeof this.ctx.createBiquadFilter === 'function') {
+        this.musicFilter = this.ctx.createBiquadFilter();
+        this.musicFilter.type = 'lowpass';
+        this.musicFilter.frequency.setValueAtTime(2350, this.ctx.currentTime);
+        this.musicFilter.Q.setValueAtTime(0.7, this.ctx.currentTime);
+        this.musicFilter.connect(this.musicBus);
+      }
+
+      this.musicBus.connect(this.ctx.destination);
+    }
+
+    _targetMusicGain() {
+      if (!this.soundEnabled || !this.musicEnabled) return 0.0001;
+      if (this.isCelebrating) return 0.055;
+      if (this.isSpeechDucking) return 0.11;
+      return 0.27;
+    }
+
+    _updateMusicBusGain() {
+      if (!this.ctx || !this.musicBus) return;
+      const target = this._targetMusicGain();
+      const now = this.ctx.currentTime;
+      if (typeof this.musicBus.gain.setTargetAtTime === 'function') {
+        this.musicBus.gain.setTargetAtTime(target, now, 0.08);
+      } else {
+        this.musicBus.gain.setValueAtTime(target, now);
+      }
+    }
+
+    _syncMusicPlayback() {
+      this._updateMusicBusGain();
+      if (!this.soundEnabled || !this.musicEnabled) {
+        this._stopMusicScheduler();
+      } else if (this.ctx && (typeof document === 'undefined' || !document.hidden)) {
+        this._startMusicScheduler();
+      }
+    }
+
+    _startMusicScheduler() {
+      if (!this.ctx || this._musicTimer) return;
+      this._ensureMusicBus();
+      this._updateMusicBusGain();
+
+      if (this._nextMusicNoteTime < this.ctx.currentTime) {
+        this._nextMusicNoteTime = this.ctx.currentTime + 0.06;
+      }
+
+      const tick = () => {
+        this._musicTimer = null;
+        if (!this.soundEnabled || !this.musicEnabled || !this.ctx) return;
+        if (typeof document !== 'undefined' && document.hidden) return;
+
+        // Clamp if audio clock jumped forward while suspended
+        if (this._nextMusicNoteTime < this.ctx.currentTime - 0.1) {
+          this._nextMusicNoteTime = this.ctx.currentTime + 0.05;
+        }
+
+        // Schedule happy thinking music notes 0.30s ahead on Web Audio clock
+        while (this._nextMusicNoteTime < this.ctx.currentTime + 0.3) {
+          this._scheduleMusicStep(this._musicStep, this._nextMusicNoteTime);
+          this._nextMusicNoteTime += MUSIC_STEP_SEC;
+          this._musicStep = (this._musicStep + 1) % TOTAL_MUSIC_STEPS;
+        }
+
+        this._musicTimer = setTimeout(tick, 125);
+      };
+
+      tick();
+    }
+
+    _stopMusicScheduler() {
+      if (this._musicTimer) {
+        clearTimeout(this._musicTimer);
+        this._musicTimer = null;
+      }
+    }
+
+    /** Synthesize one eighth-note step of the cheerful marimba + pizzicato bass loop */
+    _scheduleMusicStep(step, st) {
+      if (!this.ctx || !this.musicBus) return;
+      const dest = this.musicFilter || this.musicBus;
+
+      const barIndex = Math.floor(step / 8) % THINKING_BARS.length;
+      const beatStep = step % 8;
+      const bar = THINKING_BARS[barIndex];
+
+      // 1. Bouncy Pizzicato Bass on beats 1 and 3 (beatStep 0 and 4)
+      if (beatStep === 0 || beatStep === 4) {
+        const bassNote = bar.bass[beatStep === 0 ? 0 : 1];
+        const bassHz = NOTE_HZ[bassNote];
+        if (bassHz) {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(bassHz, st);
+          gain.gain.setValueAtTime(0.0008, st);
+          gain.gain.linearRampToValueAtTime(0.19, st + 0.016);
+          gain.gain.exponentialRampToValueAtTime(0.0008, st + 0.34);
+          osc.connect(gain);
+          gain.connect(dest);
+          osc.start(st);
+          osc.stop(st + 0.36);
+        }
+      }
+
+      // 2. Light Sunny Off-Beat Chord Pluck on beats 2 and 4 (beatStep 2 and 6)
+      if (beatStep === 2 || beatStep === 6) {
+        bar.chord.forEach((chordNote) => {
+          const hz = NOTE_HZ[chordNote];
+          if (!hz) return;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(hz, st);
+          gain.gain.setValueAtTime(0.0008, st);
+          gain.gain.linearRampToValueAtTime(0.055, st + 0.012);
+          gain.gain.exponentialRampToValueAtTime(0.0008, st + 0.14);
+          osc.connect(gain);
+          gain.connect(dest);
+          osc.start(st);
+          osc.stop(st + 0.16);
+        });
+      }
+
+      // 3. Cheerful Toy Marimba / Celesta Lead Melody
+      const melNote = bar.melody[beatStep];
+      const melHz = melNote ? NOTE_HZ[melNote] : 0;
+      if (melHz) {
+        const osc = this.ctx.createOscillator();
+        const overtone = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        const overGain = this.ctx.createGain();
+
+        osc.type = 'triangle';
+        overtone.type = 'sine';
+        osc.frequency.setValueAtTime(melHz, st);
+        overtone.frequency.setValueAtTime(melHz * 2, st);
+
+        gain.gain.setValueAtTime(0.0008, st);
+        gain.gain.linearRampToValueAtTime(0.16, st + 0.012);
+        gain.gain.exponentialRampToValueAtTime(0.0008, st + 0.25);
+
+        overGain.gain.setValueAtTime(0.0008, st);
+        overGain.gain.linearRampToValueAtTime(0.036, st + 0.008);
+        overGain.gain.exponentialRampToValueAtTime(0.0008, st + 0.13);
+
+        osc.connect(gain);
+        overtone.connect(overGain);
+        gain.connect(dest);
+        overGain.connect(dest);
+
+        osc.start(st);
+        overtone.start(st);
+        osc.stop(st + 0.27);
+        overtone.stop(st + 0.15);
       }
     }
   }

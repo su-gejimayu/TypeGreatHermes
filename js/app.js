@@ -96,10 +96,12 @@
   const keyRedArrow = document.getElementById('key-red-arrow');
 
   const soundBtn = document.getElementById('sound-toggle-btn');
+  const musicBtn = document.getElementById('music-toggle-btn');
   const fullscreenBtn = document.getElementById('fullscreen-btn');
   const optionsPopover = document.getElementById('parent-options');
   const modeSelect = document.getElementById('mode-select');
   const orderSelect = document.getElementById('order-select');
+  const musicCheckbox = document.getElementById('music-checkbox');
   const voiceCheckbox = document.getElementById('voice-checkbox');
   const hintCheckbox = document.getElementById('hint-checkbox');
   const skipBtn = document.getElementById('skip-letter-btn');
@@ -110,6 +112,7 @@
     mode: 'letters', // 'letters' | 'numbers' | 'both' | 'words'
     order: 'shuffle', // 'shuffle' | 'sequential'
     soundOn: true,
+    musicOn: true,
     voiceOn: true,
     showHint: true,
     hasInteracted: false,
@@ -196,6 +199,9 @@
       if (typeof saved.soundOn === 'boolean') {
         state.soundOn = saved.soundOn;
       }
+      if (typeof saved.musicOn === 'boolean') {
+        state.musicOn = saved.musicOn;
+      }
       if (typeof saved.voiceOn === 'boolean') {
         state.voiceOn = saved.voiceOn;
         voiceCheckbox.checked = saved.voiceOn;
@@ -218,6 +224,7 @@
           mode: state.mode,
           order: state.order,
           soundOn: state.soundOn,
+          musicOn: state.musicOn,
           voiceOn: state.voiceOn,
           showHint: state.showHint
         })
@@ -229,9 +236,15 @@
 
   function syncSoundUI() {
     window.hermesAudio.setSoundEnabled(state.soundOn);
+    window.hermesAudio.setMusicEnabled(state.musicOn);
     window.hermesAudio.setVoiceEnabled(state.voiceOn);
     soundBtn.setAttribute('aria-pressed', String(state.soundOn));
-    soundBtn.setAttribute('aria-label', state.soundOn ? 'Mute sound' : 'Turn sound on');
+    if (musicBtn) {
+      musicBtn.setAttribute('aria-pressed', String(state.musicOn));
+    }
+    if (musicCheckbox) {
+      musicCheckbox.checked = state.musicOn;
+    }
   }
 
   function getPool() {
@@ -537,11 +550,13 @@
   function renderNumberCountBadges(item) {
     if (!paperCountBadges) return;
     if (typeof item.count !== 'number') {
+      paperCountBadges.setAttribute('hidden', '');
       paperCountBadges.hidden = true;
       paperCountBadges.innerHTML = '';
       return;
     }
 
+    paperCountBadges.removeAttribute('hidden');
     paperCountBadges.hidden = false;
     paperCountBadges.innerHTML = '';
 
@@ -574,6 +589,7 @@
     const item = state.currentItem;
     const multiChar = isMultiCharItem(item);
 
+    window.hermesAudio.setCelebrating(false);
     body.dataset.state = 'prompting';
     body.style.setProperty('--accent-hue', String(item.accentHue || 36));
 
@@ -585,13 +601,20 @@
     buzzFeedback.hidden = true;
 
     if (multiChar) {
+      // SVGSVGElement does not reflect .hidden to the [hidden] HTML attribute; set explicitly & clear glyph text
+      paperSingleSvg.setAttribute('hidden', '');
       paperSingleSvg.hidden = true;
+      paperLetterText.textContent = '';
+      paperLetterShadow.textContent = '';
+      paperWordSlots.removeAttribute('hidden');
       paperWordSlots.hidden = false;
       buildWordPaperSlots(item.key);
       syncWordProgressUI();
     } else {
+      paperWordSlots.setAttribute('hidden', '');
       paperWordSlots.hidden = true;
       paperWordSlots.innerHTML = '';
+      paperSingleSvg.removeAttribute('hidden');
       paperSingleSvg.hidden = false;
       promptTarget.textContent = item.key;
       paperLetterText.textContent = item.key;
@@ -708,6 +731,7 @@
     updateKeyHighlights();
     spawnConfettiBurst(40);
 
+    window.hermesAudio.setCelebrating(true);
     window.hermesAudio.playSuccess(item.sfx);
     window.hermesAudio.speak(item.spoken || item.phrase, {
       rate: 0.94,
@@ -906,7 +930,7 @@
   document.addEventListener('fullscreenchange', syncFullscreenUI);
   document.addEventListener('webkitfullscreenchange', syncFullscreenUI);
 
-  // Sound Toggle
+  // Sound & Happy Thinking Music Toggles
   soundBtn.addEventListener('click', (e) => {
     if (e.detail > 0) soundBtn.blur();
     state.hasInteracted = true;
@@ -917,6 +941,38 @@
     syncSoundUI();
     saveSettings();
   });
+
+  if (musicBtn) {
+    musicBtn.addEventListener('click', (e) => {
+      if (e.detail > 0) musicBtn.blur();
+      state.hasInteracted = true;
+      state.musicOn = !state.musicOn;
+      syncSoundUI();
+      if (state.soundOn && state.musicOn) {
+        window.hermesAudio.unlock();
+      }
+      saveSettings();
+    });
+  }
+
+  // Unlock Web Audio & start gentle thinking music on first pointer interaction anywhere
+  window.addEventListener(
+    'pointerdown',
+    (e) => {
+      if (
+        e.target &&
+        e.target.closest &&
+        e.target.closest('#sound-toggle-btn, #music-toggle-btn')
+      ) {
+        return;
+      }
+      state.hasInteracted = true;
+      if (state.soundOn) {
+        window.hermesAudio.unlock();
+      }
+    },
+    { passive: true }
+  );
 
   // Parent Settings Listeners
   modeSelect.addEventListener('change', () => {
@@ -936,6 +992,18 @@
     saveSettings();
     startNewPrompt({ speakPrompt: true, animateFeed: true });
   });
+
+  if (musicCheckbox) {
+    musicCheckbox.addEventListener('change', () => {
+      state.hasInteracted = true;
+      state.musicOn = musicCheckbox.checked;
+      syncSoundUI();
+      if (state.soundOn && state.musicOn) {
+        window.hermesAudio.unlock();
+      }
+      saveSettings();
+    });
+  }
 
   voiceCheckbox.addEventListener('change', () => {
     state.voiceOn = voiceCheckbox.checked;

@@ -166,8 +166,8 @@
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     align-items: start;
-    padding-block: clamp(0.65rem, 1.8dvh, 1.25rem);
-    padding-inline: clamp(0.75rem, 2.2dvw, 1.6rem);
+    padding-block: clamp(0.4rem, 1.1dvh, 0.85rem);
+    padding-inline: clamp(0.65rem, 1.8dvw, 1.4rem);
     pointer-events: none;
   }
 
@@ -179,7 +179,7 @@
 
   .hud-left {
     display: flex;
-    gap: 0.5rem;
+    gap: 0.45rem;
     justify-self: start;
   }
 
@@ -188,7 +188,7 @@
     justify-self: end;
   }
 
-  /* MAIN STAGE */
+  /* MAIN STAGE (Wide keyboard-forward proportions) */
   .game-stage {
     position: relative;
     z-index: 5;
@@ -196,17 +196,16 @@
     block-size: 100dvh;
     display: grid;
     place-items: end center;
-    padding-block-start: clamp(3.4rem, 9dvh, 5.4rem);
-    padding-block-end: clamp(0.35rem, 1.4dvh, 1rem);
-    padding-inline: 1rem;
+    padding-block-start: clamp(3rem, 7.2dvh, 4.3rem);
+    padding-block-end: clamp(0.2rem, 0.8dvh, 0.6rem);
+    padding-inline: clamp(0.45rem, 1.4dvw, 1.2rem);
   }
 
   .scene-rig {
     position: relative;
-    aspect-ratio: 860 / 750;
-    block-size: min(86dvh, calc(94dvw * 750 / 860), 47rem);
-    inline-size: auto;
-    container-type: size;
+    inline-size: min(96.5dvw, calc(91.2dvh * 1200 / 780));
+    block-size: min(91.2dvh, calc(96.5dvw * 780 / 1200));
+    container: stage / size;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -248,9 +247,9 @@
     }
   }
 
-  /* Keep parent controls subtle so 4yo focuses on the center letter */
+  /* Keep parent controls subtle so 4yo focuses on the center letter & keyboard */
   .hud-left .icon-btn {
-    opacity: 0.62;
+    opacity: 0.66;
 
     &:hover,
     &:focus-visible {
@@ -264,6 +263,7 @@
   }
 
   .icon-sound-off,
+  .icon-music-off,
   .icon-fs-exit {
     display: none;
   }
@@ -275,6 +275,17 @@
       display: none;
     }
     & .icon-sound-off {
+      display: block;
+    }
+  }
+
+  #music-toggle-btn[aria-pressed='false'] {
+    background: #ffe3e3;
+
+    & .icon-music-on {
+      display: none;
+    }
+    & .icon-music-off {
       display: block;
     }
   }
@@ -293,22 +304,22 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.25rem;
+    gap: 0.22rem;
     text-align: center;
   }
 
   .prompt-heading {
     display: inline-flex;
     align-items: baseline;
-    gap: 0.4rem;
-    padding-block: 0.22rem;
-    padding-inline: 1.15rem;
+    gap: 0.38rem;
+    padding-block: 0.16rem;
+    padding-inline: 1.05rem;
     border-radius: 999px;
-    font-size: clamp(1.75rem, 1.1rem + 2.8vmin, 3.1rem);
+    font-size: clamp(1.35rem, 0.85rem + 2.1vmin, 2.55rem);
     font-weight: 700;
     letter-spacing: 0.02em;
     color: var(--ink);
-    background: rgb(255 255 255 / 0.86);
+    background: rgb(255 255 255 / 0.9);
     border: 3px solid var(--ink);
     box-shadow: 0 4px 0 var(--ink);
     transition:
@@ -455,9 +466,9 @@
   /* B&W Starburst & Rainbow Arcs behind Paper */
   .bw-paper-burst {
     position: absolute;
-    inset-block-start: 0;
-    inline-size: 92%;
-    max-block-size: 62%;
+    inset-block-start: -2%;
+    inline-size: 76%;
+    max-block-size: 46%;
     z-index: 1;
     pointer-events: none;
     transition: opacity 0.28s ease, transform 0.35s ease;
@@ -465,9 +476,9 @@
 
   .color-rainbow-arcs {
     position: absolute;
-    inset-block-start: -2%;
-    inline-size: 100%;
-    max-block-size: 66%;
+    inset-block-start: -3%;
+    inline-size: 86%;
+    max-block-size: 50%;
     z-index: 2;
     pointer-events: none;
     opacity: 0;
@@ -487,18 +498,18 @@
     inset-block-end: 0;
     inset-inline: 0;
     inline-size: 100%;
-    aspect-ratio: 860 / 450;
+    aspect-ratio: 1200 / 540;
     z-index: 2;
     pointer-events: none;
     overflow: visible;
   }
 
-  /* PAPER STAGE (Sandwiched in front of Platen, behind Hermes' Hood!) */
+  /* PAPER STAGE (Compact Upper Card emerging from Platen above Hermes' Hood!) */
   .paper-stage {
     position: absolute;
-    inset-block-start: 2%;
-    inline-size: 46%;
-    block-size: 54%;
+    inset-block-start: 0.4%;
+    inline-size: 43%;
+    block-size: 38%;
     z-index: 3;
     display: flex;
     justify-content: center;
@@ -510,7 +521,7 @@
     block-size: 100%;
     background: var(--paper-bw);
     border: 4px solid var(--ink);
-    border-radius: 0.35rem 1.8rem 0.25rem 0.25rem;
+    border-radius: 0.35rem 1.65rem 0.25rem 0.25rem;
     box-shadow:
       -6px 8px 0 rgb(24 24 24 / 0.14),
       inset 0 -18px 24px rgb(0 0 0 / 0.05);
@@ -518,8 +529,9 @@
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    padding-block-start: 3%;
-    padding-inline: 0.65rem;
+    padding-block-start: 2%;
+    padding-block-end: 12%;
+    padding-inline: 0.75rem;
     cursor: pointer;
     transform-origin: 50% 100%;
     transition:
@@ -532,8 +544,8 @@
     position: absolute;
     inset-block-start: -4px;
     inset-inline-end: -4px;
-    inline-size: clamp(1.5rem, 4.4cqi, 2.35rem);
-    block-size: clamp(1.5rem, 4.4cqi, 2.35rem);
+    inline-size: clamp(1.25rem, 3.2vmin, 2.15rem);
+    block-size: clamp(1.25rem, 3.2vmin, 2.15rem);
     background:
       linear-gradient(
         225deg,
@@ -554,13 +566,14 @@
   }
 
   .paper-letter-svg {
-    inline-size: 80%;
-    max-block-size: 56%;
+    display: block;
+    inline-size: 72%;
+    max-block-size: 58%;
     overflow: visible;
     transition: transform 0.42s cubic-bezier(0.24, 1.48, 0.42, 1);
 
     &[hidden] {
-      display: none;
+      display: none !important;
     }
   }
 
@@ -588,19 +601,26 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.35cqi;
-    inline-size: 94%;
-    max-block-size: 56%;
-    margin-block-start: 4%;
-    margin-block-end: 2%;
+    gap: 0.4vmin;
+    inline-size: 92%;
+    max-block-size: 62%;
+    margin-block-start: 2%;
+    margin-block-end: 1%;
     transition: transform 0.42s cubic-bezier(0.24, 1.48, 0.42, 1);
 
     &[hidden] {
-      display: none;
+      display: none !important;
+    }
+  }
+
+  @supports (font-size: 1cqi) {
+    .paper-word-slots {
+      gap: 0.35cqi;
     }
   }
 
   .word-slot-svg {
+    display: block;
     flex: 1 1 0;
     min-inline-size: 0;
     max-inline-size: 31%;
@@ -663,10 +683,10 @@
     flex-wrap: balance;
     justify-content: center;
     align-items: center;
-    gap: clamp(0.14rem, 0.55cqi, 0.34rem);
-    max-inline-size: 92%;
-    margin-block-start: -0.2rem;
-    margin-block-end: 0.2rem;
+    gap: clamp(0.14rem, 0.45vmin, 0.32rem);
+    max-inline-size: 94%;
+    margin-block-start: -0.15rem;
+    margin-block-end: 0.15rem;
     opacity: 0;
     transform: scale(0.8);
     transition:
@@ -674,40 +694,40 @@
       transform 0.36s cubic-bezier(0.24, 1.48, 0.42, 1) 0.05s;
 
     &[hidden] {
-      display: none;
+      display: none !important;
     }
   }
 
   .count-star {
     display: inline-grid;
     place-items: center;
-    inline-size: clamp(1rem, 2.55cqi, 1.55rem);
+    inline-size: clamp(0.95rem, 2.2vmin, 1.45rem);
     aspect-ratio: 1;
     border-radius: 50%;
     background: #ffe03b;
     border: 2px solid var(--ink);
     box-shadow: 0 2px 0 var(--ink);
-    font-size: clamp(0.62rem, 1.65cqi, 1rem);
+    font-size: clamp(0.6rem, 1.4vmin, 0.95rem);
     line-height: 1;
     color: #ff2e4c;
   }
 
   .zero-hero-pill {
-    padding: 0.12rem 0.6rem;
+    padding: 0.1rem 0.55rem;
     border: 2.2px solid var(--ink);
     border-radius: 999px;
     background: #ffe03b;
     box-shadow: 0 2px 0 var(--ink);
-    font-size: clamp(0.72rem, 1.9cqi, 1.05rem);
+    font-size: clamp(0.68rem, 1.65vmin, 1rem);
     font-weight: 700;
     color: var(--ink);
   }
 
   .paper-phrase {
-    margin-block-start: -0.1rem;
+    margin-block-start: -0.05rem;
     max-inline-size: 96%;
-    font-size: clamp(0.84rem, 2.55cqi, 1.52rem);
-    line-height: 1.15;
+    font-size: clamp(0.84rem, 2.1vmin, 1.48rem);
+    line-height: 1.12;
     font-weight: 700;
     text-align: center;
     color: var(--ink);
@@ -718,12 +738,27 @@
       transform 0.38s cubic-bezier(0.24, 1.48, 0.42, 1) 0.08s;
   }
 
+  @supports (font-size: 1cqi) {
+    .count-star {
+      inline-size: clamp(0.95rem, 1.9cqi, 1.45rem);
+      font-size: clamp(0.6rem, 1.15cqi, 0.95rem);
+    }
+
+    .zero-hero-pill {
+      font-size: clamp(0.68rem, 1.35cqi, 1rem);
+    }
+
+    .paper-phrase {
+      font-size: clamp(0.84rem, 1.9cqi, 1.48rem);
+    }
+  }
+
   /* Dynamic Cartoon Character Bounding Onto Upper-Right of Paper! */
   .critter-stage {
     position: absolute;
-    inset-block-start: -5%;
-    inset-inline-end: -36%;
-    inline-size: clamp(7rem, 28cqi, 15rem);
+    inset-block-start: -4%;
+    inset-inline-end: -32%;
+    inline-size: clamp(6.2rem, 19.5vmin, 13.8rem);
     aspect-ratio: 1;
     z-index: 8;
     pointer-events: none;
@@ -738,7 +773,14 @@
     }
   }
 
+  @supports (font-size: 1cqi) {
+    .critter-stage {
+      inline-size: clamp(6.2rem, 18.5cqi, 13.8rem);
+    }
+  }
+
   .critter-svg {
+    display: block;
     inline-size: 100%;
     block-size: 100%;
     overflow: visible;
@@ -749,10 +791,10 @@
     position: absolute;
     z-index: 9;
     pointer-events: none;
-    font-size: clamp(1.8rem, 1rem + 3.8vmin, 3.6rem);
+    font-size: clamp(1.55rem, 0.95rem + 3.1vmin, 3.2rem);
     font-weight: 700;
     letter-spacing: 0.03em;
-    -webkit-text-stroke: 6px var(--ink);
+    -webkit-text-stroke: 5.5px var(--ink);
     paint-order: stroke fill;
     filter: drop-shadow(0 5px 0 var(--ink));
     opacity: 0;
@@ -767,15 +809,15 @@
   }
 
   .callout-ding {
-    inset-block-start: 20%;
-    inset-inline-start: 4%;
+    inset-block-start: 6%;
+    inset-inline-start: 8%;
     color: #4bd6ff;
     rotate: -14deg;
   }
 
   .callout-yay {
-    inset-block-start: 22%;
-    inset-inline-end: 2%;
+    inset-block-start: 7%;
+    inset-inline-end: 8%;
     color: #ff5ca8;
     rotate: 12deg;
   }
@@ -784,14 +826,14 @@
     position: absolute;
     z-index: 9;
     pointer-events: none;
-    padding: 0.7rem 1.25rem;
+    padding: 0.55rem 1.05rem;
     border: 4px solid var(--ink);
     border-radius: 999px;
-    font-size: clamp(1.25rem, 0.85rem + 2.2vmin, 2.25rem);
+    font-size: clamp(1.1rem, 0.78rem + 1.9vmin, 2.05rem);
     font-weight: 700;
     letter-spacing: 0.03em;
     color: #ffffff;
-    -webkit-text-stroke: 4.5px var(--ink);
+    -webkit-text-stroke: 4px var(--ink);
     paint-order: stroke fill;
     box-shadow: 0 5px 0 var(--ink);
     opacity: 0;
@@ -806,34 +848,34 @@
   }
 
   .callout-left {
-    inset-block-end: 18%;
-    inset-inline-start: 1%;
+    inset-block-start: 22%;
+    inset-inline-start: 3%;
     background: #ff6b4a;
     color: #ffe853;
-    rotate: -15deg;
+    rotate: -14deg;
   }
 
   .callout-right {
-    inset-block-end: 18%;
-    inset-inline-end: 1%;
+    inset-block-start: 22%;
+    inset-inline-end: 3%;
     background: #ffa62b;
     color: #52e3ff;
-    rotate: 14deg;
+    rotate: 13deg;
   }
 
   .callout-buzz {
     position: absolute;
-    inset-block-start: 18%;
-    inset-inline-end: 10%;
+    inset-block-start: 12%;
+    inset-inline-end: 13%;
     z-index: 12;
     pointer-events: none;
-    padding: 0.35rem 0.95rem;
+    padding: 0.32rem 0.9rem;
     background: #ffffff;
     color: var(--ink);
     border: 4px solid var(--ink);
     border-radius: 0.65rem;
     box-shadow: 0 4px 0 var(--ink);
-    font-size: clamp(1.3rem, 0.9rem + 2vmin, 2.1rem);
+    font-size: clamp(1.2rem, 0.85rem + 1.8vmin, 2rem);
     font-weight: 700;
     rotate: 10deg;
     opacity: 0;
@@ -841,12 +883,12 @@
     transition: opacity 0.14s ease, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
-  /* HERMES TYPEWRITER LOWER STAGE */
+  /* HERMES TYPEWRITER LOWER STAGE (WIDE KEYBOARD-CENTRIC DECK) */
   .hermes-typewriter {
     position: relative;
     z-index: 5;
     inline-size: 100%;
-    aspect-ratio: 860 / 450;
+    aspect-ratio: 1200 / 540;
     flex-shrink: 0;
   }
 
@@ -882,7 +924,7 @@
     fill: #3b3b39;
   }
   .tw-keywell {
-    fill: #2c2d2c;
+    fill: #262726;
   }
   .tw-base-pad {
     fill: #4f4f4c;
@@ -902,11 +944,11 @@
     font-family: 'Georgia', 'Times New Roman', serif;
     font-style: italic;
     font-weight: 700;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.08em;
     fill: #8d8d88;
     stroke: var(--ink);
-    stroke-width: 1.4px;
-    opacity: 0.55;
+    stroke-width: 1.2px;
+    opacity: 0.6;
     transition: fill 0.32s ease, opacity 0.32s ease;
   }
 
@@ -919,7 +961,7 @@
   }
 
   .eyes-open {
-    transform-origin: 430px 112px;
+    transform-origin: 600px 66px;
     animation: natural-blink 5.2s infinite;
 
     @media (prefers-reduced-motion: reduce) {
@@ -941,11 +983,11 @@
     }
   }
 
-  /* INTERACTIVE PERMANENT 4-ROW VINTAGE TYPEWRITER KEYS ON HERMES' DECK */
+  /* LARGE CHILD-LEGIBLE 4-ROW ONSCREEN KEYBOARD ON HERMES' WIDE DECK */
   .typewriter-keys {
     position: absolute;
-    inset-inline: 23%;
-    inset-block: 55.8% 9.4%;
+    inset-inline: 9.6%;
+    inset-block: 35.2% 6.2%;
     pointer-events: none;
   }
 
@@ -956,29 +998,45 @@
     align-items: center;
     inline-size: 100%;
     block-size: 100%;
-    gap: 0.1cqi;
+    gap: 0.25vmin;
   }
 
   .key-row {
     display: flex;
     justify-content: center;
-    gap: clamp(0.1rem, 0.58cqi, 0.34rem);
+    gap: clamp(0.18rem, 0.85vmin, 0.72rem);
     inline-size: 100%;
+
+    /* Gentle authentic QWERTY stagger so keys match a physical keyboard */
+    &:nth-child(2) {
+      padding-inline-start: 1.4%;
+    }
+    &:nth-child(3) {
+      padding-inline-end: 1.2%;
+    }
+    &:nth-child(4) {
+      padding-inline-end: 4.6%;
+    }
   }
 
   .tw-key {
     pointer-events: auto;
     position: relative;
-    inline-size: clamp(0.86rem, 3.28cqi, 1.82rem);
-    aspect-ratio: 1;
+    min-inline-size: 1.5rem;
+    min-block-size: 1.5rem;
+    inline-size: clamp(1.5rem, 6.2vmin, 5.8rem);
+    block-size: clamp(1.5rem, 5.4vmin, 4.9rem);
     padding: 0;
-    border: 2.2px solid var(--ink);
-    border-radius: 50%;
-    background: radial-gradient(circle at 35% 30%, #ffffff, #d5d5d0);
-    box-shadow: 0 3px 0 var(--ink);
-    font-size: clamp(0.45rem, 1.35cqi, 0.78rem);
+    border: 3px solid var(--ink);
+    border-radius: 36%;
+    background: linear-gradient(180deg, #ffffff 0%, #f1f1ec 68%, #d9d9d2 100%);
+    box-shadow:
+      0 4px 0 var(--ink),
+      inset 0 2px 0 rgb(255 255 255 / 0.92);
+    font-size: clamp(1.08rem, 3.1vmin, 2.68rem);
     font-weight: 700;
     line-height: 1;
+    letter-spacing: -0.01em;
     color: var(--ink);
     display: grid;
     place-items: center;
@@ -989,39 +1047,51 @@
       box-shadow 0.18s ease,
       outline-color 0.25s ease;
 
+    /* Tactile home-row locator bars on F and J matching physical keyboards */
+    &[data-key='F']::after,
+    &[data-key='J']::after {
+      content: '';
+      position: absolute;
+      inset-block-end: 11%;
+      inline-size: 28%;
+      block-size: 3px;
+      border-radius: 999px;
+      background: rgb(24 24 24 / 0.48);
+    }
+
     &:hover:not(:disabled) {
       background: #ffffff;
     }
 
     &:active:not(:disabled),
     &.is-pressed {
-      transform: translateY(3px);
+      transform: translateY(4px);
       box-shadow: 0 0 0 var(--ink);
     }
 
     /* 0s - 5s: Animated Black & White key prompt */
     &.is-hint {
       background: #ffffff;
-      outline: 3px solid var(--ink);
+      outline: 4px solid var(--ink);
       outline-offset: 2px;
       z-index: 2;
       animation: key-hint-pulse 0.9s ease-in-out infinite;
 
       @media (prefers-reduced-motion: reduce) {
         animation: none;
-        outline-width: 4px;
+        outline-width: 4.5px;
       }
     }
 
     /* After 5s: Turns to vibrant Colour right on Hermes' B&W keyboard! */
     &.is-color-hint {
-      background: radial-gradient(circle at 35% 30%, #fff475, #ff7a24);
+      background: radial-gradient(circle at 35% 28%, #fff680, #ff7a24);
       color: var(--ink);
-      outline: 3px solid #ff1e38;
+      outline: 4px solid #ff1e38;
       outline-offset: 2px;
       box-shadow:
-        0 3px 0 var(--ink),
-        0 0 16px rgb(255 122 36 / 0.9);
+        0 4px 0 var(--ink),
+        0 0 20px rgb(255 122 36 / 0.92);
       z-index: 4;
       animation: key-color-pulse 0.74s ease-in-out infinite;
 
@@ -1031,24 +1101,46 @@
     }
   }
 
+  @supports (font-size: 1cqi) {
+    .key-rows-mount {
+      gap: 0.22cqb;
+    }
+
+    .key-row {
+      gap: 0.85cqi;
+    }
+
+    .tw-key {
+      inline-size: 6.72cqi;
+      block-size: 8.2cqb;
+      font-size: clamp(1.08rem, 3.15cqi, 2.68rem);
+    }
+  }
+
   /* After 10s: Bold Comic Red Arrow pointing directly at the target key! */
   .key-red-arrow {
     position: absolute;
     inset-inline-start: var(--arrow-x, 50%);
     inset-block-start: var(--arrow-y, 0px);
-    translate: -50% calc(-100% - 0.3rem);
-    inline-size: clamp(1.85rem, 6.2cqi, 3.3rem);
+    translate: -50% calc(-100% - 0.35rem);
+    inline-size: clamp(2.1rem, 5.6vmin, 4.1rem);
     aspect-ratio: 64 / 78;
     z-index: 15;
     pointer-events: none;
     opacity: 1;
     scale: 1;
-    filter: drop-shadow(0 4px 0 rgb(24 24 24 / 0.32));
+    filter: drop-shadow(0 4px 0 rgb(24 24 24 / 0.34));
     transition:
       display 0.22s,
       opacity 0.22s ease-out,
       scale 0.24s cubic-bezier(0.22, 1.5, 0.38, 1);
     transition-behavior: allow-discrete;
+  }
+
+  @supports (font-size: 1cqi) {
+    .key-red-arrow {
+      inline-size: clamp(2.1rem, 5.4cqi, 4.1rem);
+    }
   }
 
   @supports (anchor-name: --hint-target-key) {
@@ -1059,7 +1151,7 @@
     .key-red-arrow {
       inset: auto;
       position-anchor: --hint-target-key;
-      inset-block-end: calc(anchor(top) + 0.3rem);
+      inset-block-end: calc(anchor(top) + 0.35rem);
       inset-inline-start: anchor(center);
       translate: -50% 0;
     }
@@ -1096,17 +1188,23 @@
   }
 
   .tw-spacebar {
-    inline-size: 46%;
-    block-size: clamp(0.46rem, 1.38cqi, 0.8rem);
-    border: 2.3px solid var(--ink);
+    inline-size: 48%;
+    block-size: clamp(0.68rem, 2vmin, 1.35rem);
+    border: 3px solid var(--ink);
     border-radius: 999px;
-    background: #cfcfca;
-    box-shadow: 0 3px 0 var(--ink);
-    transition: background-color 0.3s ease, transform 0.08s ease;
+    background: linear-gradient(180deg, #e5e5e0, #c8c8c2);
+    box-shadow: 0 4px 0 var(--ink);
+    transition: background 0.3s ease, transform 0.08s ease;
 
     &.is-pressed {
-      transform: translateY(2px);
+      transform: translateY(3px);
       box-shadow: 0 1px 0 var(--ink);
+    }
+  }
+
+  @supports (font-size: 1cqi) {
+    .tw-spacebar {
+      block-size: 2.65cqb;
     }
   }
 
@@ -1308,7 +1406,7 @@
     }
 
     & .arms-celebrating {
-      transform-origin: 430px 260px;
+      transform-origin: 600px 208px;
       animation: arms-cheer-bounce 0.55s ease-in-out infinite alternate;
 
       @media (prefers-reduced-motion: reduce) {
@@ -1317,19 +1415,19 @@
     }
 
     & .pupils-group {
-      transform: translateY(5px);
+      transform: translateY(4px);
     }
 
     /* Mint Keycaps & Coral Accent Keys */
     & .tw-key {
-      background: radial-gradient(circle at 35% 30%, #dcfff4, #8adbc4);
+      background: linear-gradient(180deg, #e8fff8 0%, #b5f2df 65%, #7fd7be 100%);
     }
     & .tw-key.is-target-celebrate {
       background: radial-gradient(circle at 35% 30%, #ffe863, #ff7b3b);
-      transform: translateY(-2px) scale(1.14);
+      transform: translateY(-2px) scale(1.12);
     }
     & .tw-spacebar {
-      background: #8adbc4;
+      background: linear-gradient(180deg, #c6f7e7, #8adbc4);
     }
   }
 
@@ -1430,20 +1528,20 @@
 @keyframes glove-hover-l {
   0%,
   100% {
-    transform: translate(154px, 318px) rotate(0deg);
+    transform: translate(64px, 348px) rotate(0deg);
   }
   50% {
-    transform: translate(156px, 313px) rotate(-4deg);
+    transform: translate(66px, 343px) rotate(-4deg);
   }
 }
 
 @keyframes glove-hover-r {
   0%,
   100% {
-    transform: translate(706px, 318px) scale(-1, 1) rotate(0deg);
+    transform: translate(1136px, 348px) scale(-1, 1) rotate(0deg);
   }
   50% {
-    transform: translate(704px, 313px) scale(-1, 1) rotate(-4deg);
+    transform: translate(1134px, 343px) scale(-1, 1) rotate(-4deg);
   }
 }
 
