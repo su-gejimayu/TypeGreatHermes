@@ -101,6 +101,7 @@
   const optionsPopover = document.getElementById('parent-options');
   const modeSelect = document.getElementById('mode-select');
   const orderSelect = document.getElementById('order-select');
+  const fastModeCheckbox = document.getElementById('fast-mode-checkbox');
   const musicCheckbox = document.getElementById('music-checkbox');
   const voiceCheckbox = document.getElementById('voice-checkbox');
   const hintCheckbox = document.getElementById('hint-checkbox');
@@ -111,6 +112,7 @@
     phase: 'prompting', // 'prompting' | 'buzzing' | 'celebrating'
     mode: 'letters', // 'letters' | 'numbers' | 'both' | 'words'
     order: 'shuffle', // 'shuffle' | 'sequential'
+    fastMode: false,
     soundOn: true,
     musicOn: true,
     voiceOn: true,
@@ -185,6 +187,13 @@
     }
   }
 
+  function syncFastModeUI() {
+    body.classList.toggle('is-fast-mode', state.fastMode);
+    if (fastModeCheckbox) {
+      fastModeCheckbox.checked = state.fastMode;
+    }
+  }
+
   function loadSettings() {
     try {
       const saved = JSON.parse(localStorage.getItem('hermes_settings_v1') || '{}');
@@ -195,6 +204,9 @@
       if (saved.order && ['shuffle', 'sequential'].includes(saved.order)) {
         state.order = saved.order;
         orderSelect.value = saved.order;
+      }
+      if (typeof saved.fastMode === 'boolean') {
+        state.fastMode = saved.fastMode;
       }
       if (typeof saved.soundOn === 'boolean') {
         state.soundOn = saved.soundOn;
@@ -213,6 +225,7 @@
     } catch (_) {
       // Ignore storage errors in private/file contexts
     }
+    syncFastModeUI();
     syncSoundUI();
   }
 
@@ -223,6 +236,7 @@
         JSON.stringify({
           mode: state.mode,
           order: state.order,
+          fastMode: state.fastMode,
           soundOn: state.soundOn,
           musicOn: state.musicOn,
           voiceOn: state.voiceOn,
@@ -641,13 +655,17 @@
     announce(multiChar ? `Spell ${item.word}: ${item.key}` : `Type ${item.key}`);
 
     if (speakPrompt && state.hasInteracted) {
-      const promptSpeech = multiChar
-        ? `${item.isBonus ? 'Bonus word! ' : ''}Spell ${item.word}! Type ${item.key[0]}!`
-        : `Type ${item.key}!`;
+      const promptSpeech = state.fastMode
+        ? multiChar
+          ? `Spell ${item.word}!`
+          : `Type ${item.key}!`
+        : multiChar
+          ? `${item.isBonus ? 'Bonus word! ' : ''}Spell ${item.word}! Type ${item.key[0]}!`
+          : `Type ${item.key}!`;
       window.hermesAudio.speak(promptSpeech, {
-        rate: 0.95,
+        rate: state.fastMode ? 1.08 : 0.95,
         pitch: 0.92,
-        delayMs: 220
+        delayMs: state.fastMode ? 70 : 220
       });
     }
   }
@@ -666,7 +684,9 @@
       const tx = Math.cos(angle) * dist;
       const ty = Math.sin(angle) * dist - 40;
       const rot = Math.round((Math.random() - 0.5) * 520);
-      const dur = (1.25 + Math.random() * 0.9).toFixed(2);
+      const dur = (
+        state.fastMode ? 0.65 + Math.random() * 0.42 : 1.25 + Math.random() * 0.9
+      ).toFixed(2);
 
       el.style.setProperty('--p-color', color);
       el.style.setProperty('--tx', `${tx.toFixed(0)}px`);
@@ -701,9 +721,9 @@
 
     window.hermesAudio.playLetterStep(stampedIdx);
     window.hermesAudio.speak(`Next, ${nextChar}!`, {
-      rate: 0.98,
+      rate: state.fastMode ? 1.1 : 0.98,
       pitch: 0.93,
-      delayMs: 280
+      delayMs: state.fastMode ? 60 : 280
     });
     announce(`Good! Next letter ${nextChar}`);
   }
@@ -729,19 +749,29 @@
 
     body.dataset.state = 'celebrating';
     updateKeyHighlights();
-    spawnConfettiBurst(40);
+    spawnConfettiBurst(state.fastMode ? 22 : 40);
 
     window.hermesAudio.setCelebrating(true);
-    window.hermesAudio.playSuccess(item.sfx);
-    window.hermesAudio.speak(item.spoken || item.phrase, {
-      rate: 0.94,
+    window.hermesAudio.playSuccess(item.sfx, { fast: state.fastMode });
+    const celebrateSpeech = state.fastMode
+      ? item.word
+        ? `${item.word}!`
+        : item.spoken || item.phrase
+      : item.spoken || item.phrase;
+    window.hermesAudio.speak(celebrateSpeech, {
+      rate: state.fastMode ? 1.15 : 0.94,
       pitch: 0.95,
-      delayMs: 360
+      delayMs: state.fastMode ? 40 : 360
     });
     announce(`Correct! ${item.phrase}`);
 
-    const holdMs =
-      isMultiCharItem(item) || typeof item.count === 'number' ? 4150 : 3750;
+    const holdMs = state.fastMode
+      ? isMultiCharItem(item) || typeof item.count === 'number'
+        ? 1100
+        : 950
+      : isMultiCharItem(item) || typeof item.count === 'number'
+        ? 4150
+        : 3750;
     state.celebrateTimer = setTimeout(() => {
       startNewPrompt({ speakPrompt: true, animateFeed: true });
     }, holdMs);
@@ -992,6 +1022,19 @@
     saveSettings();
     startNewPrompt({ speakPrompt: true, animateFeed: true });
   });
+
+  if (fastModeCheckbox) {
+    fastModeCheckbox.addEventListener('change', () => {
+      state.hasInteracted = true;
+      state.fastMode = fastModeCheckbox.checked;
+      syncFastModeUI();
+      saveSettings();
+      if (state.fastMode && state.phase === 'celebrating') {
+        clearTimeout(state.celebrateTimer);
+        startNewPrompt({ speakPrompt: true, animateFeed: true });
+      }
+    });
+  }
 
   if (musicCheckbox) {
     musicCheckbox.addEventListener('change', () => {

@@ -366,18 +366,19 @@
     }
 
     /** Typewriter carriage return bell DING + joyful fanfare + character motif */
-    playSuccess(sfxType = 'sparkle') {
+    playSuccess(sfxType = 'sparkle', { fast = false } = {}) {
       if (!this.soundEnabled) return;
       this.unlock();
       if (!this.ctx) return;
 
       const t = this.ctx.currentTime;
+      const decayScale = fast ? 0.6 : 1;
 
       // 1. Shimmering Vintage Typewriter Bell "DING!"
       const bellPartials = [
-        { freq: 1760, amp: 0.24, decay: 1.05 },
-        { freq: 3520, amp: 0.12, decay: 0.65 },
-        { freq: 5180, amp: 0.07, decay: 0.38 }
+        { freq: 1760, amp: 0.24, decay: 1.05 * decayScale },
+        { freq: 3520, amp: 0.12, decay: 0.65 * decayScale },
+        { freq: 5180, amp: 0.07, decay: 0.38 * decayScale }
       ];
       bellPartials.forEach(({ freq, amp, decay }) => {
         const osc = this.ctx.createOscillator();
@@ -393,10 +394,11 @@
       });
 
       // 2. Cheerful Cartoon Colour-Burst Marimba/Brass Arpeggio
+      const stepSec = fast ? 0.045 : 0.075;
       const notes = [523.25, 659.25, 783.99, 1046.5]; // C5 E5 G5 C6
       notes.forEach((freq, idx) => {
-        const st = t + 0.06 + idx * 0.075;
-        const dur = idx === notes.length - 1 ? 0.55 : 0.22;
+        const st = t + (fast ? 0.035 : 0.06) + idx * stepSec;
+        const dur = (idx === notes.length - 1 ? 0.55 : 0.22) * (fast ? 0.68 : 1);
         const osc = this.ctx.createOscillator();
         const sub = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
@@ -419,8 +421,8 @@
         sub.stop(st + dur + 0.02);
       });
 
-      // 3. Playful Character Sound Effect at +0.36s
-      this._playCritterMotif(sfxType, t + 0.38);
+      // 3. Playful Character Sound Effect
+      this._playCritterMotif(sfxType, t + (fast ? 0.21 : 0.38));
     }
 
     _playCritterMotif(type, start) {
