@@ -139,7 +139,9 @@
     arrowHintTimer: null,
     isInitialLoad: true,
     playerName: PLACEHOLDER_PLAYER_NAME,
-    hasGreeted: false
+    hasGreeted: false,
+    affirmationDeck: [],
+    lastAffirmationIndex: -1
   };
 
   const keyButtonsByChar = new Map();
@@ -234,6 +236,9 @@
         state.showHint = saved.showHint;
         hintCheckbox.checked = saved.showHint;
       }
+      if (typeof saved.playerName === 'string' && saved.playerName.trim()) {
+        state.playerName = saved.playerName.trim();
+      }
     } catch (_) {
       // Ignore storage errors in private/file contexts
     }
@@ -252,7 +257,8 @@
           soundOn: state.soundOn,
           musicOn: state.musicOn,
           voiceOn: state.voiceOn,
-          showHint: state.showHint
+          showHint: state.showHint,
+          playerName: state.playerName
         })
       );
     } catch (_) {
@@ -370,7 +376,138 @@
     return /^\d$/.test(ch) ? `the number ${ch}` : `the letter ${spokenLetter(ch)}`;
   }
 
+  /** Build the prompt context object passed to each post-answer affirmation template */
+  function buildAffirmationContext(item) {
+    const multiChar = isMultiCharItem(item);
+    const isDigit = !multiChar && /^\d$/.test(item.key);
+    const kind = multiChar ? (item.isBonus ? 'bonus word' : 'word') : isDigit ? 'number' : 'letter';
+    const nextPrompt = multiChar
+      ? item.isBonus
+        ? `the bonus word ${item.word}`
+        : `the word ${item.word}`
+      : charLabel(item.key);
+    const shortPrompt = multiChar ? item.word : spokenLetter(item.key);
+    const actionVerb = multiChar ? 'spell' : 'find';
+    return {
+      name: playerName(),
+      kind,
+      nextPrompt,
+      shortPrompt,
+      actionVerb
+    };
+  }
+
+  /**
+   * 16 post-answer voice affirmations (10 using the player's name placeholder "John", 6 without).
+   */
+  const POST_ANSWER_AFFIRMATIONS = [
+    // --- 10 affirmations that use the player's name (placeholder: "John") ---
+    {
+      usesName: true,
+      format: ({ name, nextPrompt }) => `Awesome, ${name}. Now find ${nextPrompt}.`
+    },
+    {
+      usesName: true,
+      format: ({ name, nextPrompt }) => `Amazing. ${name}, can you find ${nextPrompt}?`
+    },
+    {
+      usesName: true,
+      format: ({ name, actionVerb, nextPrompt }) =>
+        `Great job, ${name}. Can you ${actionVerb} ${nextPrompt}?`
+    },
+    {
+      usesName: true,
+      format: ({ name, kind, shortPrompt }) =>
+        `Well done, ${name}! The next ${kind} is ${shortPrompt}.`
+    },
+    {
+      usesName: true,
+      format: ({ name, nextPrompt }) => `Way to go, ${name}! Let's try ${nextPrompt}.`
+    },
+    {
+      usesName: true,
+      format: ({ name, actionVerb, nextPrompt }) =>
+        `Super typing, ${name}! Now ${actionVerb} ${nextPrompt}.`
+    },
+    {
+      usesName: true,
+      format: ({ name, nextPrompt }) => `Fantastic, ${name}! What about ${nextPrompt}?`
+    },
+    {
+      usesName: true,
+      format: ({ name, actionVerb, nextPrompt }) =>
+        `You're a star, ${name}! Can you ${actionVerb} ${nextPrompt}?`
+    },
+    {
+      usesName: true,
+      format: ({ name, nextPrompt }) => `Brilliant work, ${name}. Next up is ${nextPrompt}.`
+    },
+    {
+      usesName: true,
+      format: ({ name, actionVerb, nextPrompt }) =>
+        `Hooray, ${name}! Now can you ${actionVerb} ${nextPrompt}?`
+    },
+
+    // --- 6 affirmations without the player's name ---
+    {
+      usesName: false,
+      format: ({ kind, shortPrompt }) => `You did it! The next ${kind} is ${shortPrompt}.`
+    },
+    {
+      usesName: false,
+      format: ({ nextPrompt }) => `Correct! What about ${nextPrompt}?`
+    },
+    {
+      usesName: false,
+      format: ({ actionVerb, nextPrompt }) => `Great! Now ${actionVerb} ${nextPrompt}?`
+    },
+    {
+      usesName: false,
+      format: ({ kind, shortPrompt }) => `Woohoo! The next ${kind} is ${shortPrompt}.`
+    },
+    {
+      usesName: false,
+      format: ({ actionVerb, nextPrompt }) => `Spot on! Can you ${actionVerb} ${nextPrompt}?`
+    },
+    {
+      usesName: false,
+      format: ({ nextPrompt }) => `Yay! Let's do ${nextPrompt} next.`
+    }
+  ];
+
+  function pickNextAffirmationTemplate() {
+    if (state.affirmationDeck.length === 0) {
+      const indices = POST_ANSWER_AFFIRMATIONS.map((_, i) => i);
+      state.affirmationDeck = shuffleArray(indices);
+      if (
+        state.affirmationDeck.length > 1 &&
+        state.affirmationDeck[state.affirmationDeck.length - 1] === state.lastAffirmationIndex
+      ) {
+        const topIdx = state.affirmationDeck.length - 1;
+        const tmp = state.affirmationDeck[topIdx];
+        state.affirmationDeck[topIdx] = state.affirmationDeck[0];
+        state.affirmationDeck[0] = tmp;
+      }
+    }
+    const chosenIdx = state.affirmationDeck.pop();
+    state.lastAffirmationIndex = chosenIdx;
+    return POST_ANSWER_AFFIRMATIONS[chosenIdx];
+  }
+
   const VoiceScript = {
+    affirmations: POST_ANSWER_AFFIRMATIONS,
+
+    resetAffirmationDeck() {
+      state.affirmationDeck = [];
+      state.lastAffirmationIndex = -1;
+    },
+
+    /** Format a specific affirmation template (0..15) for a given prompt item */
+    formatAffirmation(index, item) {
+      const entry = POST_ANSWER_AFFIRMATIONS[index];
+      return entry ? entry.format(buildAffirmationContext(item)) : '';
+    },
+
     /** Fresh challenge (first of the session, mode change, or skip) */
     opening(item) {
       const line = isMultiCharItem(item)
@@ -379,14 +516,10 @@
       return state.hasGreeted ? line : `Hi ${playerName()}! ${line}`;
     },
 
-    /** Follow-on challenge straight after a correct answer */
+    /** Follow-on challenge straight after a correct answer (cycles through all 16 affirmations) */
     afterSuccess(item) {
-      if (isMultiCharItem(item)) {
-        return item.isBonus
-          ? `Next is a bonus word! The word ${item.word}.`
-          : `Next is the word ${item.word}.`;
-      }
-      return `Great! Now find ${charLabel(item.key)}?`;
+      const entry = pickNextAffirmationTemplate();
+      return entry.format(buildAffirmationContext(item));
     },
 
     /** Echo each correctly typed letter inside a word ("f", "o", ...) without saying "Capital" or "Next" */
@@ -394,18 +527,18 @@
       return spokenLetter(ch);
     },
 
-    /** Single letter / number solved: "d is for Dog! Well done, John!" */
+    /** Single letter / number solved: "d is for Dog!" / "1! A Kookaburra in a Gum Tree!" */
     singleSolved(item) {
       if (item.key.length === 1 && !/^\d$/.test(item.key)) {
-        return `${spokenLetter(item.key)} is for ${item.word}! Well done, ${playerName()}!`;
+        return `${spokenLetter(item.key)} is for ${item.word}!`;
       }
-      return `${item.spoken || item.phrase} Well done, ${playerName()}!`;
+      return item.spoken || item.phrase;
     },
 
-    /** Final letter of a word solved: "x. Fox! Well done, John!" */
+    /** Final letter of a word solved: "x. Fox!" */
     wordSolved(item) {
       const lastChar = item.key[item.key.length - 1];
-      return `${spokenLetter(lastChar)}. ${item.word}! Well done, ${playerName()}!`;
+      return `${spokenLetter(lastChar)}. ${item.word}!`;
     },
 
     /** Wrong key */
@@ -424,6 +557,14 @@
       }
       return `Can you find ${charLabel(targetChar)}?`;
     }
+  };
+
+  // Expose VoiceScript and playerName setter for testing and future username UI
+  window.HERMES_VOICE_SCRIPT = VoiceScript;
+  window.setHermesPlayerName = function setHermesPlayerName(name) {
+    state.playerName = typeof name === 'string' && name.trim() ? name.trim() : PLACEHOLDER_PLAYER_NAME;
+    saveSettings();
+    return state.playerName;
   };
 
   /** Build permanent 4-row pill-rounded vintage typewriter keycaps (1-0 + QWERTY + Spacebar) */
