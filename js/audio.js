@@ -82,6 +82,7 @@
       this.isCelebrating = false;
       this.isSpeechDucking = false;
       this.preferredVoice = null;
+      this.voiceProfile = { pitch: 1.38, rate: 1.02 };
       this.lastBuzzSpeechAt = 0;
 
       this.musicBus = null;
@@ -102,59 +103,53 @@
         if (!voices.length) return;
 
         const enVoices = voices.filter((v) => /^en(-|_|$)/i.test(v.lang));
-        const femaleExclude =
-          /\b(female|samantha|karen|catherine|moira|tessa|victoria|fiona|ava|allison|susan|zoe|nicky|serena|martha|zira|hazel|sonia|natasha|libby|clara|flo|shelley|sandy|grandma|alice|ellen|nora|veena|google us english)\b/i;
 
-        // Prioritize warm, clear male voices (Australian male voices first!)
-        const preferredMaleNames = [
-          'Lee',
-          'Gordon',
-          'Microsoft William',
-          'Microsoft Nat',
-          'Google UK English Male',
-          'Daniel',
-          'Oliver',
-          'Aaron',
-          'Arthur',
-          'Alex',
-          'Evan',
-          'Rishi',
-          'Reed',
-          'Tom',
-          'Microsoft Ryan',
-          'Microsoft Guy',
-          'Microsoft David',
-          'Microsoft Mark',
-          'Rocko',
-          'Eddy',
-          'Fred'
+        // Exclude known female voices and creepy/robotic novelty voices so Hermes is always a playful male/boy voice
+        const femaleOrNoveltyExclude =
+          /\b(samantha|karen|victoria|fiona|moira|tessa|veena|allison|ava|susan|zoe|nicky|monica|paulina|satu|kyoko|mei-jia|sin-ji|ting-ting|lekha|mariska|milena|laura|ellen|luciana|joana|ioana|alva|kanya|damayanti|alice|amelie|anna|carmit|sara|nora|melina|yelda|zosia|uzma|zira|hazel|heera|aria|jenny|michelle|sonia|libby|maisie|natasha|clara|molly|leah|yan|neerja|female|woman|girl|albert|bad news|bahh|bells|boing|bubbles|cellos|deranged|good news|hysterical|jester|organ|pipe organ|superstar|trinoids|whisper|wobble|zarvox|grandma|kathy|princess|sandy|shelley|flo)\b/i;
+
+        const nonFemalePool = enVoices.filter((v) => !femaleOrNoveltyExclude.test(v.name));
+
+        // Playful young-boy / pitched-up male voice profiles in priority order.
+        // Adult male voices get a ~1.38x pitch lift so they sound like a cheerful, energetic young boy.
+        const boyAndMaleProfiles = [
+          { match: 'Lee', pitch: 1.38, rate: 1.02 }, // Aussie male -> pitched up into playful boy voice
+          { match: 'Gordon', pitch: 1.38, rate: 1.02 },
+          { match: 'Junior', pitch: 1.16, rate: 1.02 }, // macOS young boy voice
+          { match: 'Oliver', pitch: 1.38, rate: 1.02 },
+          { match: 'Daniel', pitch: 1.4, rate: 1.02 },
+          { match: 'Aaron', pitch: 1.38, rate: 1.02 },
+          { match: 'Alex', pitch: 1.38, rate: 1.02 },
+          { match: 'Rishi', pitch: 1.36, rate: 1.02 },
+          { match: 'Microsoft William', pitch: 1.38, rate: 1.02 },
+          { match: 'Microsoft Liam', pitch: 1.36, rate: 1.02 },
+          { match: 'Microsoft Ryan', pitch: 1.38, rate: 1.02 },
+          { match: 'Microsoft Thomas', pitch: 1.38, rate: 1.02 },
+          { match: 'Microsoft Guy', pitch: 1.38, rate: 1.02 },
+          { match: 'Microsoft Mark', pitch: 1.4, rate: 1.02 },
+          { match: 'Microsoft David', pitch: 1.42, rate: 1.02 },
+          { match: 'Google UK English Male', pitch: 1.38, rate: 1.02 },
+          { match: 'Eddy', pitch: 1.36, rate: 1.02 },
+          { match: 'Reed', pitch: 1.36, rate: 1.02 },
+          { match: 'Rocko', pitch: 1.36, rate: 1.02 },
+          { match: 'Fred', pitch: 1.36, rate: 1.02 },
+          { match: 'Ralph', pitch: 1.38, rate: 1.02 }
         ];
 
-        for (const name of preferredMaleNames) {
-          const found = enVoices.find(
-            (v) => v.name.includes(name) && !/\bfemale\b/i.test(v.name)
-          );
+        for (const profile of boyAndMaleProfiles) {
+          const found = nonFemalePool.find((v) => v.name.includes(profile.match));
           if (found) {
             this.preferredVoice = found;
+            this.voiceProfile = { pitch: profile.pitch, rate: profile.rate };
             return;
           }
         }
 
-        // Next, check any English voice explicitly labeled "Male"
-        const labeledMale = enVoices.find(
-          (v) => /\bmale\b/i.test(v.name) && !/\bfemale\b/i.test(v.name)
-        );
-        if (labeledMale) {
-          this.preferredVoice = labeledMale;
-          return;
-        }
-
-        // Next, pick an English voice not matching known female voice names
-        const nonFemaleEn =
-          enVoices.find((v) => v.localService && !femaleExclude.test(v.name)) ||
-          enVoices.find((v) => !femaleExclude.test(v.name));
-
-        this.preferredVoice = nonFemaleEn || enVoices[0] || voices[0];
+        // Next fallback: any voice explicitly labeled Male
+        const labeledMale = nonFemalePool.find((v) => /\bmale\b/i.test(v.name));
+        this.preferredVoice =
+          labeledMale || nonFemalePool[0] || enVoices[0] || voices[0];
+        this.voiceProfile = { pitch: 1.38, rate: 1.02 };
       };
 
       this._pickVoice();
@@ -215,7 +210,20 @@
       }
     }
 
-    speak(text, { rate = 0.95, pitch = 0.92, delayMs = 0, isBuzz = false } = {}) {
+    /**
+     * Speak in Hermes's high, bouncy kid-friendly voice.
+     * @param {string} text
+     * @param {object} [opts]
+     * @param {'prompt'|'cheer'|'echo'|'oops'} [opts.mood] Expressive tone preset
+     * @param {boolean} [opts.fast] Speak a little quicker (Fast Mode)
+     * @param {boolean} [opts.queue] Wait for current speech to finish instead of cutting it off
+     * @param {number} [opts.delayMs]
+     * @param {boolean} [opts.isBuzz] Throttle repeated "oops" lines
+     */
+    speak(
+      text,
+      { mood = 'prompt', fast = false, queue = false, delayMs = 0, isBuzz = false } = {}
+    ) {
       if (!this.soundEnabled || !this.voiceEnabled) return;
       if (!('speechSynthesis' in window)) return;
 
@@ -227,31 +235,59 @@
         this.lastBuzzSpeechAt = now;
       }
 
+      // Mood presets lift or soften the voice's base pitch & pace for expression
+      const MOODS = {
+        prompt: { pitch: 0, rate: 1.0 },
+        cheer: { pitch: 0.14, rate: 1.05 },
+        echo: { pitch: 0.08, rate: 1.0 },
+        oops: { pitch: -0.06, rate: 0.97 }
+      };
+      const moodAdj = MOODS[mood] || MOODS.prompt;
+      const base = this.voiceProfile || { pitch: 1.38, rate: 1.02 };
+      const pitch = Math.min(2, Math.max(0.5, base.pitch + moodAdj.pitch));
+      const rate = base.rate * moodAdj.rate * (fast ? 1.12 : 1);
+
+      // Prevent OS speech synthesizers from saying "Capital F, Capital O, Capital X"
+      // whenever an isolated uppercase letter appears in the utterance string.
+      const spokenText = String(text).replace(/\b([A-Z])\b/g, (match) => {
+        if (match === 'I') return 'I';
+        if (match === 'A') return 'ay';
+        return match.toLowerCase();
+      });
+
+      const duckMusic = () => {
+        // Briefly duck happy thinking music while Hermes speaks aloud
+        this.isSpeechDucking = true;
+        this._updateMusicBusGain();
+        clearTimeout(this._speechDuckTimer);
+        this._speechDuckTimer = setTimeout(() => {
+          this.isSpeechDucking = false;
+          this._updateMusicBusGain();
+        }, 2400);
+      };
+
       const run = () => {
         if (!this.soundEnabled || !this.voiceEnabled) return;
         try {
           if (!this.preferredVoice && this._pickVoice) {
             this._pickVoice();
           }
-          // Briefly duck happy thinking music while Hermes speaks aloud
-          this.isSpeechDucking = true;
-          this._updateMusicBusGain();
-          clearTimeout(this._speechDuckTimer);
-          this._speechDuckTimer = setTimeout(() => {
-            this.isSpeechDucking = false;
-            this._updateMusicBusGain();
-          }, 1350);
+          duckMusic();
 
-          window.speechSynthesis.cancel();
-          const utter = new SpeechSynthesisUtterance(text);
+          if (!queue) {
+            window.speechSynthesis.cancel();
+          }
+          const utter = new SpeechSynthesisUtterance(spokenText);
           if (this.preferredVoice) {
             utter.voice = this.preferredVoice;
             utter.lang = this.preferredVoice.lang;
           }
           utter.rate = rate;
           utter.pitch = pitch;
-          utter.volume = 0.96;
+          utter.volume = 1;
+          utter.onstart = duckMusic;
           utter.onend = () => {
+            if (window.speechSynthesis.pending) return;
             clearTimeout(this._speechDuckTimer);
             this.isSpeechDucking = false;
             this._updateMusicBusGain();
@@ -262,11 +298,10 @@
         }
       };
 
+      clearTimeout(this._speechTimer);
       if (delayMs > 0) {
-        clearTimeout(this._speechTimer);
         this._speechTimer = setTimeout(run, delayMs);
       } else {
-        clearTimeout(this._speechTimer);
         run();
       }
     }

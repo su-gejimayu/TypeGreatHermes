@@ -19,6 +19,10 @@
   const COLOR_HINT_DELAY_MS = 5000;
   const RED_ARROW_DELAY_MS = 10000;
 
+  // TODO(player-name): Placeholder until the "enter your name" feature lands.
+  // Replace with the saved player name; every voice line reads it via playerName().
+  const PLACEHOLDER_PLAYER_NAME = 'John';
+
   const IGNORED_KEYS = new Set([
     'Shift',
     'CapsLock',
@@ -133,7 +137,9 @@
     celebrateTimer: null,
     colorHintTimer: null,
     arrowHintTimer: null,
-    isInitialLoad: true
+    isInitialLoad: true,
+    playerName: PLACEHOLDER_PLAYER_NAME,
+    hasGreeted: false
   };
 
   const keyButtonsByChar = new Map();
@@ -340,6 +346,85 @@
     if (!state.currentItem) return '';
     return state.currentItem.key[state.charIndex] || state.currentItem.key[0];
   }
+
+  /* =========================================================
+     HERMES VOICE SCRIPT — every spoken line lives here
+     ========================================================= */
+  function playerName() {
+    return state.playerName || PLACEHOLDER_PLAYER_NAME;
+  }
+
+  /**
+   * Convert a single letter into a lowercase token so OS speech synthesis
+   * says the letter name ("f", "o", "x") instead of "Capital F, Capital O, Capital X".
+   * Maps 'A' -> 'ay' so TTS never reads standalone 'a' as the article "uh".
+   */
+  function spokenLetter(ch) {
+    const upper = String(ch).toUpperCase();
+    if (upper === 'A') return 'ay';
+    return upper.toLowerCase();
+  }
+
+  /** "the letter v" / "the number 7" */
+  function charLabel(ch) {
+    return /^\d$/.test(ch) ? `the number ${ch}` : `the letter ${spokenLetter(ch)}`;
+  }
+
+  const VoiceScript = {
+    /** Fresh challenge (first of the session, mode change, or skip) */
+    opening(item) {
+      const line = isMultiCharItem(item)
+        ? `${item.isBonus ? 'Bonus word! ' : ''}Can you spell the word ${item.word}?`
+        : `Can you find ${charLabel(item.key)}?`;
+      return state.hasGreeted ? line : `Hi ${playerName()}! ${line}`;
+    },
+
+    /** Follow-on challenge straight after a correct answer */
+    afterSuccess(item) {
+      if (isMultiCharItem(item)) {
+        return item.isBonus
+          ? `Next is a bonus word! The word ${item.word}.`
+          : `Next is the word ${item.word}.`;
+      }
+      return `Great! Now find ${charLabel(item.key)}?`;
+    },
+
+    /** Echo each correctly typed letter inside a word ("f", "o", ...) without saying "Capital" or "Next" */
+    letterEcho(ch) {
+      return spokenLetter(ch);
+    },
+
+    /** Single letter / number solved: "d is for Dog! Well done, John!" */
+    singleSolved(item) {
+      if (item.key.length === 1 && !/^\d$/.test(item.key)) {
+        return `${spokenLetter(item.key)} is for ${item.word}! Well done, ${playerName()}!`;
+      }
+      return `${item.spoken || item.phrase} Well done, ${playerName()}!`;
+    },
+
+    /** Final letter of a word solved: "x. Fox! Well done, John!" */
+    wordSolved(item) {
+      const lastChar = item.key[item.key.length - 1];
+      return `${spokenLetter(lastChar)}. ${item.word}! Well done, ${playerName()}!`;
+    },
+
+    /** Wrong key */
+    oops(item, targetChar) {
+      return isMultiCharItem(item)
+        ? `Oops! Try again, ${playerName()}. Find ${charLabel(targetChar)}.`
+        : `Oops! Try again, ${playerName()}. Can you find ${charLabel(targetChar)}?`;
+    },
+
+    /** Child taps the paper to hear the current instruction again */
+    repeat(item, targetChar) {
+      if (isMultiCharItem(item)) {
+        return state.charIndex === 0
+          ? `Can you spell the word ${item.word}?`
+          : `Can you find ${charLabel(targetChar)}?`;
+      }
+      return `Can you find ${charLabel(targetChar)}?`;
+    }
+  };
 
   /** Build permanent 4-row pill-rounded vintage typewriter keycaps (1-0 + QWERTY + Spacebar) */
   function renderTypewriterKeys() {
@@ -733,7 +818,11 @@
   }
 
   /** Set up a crisp Black & White question prompt */
-  function startNewPrompt({ speakPrompt = false, animateFeed = false } = {}) {
+  function startNewPrompt({
+    speakPrompt = false,
+    animateFeed = false,
+    afterSuccess = false
+  } = {}) {
     clearTimeout(state.buzzTimer);
     clearTimeout(state.celebrateTimer);
 
@@ -797,16 +886,15 @@
     announce(multiChar ? `Spell ${item.word}: ${item.key}` : `Type ${item.key}`);
 
     if (speakPrompt && state.hasInteracted) {
-      const promptSpeech = state.fastMode
-        ? multiChar
-          ? `Spell ${item.word}!`
-          : `Type ${item.key}!`
-        : multiChar
-          ? `${item.isBonus ? 'Bonus word! ' : ''}Spell ${item.word}! Type ${item.key[0]}!`
-          : `Type ${item.key}!`;
+      const promptSpeech = afterSuccess
+        ? VoiceScript.afterSuccess(item)
+        : VoiceScript.opening(item);
+      state.hasGreeted = true;
+      // After a win, queue behind the celebration line so it is never clipped
       window.hermesAudio.speak(promptSpeech, {
-        rate: state.fastMode ? 1.08 : 0.95,
-        pitch: 0.92,
+        mood: 'prompt',
+        fast: state.fastMode,
+        queue: afterSuccess,
         delayMs: state.fastMode ? 70 : 220
       });
     }
@@ -854,20 +942,20 @@
 
     const item = state.currentItem;
     const nextChar = getActiveTargetChar();
-    promptPrefix.textContent = 'Great! Next:';
+    promptPrefix.textContent = 'Spell:';
     syncWordProgressUI(stampedIdx);
 
     // Reset progressive 5s colour & 10s red arrow timers for the new target letter!
     startHintTimersForActiveChar();
     updateKeyHighlights();
 
+    // Say the letter just typed back to the child ("F" ... "O" ...)
     window.hermesAudio.playLetterStep(stampedIdx);
-    window.hermesAudio.speak(`Next, ${nextChar}!`, {
-      rate: state.fastMode ? 1.1 : 0.98,
-      pitch: 0.93,
-      delayMs: state.fastMode ? 60 : 280
+    window.hermesAudio.speak(VoiceScript.letterEcho(item.key[stampedIdx]), {
+      mood: 'echo',
+      fast: state.fastMode
     });
-    announce(`Good! Next letter ${nextChar}`);
+    announce(`${item.key[stampedIdx]}. Now ${nextChar}`);
   }
 
   /** Handle Completed Answer -> Burst of Colour & Sound! */
@@ -895,15 +983,15 @@
 
     window.hermesAudio.setCelebrating(true);
     window.hermesAudio.playSuccess(item.sfx, { fast: state.fastMode });
-    const celebrateSpeech = state.fastMode
-      ? item.word
-        ? `${item.word}!`
-        : item.spoken || item.phrase
-      : item.spoken || item.phrase;
+    const multiChar = isMultiCharItem(item);
+    const celebrateSpeech = multiChar
+      ? VoiceScript.wordSolved(item)
+      : VoiceScript.singleSolved(item);
     window.hermesAudio.speak(celebrateSpeech, {
-      rate: state.fastMode ? 1.15 : 0.94,
-      pitch: 0.95,
-      delayMs: state.fastMode ? 40 : 360
+      mood: 'cheer',
+      fast: state.fastMode,
+      // Words echo the final letter immediately; single letters let the DING ring first
+      delayMs: multiChar ? 60 : state.fastMode ? 40 : 360
     });
     announce(`Correct! ${item.phrase}`);
 
@@ -915,7 +1003,7 @@
         ? 4150
         : 3750;
     state.celebrateTimer = setTimeout(() => {
-      startNewPrompt({ speakPrompt: true, animateFeed: true });
+      startNewPrompt({ speakPrompt: true, animateFeed: true, afterSuccess: true });
     }, holdMs);
   }
 
@@ -954,13 +1042,13 @@
 
     updateKeyHighlights();
     window.hermesAudio.playBuzz();
-    window.hermesAudio.speak(`Oops! Try again. Press ${targetChar}!`, {
-      rate: 0.96,
-      pitch: 0.9,
+    window.hermesAudio.speak(VoiceScript.oops(item, targetChar), {
+      mood: 'oops',
+      fast: state.fastMode,
       delayMs: 120,
       isBuzz: true
     });
-    announce(`Try again. Press ${targetChar}`);
+    announce(`Try again. Find ${charLabel(targetChar)}`);
 
     // Relax Hermes' squinting eyes back to curious prompting face after shake
     state.buzzTimer = setTimeout(() => {
@@ -1218,10 +1306,10 @@
       window.hermesAudio.playClack();
       const item = state.currentItem;
       const activeChar = getActiveTargetChar();
-      const speech = isMultiCharItem(item)
-        ? `Spell ${item.word}! Press ${activeChar}!`
-        : `Type ${activeChar}!`;
-      window.hermesAudio.speak(speech, { rate: 0.95, pitch: 0.92 });
+      window.hermesAudio.speak(VoiceScript.repeat(item, activeChar), {
+        mood: 'prompt',
+        fast: state.fastMode
+      });
     }
   });
 
