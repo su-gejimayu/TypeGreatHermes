@@ -15,7 +15,7 @@
   // Hermes permanently features the number row as part of his character design!
   const ALL_KEY_ROWS = [NUMBER_ROW, ...QWERTY_LETTER_ROWS];
 
-  const VALID_MODES = ['letters', 'numbers', 'both', 'words'];
+  const VALID_MODES = ['letters', 'numbers', 'both', 'words', 'words3', 'words4'];
   const COLOR_HINT_DELAY_MS = 5000;
   const RED_ARROW_DELAY_MS = 10000;
 
@@ -281,9 +281,11 @@
   }
 
   function getPool() {
-    const { letters, numbers, words } = window.HERMES_WORDS;
+    const { letters, numbers, words, threeLetterWords, fourLetterWords } = window.HERMES_WORDS;
     if (state.mode === 'numbers') return [...numbers];
     if (state.mode === 'both') return [...letters, ...numbers];
+    if (state.mode === 'words3') return [...(threeLetterWords || words)];
+    if (state.mode === 'words4') return [...(fourLetterWords || words)];
     if (state.mode === 'words') return [...words];
     return [...letters];
   }

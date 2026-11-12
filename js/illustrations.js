@@ -1257,13 +1257,21 @@
       ${sparkle(42, 66, 12, '#5ce1ff')}
       ${sparkle(198, 166, 12, '#5ce1ff')}
       ${sparkle(192, 54, 9, '#ffe033')}
-    `)
+    `),
+
+    // New 3-letter & 4-letter aliases to existing high-fidelity illustrations
+    FROG: () => WORD_ART.HOP(),
+    STAR: () => (ART['1'] ? ART['1']() : ART.S()),
+    LION: () => ART.L(),
+    BEAR: () => ART.B(),
+    DUCK: () => ART.D()
   };
 
   window.getHermesIllustration = function (key) {
     const k = String(key).toUpperCase();
     if (WORD_ART[k]) return WORD_ART[k]();
     if (ART[k]) return ART[k]();
+    if (k.length > 1 && ART[k[0]]) return ART[k[0]]();
     return ART.D();
   };
 })();
