@@ -75,8 +75,8 @@
   }
 
   :where(button, select, input):focus-visible {
-    outline: 3px solid #ff245f;
-    outline-offset: 3px;
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
   }
 }
 
@@ -258,6 +258,14 @@
     &:focus-visible {
       opacity: 1;
     }
+  }
+
+  .icon-btn:focus,
+  .icon-btn:focus-visible,
+  #options-btn,
+  #options-btn:focus,
+  #options-btn:focus-visible {
+    outline: none;
   }
 
   .icon-svg {

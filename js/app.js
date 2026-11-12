@@ -107,6 +107,7 @@
   const soundBtn = document.getElementById('sound-toggle-btn');
   const musicBtn = document.getElementById('music-toggle-btn');
   const fullscreenBtn = document.getElementById('fullscreen-btn');
+  const optionsBtn = document.getElementById('options-btn');
   const optionsPopover = document.getElementById('parent-options');
   const modeSelect = document.getElementById('mode-select');
   const orderSelect = document.getElementById('order-select');
@@ -1436,8 +1437,23 @@
     state.hasInteracted = true;
     window.hermesAudio.unlock();
     optionsPopover.hidePopover?.();
+    optionsBtn?.blur();
     startNewPrompt({ speakPrompt: true, animateFeed: true });
   });
+
+  if (optionsBtn) {
+    optionsBtn.addEventListener('click', (e) => {
+      if (e.detail > 0) optionsBtn.blur();
+    });
+  }
+
+  if (optionsPopover) {
+    optionsPopover.addEventListener('toggle', (e) => {
+      if (e.newState === 'closed') {
+        optionsBtn?.blur();
+      }
+    });
+  }
 
   // Clicking the paper reads the target prompt aloud for pre-readers!
   paperSheet.addEventListener('click', () => {
