@@ -4,7 +4,7 @@
  * Supports:
  * - Letters A-Z
  * - Numbers 0-9 (0 = Zero to Hero, 1-9 = Australian 12 Days of Christmas with exact countable critters!)
- * - All 33 3-letter (+ bonus 4-letter JUMP) dictionary words
+ * - All 50 3-letter words and 30 4-letter words (80 total dictionary words)
  */
 (function () {
   const INK = '#181818';
@@ -43,6 +43,15 @@
 
   function sparkle(x, y, s = 10, fill = '#ffe047') {
     return `<path class="anim-twinkle" d="M${x},${y - s} Q${x},${y} ${x + s},${y} Q${x},${y} ${x},${y + s} Q${x},${y} ${x - s},${y} Q${x},${y} ${x},${y - s} Z" fill="${fill}" stroke="${INK}" stroke-width="3.5"/>`;
+  }
+
+  /** Single side-profile cartoon eye (for fish, ducks and other profile critters) */
+  function singleEye(cx, cy, rx = 10, ry = 14) {
+    return `
+      <ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="#ffffff"/>
+      <circle cx="${cx + 2}" cy="${cy - 1}" r="${rx * 0.56}" fill="${INK}" stroke="none"/>
+      <polygon points="${cx + 2},${cy - 1} ${cx + 9},${cy - 6} ${cx + 9},${cy + 1}" fill="#ffffff" stroke="none"/>
+    `;
   }
 
   // Reusable countable Aussie mini-critters for 2-9 (Australian 12 Days of Christmas)
@@ -1259,12 +1268,565 @@
       ${sparkle(192, 54, 9, '#ffe033')}
     `),
 
-    // New 3-letter & 4-letter aliases to existing high-fidelity illustrations
-    FROG: () => WORD_ART.HOP(),
-    STAR: () => (ART['1'] ? ART['1']() : ART.S()),
+    /* ===================== NEW 3-LETTER WORDS ===================== */
+
+    ANT: () => wrapSvg('Tiny busy red ant carrying a crumb', `
+      <path d="M150,96 C156,70 170,58 182,54 M166,100 C178,80 194,74 204,74" fill="none" stroke-width="5"/>
+      <circle cx="182" cy="54" r="6" fill="#ffe03b"/>
+      <circle cx="204" cy="74" r="6" fill="#ffe03b"/>
+      <line x1="78" y1="150" x2="56" y2="190" stroke-width="6"/>
+      <line x1="104" y1="152" x2="98" y2="196" stroke-width="6"/>
+      <line x1="128" y1="146" x2="140" y2="190" stroke-width="6"/>
+      <line x1="80" y1="140" x2="44" y2="134" stroke-width="6"/>
+      <ellipse cx="62" cy="142" rx="38" ry="30" fill="#c8331f"/>
+      <ellipse cx="112" cy="138" rx="22" ry="18" fill="#d9402a"/>
+      <circle cx="158" cy="118" r="32" fill="#e04b33"/>
+      ${cartoonEyes(148, 172, 112, 8, 11)}
+      <path d="M150,134 Q162,142 174,134" fill="none" stroke-width="4"/>
+      <g class="anim-bob"><rect x="92" y="62" width="40" height="30" rx="6" fill="#f4c26b"/>
+      <circle cx="104" cy="74" r="3" fill="#b07a2a" stroke="none"/><circle cx="120" cy="80" r="3" fill="#b07a2a" stroke="none"/></g>
+      <line x1="112" y1="92" x2="112" y2="122" stroke-width="5"/>
+    `),
+
+    RAT: () => wrapSvg('Quick friendly grey rat with pink ears', `
+      <path class="anim-wag" style="transform-origin: 176px 168px" d="M176,170 C210,176 224,150 210,130 C202,118 214,104 226,108" fill="none" stroke="#ff9fb4" stroke-width="7"/>
+      <ellipse cx="128" cy="160" rx="58" ry="40" fill="#9aa3ad"/>
+      <ellipse cx="96" cy="196" rx="14" ry="8" fill="#ff9fb4"/>
+      <ellipse cx="150" cy="198" rx="14" ry="8" fill="#ff9fb4"/>
+      <circle cx="58" cy="84" r="24" fill="#9aa3ad"/>
+      <circle cx="58" cy="84" r="13" fill="#ffb6c6" stroke="none"/>
+      <circle cx="124" cy="80" r="24" fill="#9aa3ad"/>
+      <circle cx="124" cy="80" r="13" fill="#ffb6c6" stroke="none"/>
+      <path d="M50,108 C50,84 132,80 132,110 C132,128 104,144 40,140 C26,138 26,122 50,108 Z" fill="#b2bac3"/>
+      <circle cx="30" cy="132" r="8" fill="#ff7a9a"/>
+      ${cartoonEyes(78, 106, 112, 8, 11)}
+      <path d="M40,124 L18,118 M40,132 L18,136" fill="none" stroke-width="3"/>
+    `),
+
+    RAM: () => wrapSvg('Woolly cream ram with curly golden horns', `
+      <g fill="#fff6e0">
+        <circle cx="92" cy="150" r="30"/><circle cx="130" cy="140" r="32"/><circle cx="166" cy="152" r="28"/>
+        <circle cx="110" cy="180" r="28"/><circle cx="150" cy="182" r="28"/>
+      </g>
+      <rect x="98" y="196" width="14" height="24" rx="5" fill="#3d3a3a"/>
+      <rect x="146" y="196" width="14" height="24" rx="5" fill="#3d3a3a"/>
+      <ellipse cx="74" cy="110" rx="34" ry="40" fill="#5b4b45"/>
+      <path d="M58,80 C24,66 18,118 46,118 C64,118 64,96 50,96" fill="none" stroke="#d99a3d" stroke-width="13"/>
+      <path d="M92,80 C126,66 132,118 104,118 C86,118 86,96 100,96" fill="none" stroke="#d99a3d" stroke-width="13"/>
+      ${cartoonEyes(62, 88, 106, 7, 9)}
+      <ellipse cx="75" cy="132" rx="10" ry="6" fill="#ff9fb4"/>
+      ${sparkle(196, 96, 10)}
+    `),
+
+    YAK: () => wrapSvg('Shaggy brown yak with white horns', `
+      <path d="M40,120 C40,90 200,90 200,120 L210,184 L190,170 L176,190 L160,172 L142,192 L124,172 L106,192 L90,172 L72,190 L58,170 L30,184 Z" fill="#7a4e2d"/>
+      <path d="M86,72 C56,72 44,52 50,36 C60,50 74,54 92,54" fill="#fff6e0"/>
+      <path d="M154,72 C184,72 196,52 190,36 C180,50 166,54 148,54" fill="#fff6e0"/>
+      <ellipse cx="120" cy="96" rx="46" ry="44" fill="#8f5d36"/>
+      <path d="M78,78 Q100,62 120,76 Q140,62 162,78 Q140,90 120,84 Q100,90 78,78 Z" fill="#5e3a1f"/>
+      ${cartoonEyes(104, 136, 98, 8, 10)}
+      <ellipse cx="120" cy="126" rx="24" ry="14" fill="#c99a74"/>
+      <circle cx="112" cy="126" r="3.5" fill="${INK}" stroke="none"/><circle cx="128" cy="126" r="3.5" fill="${INK}" stroke="none"/>
+    `),
+
+    EEL: () => wrapSvg('Slippery teal eel swishing through bubbles', `
+      <path class="anim-wag" style="transform-origin: 60px 150px" d="M30,170 C60,120 90,200 120,150 C150,100 170,170 200,120" fill="none" stroke="${INK}" stroke-width="34"/>
+      <path class="anim-wag" style="transform-origin: 60px 150px" d="M30,170 C60,120 90,200 120,150 C150,100 170,170 200,120" fill="none" stroke="#2fc4b2" stroke-width="24"/>
+      <circle cx="202" cy="116" r="22" fill="#3fd6c3"/>
+      <circle cx="208" cy="110" r="7" fill="#ffffff"/><circle cx="210" cy="110" r="3.5" fill="${INK}" stroke="none"/>
+      <path d="M200,128 Q210,132 218,126" fill="none" stroke-width="3.5"/>
+      <circle class="anim-bob" cx="170" cy="62" r="10" fill="#bff3ff"/>
+      <circle class="anim-bob" cx="196" cy="40" r="7" fill="#bff3ff"/>
+      <circle class="anim-bob" cx="60" cy="80" r="8" fill="#bff3ff"/>
+    `),
+
+    ELK: () => wrapSvg('Proud brown elk with big branching antlers', `
+      <g fill="none" stroke="#c48a4a" stroke-width="10">
+        <path d="M96,82 C80,56 62,40 40,30 M74,56 L50,62 M62,44 L56,22"/>
+        <path d="M144,82 C160,56 178,40 200,30 M166,56 L190,62 M178,44 L184,22"/>
+      </g>
+      <ellipse cx="80" cy="96" rx="16" ry="10" fill="#8a5a33" transform="rotate(-30 80 96)"/>
+      <ellipse cx="160" cy="96" rx="16" ry="10" fill="#8a5a33" transform="rotate(30 160 96)"/>
+      <rect x="96" y="150" width="48" height="70" rx="14" fill="#8a5a33"/>
+      <path d="M90,100 C90,78 150,78 150,100 L144,164 C140,184 100,184 96,164 Z" fill="#a06a3d"/>
+      ${cartoonEyes(106, 134, 112, 8, 10)}
+      <ellipse cx="120" cy="164" rx="20" ry="14" fill="#5a3a22"/>
+      <path d="M110,136 Q120,144 130,136" fill="none" stroke-width="3.5"/>
+    `),
+
+    MAP: () => wrapSvg('Folded treasure map with dotted trail and red X', `
+      <polygon points="30,60 90,44 150,60 210,44 210,190 150,206 90,190 30,206" fill="#f6e2a8"/>
+      <line x1="90" y1="44" x2="90" y2="190" stroke-width="4"/>
+      <line x1="150" y1="60" x2="150" y2="206" stroke-width="4"/>
+      <path d="M50,180 C70,150 110,170 120,130 C130,96 170,110 178,82" fill="none" stroke="#2f7de1" stroke-width="5" stroke-dasharray="4 12"/>
+      <path d="M48,98 C60,84 76,92 72,106 C66,118 52,114 48,98 Z" fill="#6cc04a" stroke-width="4"/>
+      <g class="anim-bob"><path d="M168,70 L192,94 M192,70 L168,94" fill="none" stroke="#e52521" stroke-width="9"/></g>
+      ${sparkle(206, 30, 9)}
+    `),
+
+    KEY: () => wrapSvg('Shiny golden key', `
+      <g transform="rotate(-30 120 120)">
+        <circle cx="72" cy="120" r="40" fill="#ffc83d"/>
+        <circle cx="72" cy="120" r="16" fill="#fff6d6"/>
+        <rect x="106" y="108" width="104" height="24" rx="6" fill="#ffc83d"/>
+        <rect x="170" y="128" width="16" height="26" rx="4" fill="#ffc83d"/>
+        <rect x="194" y="128" width="16" height="18" rx="4" fill="#ffc83d"/>
+        <path d="M54,104 Q62,96 72,98" fill="none" stroke="#ffffff" stroke-width="5"/>
+      </g>
+      ${sparkle(190, 60, 12)}
+      ${sparkle(50, 190, 9)}
+    `),
+
+    CAR: () => wrapSvg('Zippy red cartoon car', `
+      <path d="M8,130 L30,130 M4,150 L26,150" fill="none" stroke-width="5"/>
+      <path class="anim-bob" d="M40,160 L40,128 C40,116 52,110 64,108 L84,76 C88,70 96,66 106,66 L156,66 C166,66 174,72 178,80 L194,108 C210,110 222,118 222,132 L222,160 Z" fill="#ff3b3b"/>
+      <path d="M94,82 L84,106 L128,106 L128,80 L104,80 C100,80 96,80 94,82 Z" fill="#bfe8ff"/>
+      <path d="M140,80 L140,106 L182,106 L170,84 C168,81 164,80 160,80 Z" fill="#bfe8ff"/>
+      <circle cx="80" cy="162" r="24" fill="#323643"/><circle cx="80" cy="162" r="10" fill="#d9dde3"/>
+      <circle cx="180" cy="162" r="24" fill="#323643"/><circle cx="180" cy="162" r="10" fill="#d9dde3"/>
+      <rect x="208" y="122" width="14" height="12" rx="4" fill="#ffe03b"/>
+    `),
+
+    BAG: () => wrapSvg('Packed purple school backpack', `
+      <path d="M90,70 C90,30 150,30 150,70" fill="none" stroke-width="10"/>
+      <rect x="56" y="64" width="128" height="150" rx="34" fill="#8e5bd6"/>
+      <rect x="78" y="140" width="84" height="56" rx="16" fill="#a97ef0"/>
+      <line x1="78" y1="160" x2="162" y2="160" stroke-width="4"/>
+      <circle cx="120" cy="160" r="6" fill="#ffe03b"/>
+      <path d="M82,96 Q120,108 158,96" fill="none" stroke-width="4"/>
+      <circle cx="120" cy="120" r="10" fill="#ffe03b"/>
+      ${sparkle(198, 64, 10)}
+    `),
+
+    JAR: () => wrapSvg('Glass jar full of colourful sweets', `
+      <rect x="68" y="40" width="104" height="30" rx="8" fill="#e5463b"/>
+      <path d="M62,82 C62,72 178,72 178,82 L182,198 C182,212 58,212 58,198 Z" fill="#dff6ff"/>
+      <circle cx="94" cy="176" r="15" fill="#ff5ca8"/><circle cx="128" cy="182" r="15" fill="#ffe03b"/>
+      <circle cx="158" cy="172" r="14" fill="#47c26b"/><circle cx="110" cy="146" r="14" fill="#5ac8ff"/>
+      <circle cx="146" cy="142" r="14" fill="#ff8a3d"/><circle cx="90" cy="118" r="12" fill="#9b6bdf"/>
+      <path d="M74,96 L74,150" fill="none" stroke="#ffffff" stroke-width="7"/>
+      ${sparkle(196, 70, 10)}
+    `),
+
+    EGG: () => wrapSvg('Sunny side up fried egg with a happy yolk', `
+      <path d="M60,90 C40,60 90,30 130,46 C170,30 214,70 196,112 C220,150 180,206 130,190 C90,214 34,180 46,140 C24,120 36,100 60,90 Z" fill="#ffffff"/>
+      <circle class="anim-bob" cx="124" cy="120" r="42" fill="#ffc21f"/>
+      ${cartoonEyes(110, 138, 114, 7, 9)}
+      <path d="M108,134 Q124,146 140,134" fill="none" stroke-width="4"/>
+      <path d="M100,96 Q108,88 118,88" fill="none" stroke="#fff3b0" stroke-width="6"/>
+    `),
+
+    /* NATURE & WORLD */
+
+    WEB: () => wrapSvg('Silky spider web with a little smiling spider', `
+      <g fill="none" stroke="#c9d6e8" stroke-width="4">
+        <line x1="120" y1="20" x2="120" y2="220"/><line x1="20" y1="120" x2="220" y2="120"/>
+        <line x1="50" y1="50" x2="190" y2="190"/><line x1="190" y1="50" x2="50" y2="190"/>
+        <polygon points="120,90 141,99 150,120 141,141 120,150 99,141 90,120 99,99"/>
+        <polygon points="120,60 162,78 180,120 162,162 120,180 78,162 60,120 78,78"/>
+        <polygon points="120,32 182,58 208,120 182,182 120,208 58,182 32,120 58,58"/>
+      </g>
+      <line x1="160" y1="20" x2="160" y2="70" stroke-width="3"/>
+      <g class="anim-bob">
+        <path d="M144,80 L132,72 M144,88 L130,90 M176,80 L188,72 M176,88 L190,90" fill="none" stroke-width="4"/>
+        <circle cx="160" cy="84" r="18" fill="#3a2f4a"/>
+        ${cartoonEyes(153, 167, 82, 5, 6)}
+      </g>
+    `),
+
+    DEW: () => wrapSvg('Fresh green leaf sparkling with dew drops', `
+      <path d="M30,200 C30,110 100,40 210,30 C200,140 130,210 30,200 Z" fill="#5cc44f"/>
+      <path d="M30,200 C80,150 130,100 196,44" fill="none" stroke="#2f8a2a" stroke-width="5"/>
+      <path class="anim-bob" d="M96,98 C96,98 82,118 82,128 C82,138 90,144 96,144 C102,144 110,138 110,128 C110,118 96,98 96,98 Z" fill="#bff3ff"/>
+      <path class="anim-bob" d="M150,120 C150,120 140,134 140,142 C140,150 146,154 150,154 C154,154 160,150 160,142 C160,134 150,120 150,120 Z" fill="#bff3ff"/>
+      <path d="M118,62 C118,62 110,74 110,80 C110,86 114,90 118,90 C122,90 126,86 126,80 C126,74 118,62 118,62 Z" fill="#bff3ff"/>
+      ${sparkle(90, 118, 6, '#ffffff')}
+      ${sparkle(200, 170, 10)}
+    `),
+
+    FOG: () => wrapSvg('Soft misty grey fog clouds', `
+      <path d="M40,110 C30,80 70,60 92,76 C104,48 152,48 160,80 C190,70 214,96 200,118 Z" fill="#dfe4ea"/>
+      <g fill="none" stroke-width="10">
+        <path class="anim-wag" style="transform-origin: 120px 140px" d="M30,140 C70,128 110,152 150,140 C180,132 200,140 214,144" stroke="#c4ccd6"/>
+        <path d="M44,170 C84,158 124,182 164,170 C184,164 200,168 210,172" stroke="#d6dce3"/>
+        <path class="anim-wag" style="transform-origin: 120px 200px" d="M26,200 C66,188 106,212 146,200 C176,192 196,200 206,204" stroke="#c4ccd6"/>
+      </g>
+      ${cartoonEyes(102, 138, 92, 7, 9)}
+      <path d="M108,106 Q120,114 132,106" fill="none" stroke-width="4"/>
+    `),
+
+    /* ACTION VERBS */
+
+    DIG: () => wrapSvg('Red shovel digging into a mound of dirt', `
+      <path d="M20,206 C50,150 110,140 140,170 C170,140 210,160 222,206 Z" fill="#9b6a3f"/>
+      <circle cx="70" cy="186" r="5" fill="#6b4526" stroke="none"/><circle cx="180" cy="190" r="5" fill="#6b4526" stroke="none"/>
+      <g class="anim-bob">
+        <rect x="132" y="26" width="16" height="104" rx="6" fill="#d9a35b" transform="rotate(22 140 78)"/>
+        <rect x="140" y="12" width="46" height="18" rx="8" fill="#d9a35b" transform="rotate(22 163 21)"/>
+        <path d="M98,124 C92,148 98,168 112,176 C128,180 144,170 148,148 L150,130 Z" fill="#ff4a3d"/>
+      </g>
+      <circle cx="70" cy="130" r="7" fill="#9b6a3f"/><circle cx="56" cy="110" r="5" fill="#9b6a3f"/>
+    `),
+
+    HUG: () => wrapSvg('Two happy friends sharing a big warm hug', `
+      <circle cx="84" cy="150" r="56" fill="#5ac8ff"/>
+      <circle cx="156" cy="150" r="56" fill="#ffb347"/>
+      <path d="M40,150 C70,180 120,180 150,140" fill="none" stroke="#3aa8e0" stroke-width="16"/>
+      <path d="M200,150 C170,180 120,180 90,140" fill="none" stroke="#f0952a" stroke-width="16"/>
+      ${cartoonEyes(72, 98, 130, 6.5, 8.5)}
+      ${cartoonEyes(144, 170, 130, 6.5, 8.5)}
+      ${cheeks(62, 182, 150, 8)}
+      <path class="anim-bob" d="M120,62 C120,62 102,44 92,52 C80,62 92,80 120,96 C148,80 160,62 148,52 C138,44 120,62 120,62 Z" fill="#ff4f7b"/>
+    `),
+
+    WIN: () => wrapSvg('Shiny gold winner trophy cup', `
+      <path d="M70,60 C30,60 30,120 82,120" fill="none" stroke="#ffc83d" stroke-width="12"/>
+      <path d="M170,60 C210,60 210,120 158,120" fill="none" stroke="#ffc83d" stroke-width="12"/>
+      <path d="M66,40 L174,40 L170,92 C166,134 140,148 120,148 C100,148 74,134 70,92 Z" fill="#ffd247"/>
+      <rect x="108" y="148" width="24" height="30" fill="#ffc83d"/>
+      <rect x="76" y="178" width="88" height="34" rx="6" fill="#8b5a2b"/>
+      <rect x="96" y="186" width="48" height="16" rx="3" fill="#ffd247"/>
+      <path d="M120,62 L127,78 L144,80 L131,91 L135,108 L120,99 L105,108 L109,91 L96,80 L113,78 Z" fill="#ffffff"/>
+      ${sparkle(40, 36, 11)}
+      ${sparkle(206, 160, 10)}
+    `),
+
+    /* ===================== NEW 4-LETTER WORDS ===================== */
+
+    FROG: () => wrapSvg('Happy green frog sitting on a lily pad', `
+      <ellipse cx="120" cy="200" rx="100" ry="22" fill="#3fae4a"/>
+      <path d="M120,200 L180,186" fill="none" stroke-width="4"/>
+      <ellipse cx="62" cy="186" rx="30" ry="14" fill="#5bcf4f"/>
+      <ellipse cx="178" cy="186" rx="30" ry="14" fill="#5bcf4f"/>
+      <ellipse cx="120" cy="140" rx="74" ry="56" fill="#6ddc5a"/>
+      <ellipse cx="120" cy="160" rx="44" ry="30" fill="#c8f5a8" stroke="none"/>
+      <circle cx="78" cy="88" r="28" fill="#6ddc5a"/>
+      <circle cx="162" cy="88" r="28" fill="#6ddc5a"/>
+      ${cartoonEyes(78, 162, 88, 14, 16)}
+      <path d="M76,128 Q120,164 164,128" fill="none" stroke-width="5.5"/>
+      ${cheeks(66, 174, 126, 9)}
+    `),
+
+    DUCK: () => wrapSvg('Cheerful yellow duck with an orange beak', `
+      <ellipse cx="120" cy="214" rx="96" ry="14" fill="#7fd3ff"/>
+      <path d="M40,150 C40,120 70,110 100,120 L170,120 C210,116 216,160 196,180 C178,200 70,204 50,186 C40,178 40,166 40,150 Z" fill="#ffd93b"/>
+      <path class="anim-flap" style="transform-origin: 110px 150px" d="M90,148 C110,130 150,134 160,152 C140,170 104,170 90,148 Z" fill="#ffc21f"/>
+      <circle cx="78" cy="88" r="42" fill="#ffe14d"/>
+      ${singleEye(70, 80, 9, 11)}
+      <path d="M100,98 C120,92 140,98 138,108 C134,118 108,116 98,110 Z" fill="#ff8c1a"/>
+      <ellipse cx="56" cy="102" rx="8" ry="5.2" fill="#ff8598" stroke="none" opacity="0.78"/>
+    `),
+
+    FISH: () => wrapSvg('Bright orange fish blowing bubbles', `
+      <path class="anim-wag" style="transform-origin: 170px 120px" d="M168,120 L222,80 L214,120 L222,160 Z" fill="#ff8a1f"/>
+      <path d="M100,72 C110,52 140,56 146,78 Z" fill="#ff8a1f"/>
+      <ellipse cx="110" cy="120" rx="72" ry="50" fill="#ffa43a"/>
+      <path d="M110,72 C130,100 130,140 110,168 M136,80 C152,104 152,136 136,160" fill="none" stroke="#ff7a1a" stroke-width="5"/>
+      ${singleEye(70, 108, 13, 15)}
+      <path d="M44,134 Q54,142 62,132" fill="none" stroke-width="5"/>
+      <circle class="anim-bob" cx="32" cy="80" r="10" fill="#bff3ff"/>
+      <circle class="anim-bob" cx="44" cy="46" r="7" fill="#bff3ff"/>
+    `),
+
+    BEAR: () => wrapSvg('Fuzzy brown teddy bear', `
+      <circle cx="62" cy="62" r="28" fill="#a86b3c"/><circle cx="62" cy="62" r="14" fill="#e6b88a" stroke="none"/>
+      <circle cx="178" cy="62" r="28" fill="#a86b3c"/><circle cx="178" cy="62" r="14" fill="#e6b88a" stroke="none"/>
+      <circle cx="120" cy="124" r="84" fill="#b9793f"/>
+      <ellipse cx="120" cy="156" rx="44" ry="34" fill="#e6b88a"/>
+      ${cartoonEyes(88, 152, 112, 10, 13)}
+      <ellipse cx="120" cy="140" rx="16" ry="11" fill="${INK}"/>
+      <path d="M104,164 Q120,178 136,164" fill="none" stroke-width="5"/>
+      ${cheeks(66, 174, 144, 10)}
+    `),
+
     LION: () => ART.L(),
-    BEAR: () => ART.B(),
-    DUCK: () => ART.D()
+
+    CRAB: () => wrapSvg('Red beach crab with snappy claws', `
+      <g class="anim-flap" style="transform-origin: 64px 120px">
+        <path d="M70,120 L44,92" fill="none" stroke-width="8"/>
+        <path d="M40,40 C16,50 16,90 44,96 C56,96 60,80 50,72 L60,62 C62,50 54,40 40,40 Z" fill="#ff4a3d"/>
+      </g>
+      <g class="anim-flap" style="transform-origin: 176px 120px">
+        <path d="M170,120 L196,92" fill="none" stroke-width="8"/>
+        <path d="M200,40 C224,50 224,90 196,96 C184,96 180,80 190,72 L180,62 C178,50 186,40 200,40 Z" fill="#ff4a3d"/>
+      </g>
+      <path d="M64,170 L30,196 M70,184 L44,214 M176,170 L210,196 M170,184 L196,214" fill="none" stroke-width="7"/>
+      <line x1="100" y1="110" x2="96" y2="80" stroke-width="5"/><line x1="140" y1="110" x2="144" y2="80" stroke-width="5"/>
+      <ellipse cx="120" cy="150" rx="70" ry="48" fill="#ff5a47"/>
+      ${cartoonEyes(96, 144, 76, 9, 11)}
+      <path d="M100,160 Q120,176 140,160" fill="none" stroke-width="5"/>
+      ${cheeks(82, 158, 150, 9, '#ffb36b')}
+    `),
+
+    GOAT: () => wrapSvg('Friendly white goat with little horns and beard', `
+      <path d="M92,62 C84,36 70,26 60,26 M148,62 C156,36 170,26 180,26" fill="none" stroke="#b08a5a" stroke-width="11"/>
+      <ellipse cx="62" cy="92" rx="30" ry="14" fill="#f2f2f2" transform="rotate(20 62 92)"/>
+      <ellipse cx="178" cy="92" rx="30" ry="14" fill="#f2f2f2" transform="rotate(-20 178 92)"/>
+      <path d="M80,90 C80,56 160,56 160,90 L152,168 C148,190 92,190 88,168 Z" fill="#ffffff"/>
+      ${cartoonEyes(102, 138, 104, 8, 10)}
+      <ellipse cx="120" cy="160" rx="26" ry="18" fill="#ffd3dc"/>
+      <circle cx="112" cy="156" r="3.5" fill="${INK}" stroke="none"/><circle cx="128" cy="156" r="3.5" fill="${INK}" stroke="none"/>
+      <path d="M108,184 L120,218 L132,184 Z" fill="#e8e1d6"/>
+    `),
+
+    WOLF: () => wrapSvg('Grey wolf howling at the night sky', `
+      <circle cx="194" cy="46" r="26" fill="#fff4b8"/>
+      <path d="M60,220 C60,170 70,140 92,120 L150,120 C170,140 180,170 180,220 Z" fill="#8b96a5"/>
+      <path d="M110,190 C110,160 130,150 140,150" fill="none" stroke="#c3cad4" stroke-width="5"/>
+      <polygon points="82,96 76,46 108,78" fill="#8b96a5"/>
+      <polygon points="138,90 150,44 158,90" fill="#8b96a5"/>
+      <path d="M80,130 C70,100 90,70 124,74 L176,56 C186,54 190,66 182,72 L150,100 C150,124 120,140 80,130 Z" fill="#a3adba"/>
+      <circle cx="184" cy="62" r="7" fill="${INK}"/>
+      <path d="M100,96 Q108,90 116,96" fill="none" stroke-width="4.5"/>
+      <path d="M150,96 Q158,104 168,98" fill="none" stroke-width="4"/>
+      ${sparkle(30, 40, 9)}
+      ${sparkle(150, 26, 7)}
+    `),
+
+    SEAL: () => wrapSvg('Playful grey seal balancing a ball', `
+      <g class="anim-bob"><circle cx="150" cy="40" r="26" fill="#ff4a3d"/>
+      <path d="M126,40 C140,30 160,30 174,40" fill="none" stroke="#ffffff" stroke-width="6"/></g>
+      <path d="M30,200 C40,150 90,120 120,100 C150,80 170,90 168,110 C164,140 140,170 140,200 Z" fill="#7d8b99"/>
+      <path d="M30,200 C10,190 4,210 20,216 L60,212 Z" fill="#6c7a88"/>
+      <path d="M100,170 C80,180 70,200 90,206 C104,206 110,190 116,176 Z" fill="#6c7a88"/>
+      <ellipse cx="146" cy="104" rx="26" ry="22" fill="#97a5b3"/>
+      ${cartoonEyes(138, 158, 98, 6, 8)}
+      <ellipse cx="160" cy="114" rx="6" ry="4" fill="${INK}"/>
+      <path d="M160,118 L180,114 M160,120 L180,124" fill="none" stroke-width="2.5"/>
+    `),
+
+    WORM: () => wrapSvg('Wiggly pink worm peeking out of the garden soil', `
+      <path d="M10,206 C60,180 180,180 230,206 L230,230 L10,230 Z" fill="#8a5a33"/>
+      <path class="anim-wag" style="transform-origin: 100px 196px" d="M80,200 C80,160 130,170 130,130 C130,100 100,100 100,80" fill="none" stroke="${INK}" stroke-width="40"/>
+      <path class="anim-wag" style="transform-origin: 100px 196px" d="M80,200 C80,160 130,170 130,130 C130,100 100,100 100,80" fill="none" stroke="#ff9eb8" stroke-width="30"/>
+      <circle cx="100" cy="72" r="26" fill="#ffb3c8"/>
+      ${cartoonEyes(90, 112, 68, 6, 8)}
+      <path d="M92,84 Q101,92 110,84" fill="none" stroke-width="3.5"/>
+      <path d="M160,70 C170,56 186,56 186,70 C186,84 160,84 160,70 Z" fill="#6cc04a" stroke-width="4"/>
+    `),
+
+    /* EVERYDAY OBJECTS & FOOD */
+
+    BOOK: () => wrapSvg('Open storybook with a shooting star', `
+      <path d="M20,70 C60,56 100,60 120,80 C140,60 180,56 220,70 L220,196 C180,182 140,186 120,206 C100,186 60,182 20,196 Z" fill="#2f7de1"/>
+      <path d="M30,74 C64,64 100,68 118,86 L118,194 C100,178 64,176 30,186 Z" fill="#ffffff"/>
+      <path d="M210,74 C176,64 140,68 122,86 L122,194 C140,178 176,176 210,186 Z" fill="#ffffff"/>
+      <path d="M46,104 L98,108 M46,124 L98,128 M46,144 L90,148" fill="none" stroke="#9aa3ad" stroke-width="4"/>
+      <path d="M142,108 L194,104 M142,128 L194,124 M150,148 L194,144" fill="none" stroke="#9aa3ad" stroke-width="4"/>
+      <g class="anim-bob"><path d="M160,30 L166,44 L182,46 L170,56 L174,72 L160,63 L146,72 L150,56 L138,46 L154,44 Z" fill="#ffd247"/></g>
+      ${sparkle(70, 40, 9)}
+    `),
+
+    BALL: () => wrapSvg('Bouncy striped beach ball', `
+      <ellipse cx="120" cy="216" rx="56" ry="10" fill="${INK}" stroke="none" opacity="0.18"/>
+      <g class="anim-bob">
+        <circle cx="120" cy="110" r="88" fill="#ffffff"/>
+        <path d="M120,22 C80,50 70,170 120,198 C60,190 32,140 34,104 C40,60 80,26 120,22 Z" fill="#ff4a3d"/>
+        <path d="M120,22 C160,50 170,170 120,198 C180,190 208,140 206,104 C200,60 160,26 120,22 Z" fill="#2f7de1"/>
+        <path d="M120,22 C110,60 110,160 120,198 C130,160 130,60 120,22 Z" fill="#ffd247"/>
+        <circle cx="120" cy="110" r="88" fill="none"/>
+        <path d="M70,60 Q84,46 100,42" fill="none" stroke="#ffffff" stroke-width="7"/>
+      </g>
+    `),
+
+    CAKE: () => wrapSvg('Birthday cake with pink icing and candles', `
+      <rect x="40" y="120" width="160" height="80" rx="12" fill="#c98a54"/>
+      <path d="M40,132 C40,116 200,116 200,132 L200,150 C186,162 176,146 162,158 C148,170 136,148 120,160 C104,172 92,148 78,160 C64,170 52,154 40,150 Z" fill="#ff8fc3"/>
+      <rect x="28" y="196" width="184" height="16" rx="8" fill="#e6e9ef"/>
+      <circle cx="76" cy="180" r="6" fill="#ffd247"/><circle cx="120" cy="184" r="6" fill="#5ac8ff"/><circle cx="164" cy="180" r="6" fill="#6cc04a"/>
+      <rect x="74" y="70" width="14" height="48" rx="4" fill="#5ac8ff"/>
+      <rect x="113" y="62" width="14" height="56" rx="4" fill="#ffd247"/>
+      <rect x="152" y="70" width="14" height="48" rx="4" fill="#ff5ca8"/>
+      <path class="anim-twinkle" d="M81,44 C74,56 76,64 81,66 C86,64 88,56 81,44 Z" fill="#ff8a1f"/>
+      <path class="anim-twinkle" d="M120,36 C113,48 115,56 120,58 C125,56 127,48 120,36 Z" fill="#ff8a1f"/>
+      <path class="anim-twinkle" d="M159,44 C152,56 154,64 159,66 C164,64 166,56 159,44 Z" fill="#ff8a1f"/>
+    `),
+
+    DRUM: () => wrapSvg('Red marching drum with drumsticks', `
+      <path d="M44,100 L44,180 C44,206 196,206 196,180 L196,100 Z" fill="#ff3b3b"/>
+      <path d="M44,110 L84,190 L120,110 L156,190 L196,110" fill="none" stroke="#ffd247" stroke-width="6"/>
+      <ellipse cx="120" cy="100" rx="76" ry="24" fill="#fff6e0"/>
+      <path d="M44,180 C44,206 196,206 196,180" fill="none" stroke="#ffd247" stroke-width="9"/>
+      <g class="anim-wag" style="transform-origin: 70px 30px">
+        <line x1="50" y1="24" x2="104" y2="92" stroke="#c48a4a" stroke-width="9"/>
+        <circle cx="104" cy="92" r="8" fill="#fff6e0"/>
+      </g>
+      <g class="anim-wag" style="transform-origin: 170px 30px">
+        <line x1="190" y1="24" x2="136" y2="92" stroke="#c48a4a" stroke-width="9"/>
+        <circle cx="136" cy="92" r="8" fill="#fff6e0"/>
+      </g>
+    `),
+
+    KITE: () => wrapSvg('Rainbow diamond kite flying high', `
+      <g class="anim-bob">
+        <polygon points="130,16 190,80 130,150 70,80" fill="#ff4a3d"/>
+        <polygon points="130,16 190,80 130,80" fill="#ffd247"/>
+        <polygon points="70,80 130,80 130,150" fill="#2f7de1"/>
+        <line x1="130" y1="16" x2="130" y2="150" stroke-width="4"/><line x1="70" y1="80" x2="190" y2="80" stroke-width="4"/>
+      </g>
+      <path class="anim-wag" style="transform-origin: 130px 150px" d="M130,150 C110,170 150,186 126,206 C110,218 120,228 110,236" fill="none" stroke-width="4"/>
+      <path d="M118,176 L132,170 L130,184 Z M112,204 L126,200 L124,214 Z" fill="#ff5ca8" stroke-width="3"/>
+      <path d="M130,150 L30,226" fill="none" stroke="#9aa3ad" stroke-width="2.5"/>
+      ${sparkle(206, 30, 9)}
+    `),
+
+    LAMP: () => wrapSvg('Glowing desk lamp', `
+      <path d="M100,40 L60,120 L180,120 L140,40 Z" fill="#fff3b0" stroke="none" opacity="0.6"/>
+      <ellipse cx="120" cy="208" rx="60" ry="14" fill="#2f7de1"/>
+      <rect x="112" y="130" width="16" height="78" rx="6" fill="#d9dde3"/>
+      <path class="anim-bob" d="M70,130 L96,40 L144,40 L170,130 Z" fill="#ffd247"/>
+      <path d="M86,110 L162,110" fill="none" stroke="#ffb31f" stroke-width="6"/>
+      <circle cx="120" cy="138" r="12" fill="#fff6d6"/>
+      ${sparkle(40, 60, 10)}
+      ${sparkle(200, 70, 10)}
+    `),
+
+    BOAT: () => wrapSvg('Little sailboat on blue waves', `
+      <line x1="120" y1="24" x2="120" y2="158" stroke-width="7"/>
+      <polygon points="126,30 196,146 126,146" fill="#ffffff"/>
+      <polygon points="114,48 52,146 114,146" fill="#ff4a3d"/>
+      <path d="M126,22 L160,30 L126,40 Z" fill="#ffd247"/>
+      <path class="anim-bob" d="M30,158 L210,158 L184,198 L56,198 Z" fill="#c4743a"/>
+      <path d="M10,210 C40,196 70,224 100,210 C130,196 160,224 190,210 C210,200 224,206 232,210 L232,236 L10,236 Z" fill="#3fa7f0"/>
+    `),
+
+    MILK: () => wrapSvg('Cold glass of milk with a smile', `
+      <path d="M66,40 L174,40 L162,206 C160,214 80,214 78,206 Z" fill="#f2fbff"/>
+      <path d="M72,80 L168,80 L160,200 C158,208 82,208 80,200 Z" fill="#ffffff"/>
+      <path d="M72,80 C92,92 110,72 128,84 C146,96 158,78 168,82" fill="none" stroke="#d6e9f5" stroke-width="5"/>
+      ${cartoonEyes(104, 136, 132, 8, 10)}
+      <path d="M104,156 Q120,170 136,156" fill="none" stroke-width="4.5"/>
+      ${cheeks(92, 148, 152, 8)}
+      <path d="M84,96 L88,180" fill="none" stroke="#e6f3fb" stroke-width="7"/>
+      ${sparkle(198, 54, 10, '#bff3ff')}
+    `),
+
+    SHOE: () => wrapSvg('Bright blue sneaker with white laces', `
+      <path d="M30,170 L30,110 C30,96 44,90 60,94 L100,104 C110,84 130,76 146,82 L170,130 C200,136 222,150 222,172 L222,186 L30,186 Z" fill="#2f7de1"/>
+      <rect x="22" y="180" width="208" height="26" rx="12" fill="#ffffff"/>
+      <path d="M104,110 L132,100 M110,124 L140,114 M116,138 L148,128" fill="none" stroke="#ffffff" stroke-width="7"/>
+      <path d="M170,150 C180,148 200,152 210,164" fill="none" stroke="#ffd247" stroke-width="6"/>
+      <circle cx="60" cy="140" r="12" fill="#ffd247"/>
+    `),
+
+    BELL: () => wrapSvg('Ringing golden bell with a red bow', `
+      <g class="anim-wag" style="transform-origin: 120px 50px">
+        <path d="M120,44 C76,44 66,90 66,130 C66,156 50,170 40,180 L200,180 C190,170 174,156 174,130 C174,90 164,44 120,44 Z" fill="#ffc83d"/>
+        <circle cx="120" cy="190" r="16" fill="#e6a224"/>
+        <path d="M88,80 C82,100 82,120 84,140" fill="none" stroke="#fff3b0" stroke-width="7"/>
+      </g>
+      <path d="M120,48 C96,20 76,34 90,48 C76,62 96,70 120,48 C144,70 164,62 150,48 C164,34 144,20 120,48 Z" fill="#ff3b3b"/>
+      <path d="M20,120 L36,126 M18,150 L34,150 M220,120 L204,126 M222,150 L206,150" fill="none" stroke-width="5"/>
+    `),
+
+    /* NATURE & WORLD */
+
+    TREE: () => wrapSvg('Tall leafy green tree with red apples', `
+      <path d="M104,140 L100,212 L140,212 L136,140 Z" fill="#8a5a33"/>
+      <g fill="#5cc44f">
+        <circle cx="120" cy="70" r="46"/><circle cx="74" cy="110" r="42"/><circle cx="166" cy="110" r="42"/>
+        <circle cx="120" cy="130" r="40"/>
+      </g>
+      <circle cx="90" cy="92" r="8" fill="#ff3b3b"/><circle cx="146" cy="78" r="8" fill="#ff3b3b"/>
+      <circle cx="160" cy="130" r="8" fill="#ff3b3b"/><circle cx="104" cy="140" r="8" fill="#ff3b3b"/>
+      <path d="M40,214 L200,214" fill="none" stroke="#6cc04a" stroke-width="8"/>
+    `),
+
+    STAR: () => wrapSvg('Smiling twinkling gold star', `
+      <g class="anim-bob">
+        <path d="M120,18 L146,86 L218,90 L162,136 L182,206 L120,166 L58,206 L78,136 L22,90 L94,86 Z" fill="#ffd247"/>
+        ${cartoonEyes(104, 136, 112, 8, 10)}
+        <path d="M104,136 Q120,150 136,136" fill="none" stroke-width="4.5"/>
+        ${cheeks(90, 150, 132, 8)}
+      </g>
+      ${sparkle(30, 30, 10)}
+      ${sparkle(210, 196, 10)}
+      ${sparkle(206, 34, 7)}
+    `),
+
+    MOON: () => wrapSvg('Sleepy crescent moon in the night sky', `
+      <path class="anim-bob" d="M150,20 C90,20 50,70 50,124 C50,180 96,222 150,222 C116,200 98,166 98,124 C98,80 118,44 150,20 Z" fill="#fff0a8"/>
+      <path d="M72,108 Q80,100 88,108" fill="none" stroke-width="4.5"/>
+      <path d="M74,146 Q84,156 94,148" fill="none" stroke-width="4.5"/>
+      ${sparkle(170, 70, 10)}
+      ${sparkle(196, 130, 8)}
+      ${sparkle(160, 180, 9)}
+    `),
+
+    RAIN: () => wrapSvg('Raincloud pitter-pattering raindrops', `
+      <path d="M50,120 C26,120 26,80 54,78 C58,44 104,36 120,62 C138,40 182,50 182,86 C208,86 214,120 188,120 Z" fill="#c4ccd6"/>
+      ${cartoonEyes(102, 138, 94, 7, 9)}
+      <path d="M108,108 Q120,116 132,108" fill="none" stroke-width="4"/>
+      <g fill="#3fa7f0" class="anim-bob">
+        <path d="M70,140 C70,140 60,158 60,166 C60,172 64,176 70,176 C76,176 80,172 80,166 C80,158 70,140 70,140 Z"/>
+        <path d="M120,150 C120,150 110,168 110,176 C110,182 114,186 120,186 C126,186 130,182 130,176 C130,168 120,150 120,150 Z"/>
+        <path d="M170,140 C170,140 160,158 160,166 C160,172 164,176 170,176 C176,176 180,172 180,166 C180,158 170,140 170,140 Z"/>
+        <path d="M94,186 C94,186 86,200 86,206 C86,212 90,214 94,214 C98,214 102,212 102,206 C102,200 94,186 94,186 Z"/>
+        <path d="M148,186 C148,186 140,200 140,206 C140,212 144,214 148,214 C152,214 156,212 156,206 C156,200 148,186 148,186 Z"/>
+      </g>
+    `),
+
+    SNOW: () => wrapSvg('Cheerful snowman in falling snowflakes', `
+      <circle cx="120" cy="168" r="52" fill="#ffffff"/>
+      <circle cx="120" cy="88" r="38" fill="#ffffff"/>
+      <rect x="88" y="34" width="64" height="16" rx="4" fill="#323643"/>
+      <rect x="100" y="6" width="40" height="34" rx="4" fill="#323643"/>
+      <path d="M86,116 C100,124 140,124 154,116 L158,132 L142,128 L138,148 L126,126 C110,128 96,126 86,116 Z" fill="#ff3b3b"/>
+      ${cartoonEyes(106, 134, 80, 6, 8)}
+      <path d="M120,92 L146,98 L120,102 Z" fill="#ff8a1f"/>
+      <circle cx="120" cy="150" r="5" fill="${INK}" stroke="none"/><circle cx="120" cy="172" r="5" fill="${INK}" stroke="none"/>
+      ${sparkle(34, 40, 9, '#ffffff')}
+      ${sparkle(206, 60, 9, '#ffffff')}
+      ${sparkle(36, 160, 7, '#ffffff')}
+      ${sparkle(208, 176, 8, '#ffffff')}
+    `),
+
+    LEAF: () => wrapSvg('Fluttering orange autumn leaf', `
+      <g class="anim-wag" style="transform-origin: 120px 200px">
+        <path d="M120,20 L138,62 L176,46 L166,88 L210,96 L176,126 L196,156 L150,152 L140,190 L120,166 L100,190 L90,152 L44,156 L64,126 L30,96 L74,88 L64,46 L102,62 Z" fill="#ff8a1f"/>
+        <path d="M120,40 L120,200 M120,100 L80,80 M120,100 L160,80 M120,140 L76,124 M120,140 L164,124" fill="none" stroke="#c8551a" stroke-width="5"/>
+      </g>
+      ${sparkle(206, 30, 9)}
+    `),
+
+    /* ACTION VERBS */
+
+    SWIM: () => wrapSvg('Happy swimmer with goggles splashing in the pool', `
+      <circle cx="120" cy="104" r="50" fill="#ffcf9e"/>
+      <path d="M70,96 C70,50 170,50 170,96 C150,80 90,80 70,96 Z" fill="#ff4a3d"/>
+      <circle cx="100" cy="104" r="15" fill="#bff3ff"/><circle cx="140" cy="104" r="15" fill="#bff3ff"/>
+      <line x1="115" y1="104" x2="125" y2="104" stroke-width="5"/>
+      <circle cx="102" cy="104" r="5" fill="${INK}" stroke="none"/><circle cx="142" cy="104" r="5" fill="${INK}" stroke="none"/>
+      <path d="M104,128 Q120,140 136,128" fill="none" stroke-width="4.5"/>
+      <path class="anim-flap" style="transform-origin: 70px 150px" d="M70,150 C50,120 34,100 30,80" fill="none" stroke="#ffcf9e" stroke-width="16"/>
+      <path d="M10,150 C40,136 70,164 100,150 C130,136 160,164 190,150 C210,140 224,146 232,150 L232,236 L10,236 Z" fill="#3fa7f0"/>
+      <circle class="anim-bob" cx="196" cy="110" r="8" fill="#bff3ff"/><circle class="anim-bob" cx="212" cy="132" r="6" fill="#bff3ff"/>
+    `),
+
+    PLAY: () => wrapSvg('Stack of colourful ABC toy blocks', `
+      <rect x="34" y="140" width="72" height="72" rx="8" fill="#ff4a3d"/>
+      <rect x="120" y="140" width="72" height="72" rx="8" fill="#2f7de1"/>
+      <g class="anim-bob"><rect x="78" y="62" width="72" height="72" rx="8" fill="#ffd247" transform="rotate(-8 114 98)"/></g>
+      <text x="70" y="196" font-size="48" font-weight="700" text-anchor="middle" fill="#ffffff" stroke-width="3">A</text>
+      <text x="156" y="196" font-size="48" font-weight="700" text-anchor="middle" fill="#ffffff" stroke-width="3">B</text>
+      <text x="114" y="116" font-size="48" font-weight="700" text-anchor="middle" fill="#ffffff" stroke-width="3" transform="rotate(-8 114 98)">C</text>
+      ${sparkle(200, 60, 10)}
+      ${sparkle(40, 80, 9)}
+    `),
+
+    CLAP: () => wrapSvg('Two hands clapping with joyful motion lines', `
+      <g class="anim-flap" style="transform-origin: 80px 200px">
+        <path d="M64,212 L64,150 C60,130 62,100 70,76 C74,64 88,66 88,80 L88,60 C88,46 104,46 104,60 L104,54 C104,40 120,40 120,54 L118,150 L108,212 Z" fill="#ffcf9e"/>
+        <path d="M88,80 L88,120 M104,60 L104,118" fill="none" stroke-width="3.5"/>
+      </g>
+      <g class="anim-flap" style="transform-origin: 160px 200px">
+        <path d="M176,212 L176,150 C180,130 178,100 170,76 C166,64 152,66 152,80 L152,60 C152,46 136,46 136,60 L136,54 C136,40 120,40 122,54 L122,150 L132,212 Z" fill="#f4bb86"/>
+        <path d="M152,80 L152,120 M136,60 L136,118" fill="none" stroke-width="3.5"/>
+      </g>
+      <path d="M46,64 L28,44 M36,100 L12,96 M194,64 L212,44 M204,100 L228,96 M120,30 L120,8" fill="none" stroke-width="6"/>
+      ${sparkle(30, 150, 10)}
+      ${sparkle(210, 150, 10)}
+    `)
   };
 
   window.getHermesIllustration = function (key) {
