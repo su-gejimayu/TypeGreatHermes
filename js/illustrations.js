@@ -3,7 +3,7 @@
  * Every character uses bold #181818 ink lines, cel highlights, and animated sub-groups.
  * Supports:
  * - Letters A-Z
- * - Numbers 0-9 (0 = Zero to Hero, 1-9 = Australian 12 Days of Christmas with exact countable critters!)
+ * - Numbers 0-9 (Woodland forest theme with exact countable critters and treasures!)
  * - All 50 3-letter words and 30 4-letter words (80 total dictionary words)
  */
 (function () {
@@ -54,128 +54,146 @@
     `;
   }
 
-  // Reusable countable Aussie mini-critters for 2-9 (Australian 12 Days of Christmas)
-  function miniGalah(x, y, sc = 1, flip = 1) {
+  // Reusable countable Woodland forest mini-critters & treasures for 2-9
+  function miniFox(x, y, sc = 1, flip = 1) {
     return `<g transform="translate(${x}, ${y}) scale(${flip * sc}, ${sc})">
-      <!-- Grey wing & tail -->
-      <ellipse cx="10" cy="14" rx="22" ry="28" fill="#9aa3b2"/>
-      <!-- Rose-pink chest -->
-      <ellipse cx="-4" cy="14" rx="18" ry="25" fill="#ff6ca8"/>
-      <!-- Pale pink crest -->
-      <path d="M-12,-14 C-18,-34 2,-36 8,-18 Z" fill="#ffc4dd"/>
-      <circle cx="-4" cy="-10" r="15" fill="#ff7eb3"/>
-      <circle cx="-8" cy="-12" r="4" fill="${INK}" stroke="none"/>
-      <path d="M-18,-10 L-28,-4 L-17,0 Z" fill="#fff3d6"/>
-      <line x1="-8" y1="38" x2="-8" y2="48" stroke-width="4.5"/>
-      <line x1="4" y1="38" x2="4" y2="48" stroke-width="4.5"/>
+      <!-- Fluffy white-tipped fox tail -->
+      <path class="anim-wag" style="transform-origin: 12px 24px" d="M10,24 C34,26 46,-2 32,-10 C22,-10 18,8 8,16 Z" fill="#f26b29"/>
+      <path d="M29,-6 C35,-4 38,4 32,12 C25,8 24,0 29,-6 Z" fill="#fff7e8"/>
+      <!-- Sitting fox body & cream bib -->
+      <ellipse cx="0" cy="20" rx="18" ry="22" fill="#f26b29"/>
+      <ellipse cx="-2" cy="24" rx="10" ry="15" fill="#fff4df" stroke="none"/>
+      <!-- Pointed ears & white inner tufts -->
+      <polygon points="-20,-16 -24,-40 -4,-24" fill="#f26b29"/>
+      <polygon points="16,-16 20,-40 0,-24" fill="#f26b29"/>
+      <polygon points="-18,-20 -20,-34 -8,-24" fill="#ffcdb2" stroke="none"/>
+      <polygon points="14,-20 16,-34 4,-24" fill="#ffcdb2" stroke="none"/>
+      <!-- Fox head & cream cheek whiskers -->
+      <ellipse cx="-2" cy="-8" rx="22" ry="18" fill="#ff7d3b"/>
+      <path d="M-24,-6 C-20,6 -8,10 -2,8 C4,10 16,6 20,-6 C12,-2 4,-2 -2,0 C-8,-2 -16,-2 -24,-6 Z" fill="#fff7e8"/>
+      <circle cx="-10" cy="-10" r="3.4" fill="${INK}" stroke="none"/>
+      <circle cx="6" cy="-10" r="3.4" fill="${INK}" stroke="none"/>
+      <circle cx="-2" cy="-1" r="4.2" fill="${INK}" stroke="none"/>
     </g>`;
   }
 
-  function miniJabiru(x, y, sc = 1) {
+  function miniHedgehog(x, y, sc = 1) {
     return `<g transform="translate(${x}, ${y}) scale(${sc})">
-      <!-- Long coral-red stork legs -->
-      <line x1="-5" y1="18" x2="-8" y2="56" stroke="#ff4757" stroke-width="5"/>
-      <line x1="6" y1="18" x2="9" y2="56" stroke="#ff4757" stroke-width="5"/>
-      <!-- White body & glossy dark green-blue wing -->
-      <ellipse cx="2" cy="8" rx="22" ry="16" fill="#ffffff"/>
-      <path d="M-8,2 C6,-4 20,4 22,16 C8,20 -6,16 -8,2 Z" fill="#264653"/>
-      <!-- Tall neck & glossy dark head -->
-      <path d="M-12,2 L-14,-28" fill="none" stroke="#264653" stroke-width="9"/>
-      <circle cx="-14" cy="-32" r="10" fill="#264653"/>
-      <circle cx="-16" cy="-34" r="3" fill="#ffe03b" stroke="none"/>
-      <!-- Big Jabiru bill -->
-      <polygon points="-22,-34 -46,-29 -22,-26" fill="#3b3e47"/>
+      <!-- Spiky chestnut quill shell -->
+      <path d="M-30,12 C-34,-24 30,-28 32,12 Z" fill="#7f4f24"/>
+      <polygon points="-26,-4 -34,-14 -20,-12" fill="#6b3e19"/>
+      <polygon points="-14,-16 -18,-28 -4,-20" fill="#6b3e19"/>
+      <polygon points="4,-20 10,-32 16,-18" fill="#6b3e19"/>
+      <polygon points="20,-12 32,-18 28,-2" fill="#6b3e19"/>
+      <!-- Warm cream face & tummy -->
+      <path d="M-24,12 C-24,-8 12,-12 18,12 Z" fill="#f5deb3"/>
+      <circle cx="-12" cy="2" r="3.2" fill="${INK}" stroke="none"/>
+      <circle cx="-2" cy="2" r="3.2" fill="${INK}" stroke="none"/>
+      <circle cx="-24" cy="4" r="4" fill="#ff6b8b"/>
+      <path d="M-12,10 Q-7,15 -2,10" fill="none" stroke-width="3.5"/>
+      <ellipse cx="-12" cy="14" rx="5" ry="3.5" fill="#d4a373"/>
+      <ellipse cx="10" cy="14" rx="5" ry="3.5" fill="#d4a373"/>
     </g>`;
   }
 
-  function miniLyrebird(x, y, sc = 1) {
-    return `<g transform="translate(${x}, ${y}) scale(${sc})">
-      <!-- Iconic curved Lyre tail plumes! -->
-      <path class="anim-wag" style="transform-origin: 8px 10px" d="M8,10 C28,-18 38,-42 22,-48 C14,-48 16,-28 6,4" fill="none" stroke="#c97a3d" stroke-width="6"/>
-      <path class="anim-wag" style="transform-origin: 8px 10px" d="M12,12 C36,-6 48,-28 36,-38 C28,-40 26,-20 10,8" fill="none" stroke="#e6a15c" stroke-width="5"/>
-      <line x1="10" y1="8" x2="26" y2="-32" stroke="#fff0cc" stroke-width="3"/>
-      <!-- Warm brown body & head -->
-      <ellipse cx="-2" cy="14" rx="18" ry="14" fill="#9c5a2b"/>
-      <circle cx="-14" cy="-4" r="11" fill="#b06935"/>
-      <circle cx="-17" cy="-6" r="3.2" fill="${INK}" stroke="none"/>
-      <polygon points="-24,-5 -34,-1 -24,2" fill="#ffd24c"/>
-      <line x1="-6" y1="27" x2="-8" y2="40" stroke-width="4"/>
-      <line x1="4" y1="27" x2="6" y2="40" stroke-width="4"/>
-    </g>`;
-  }
-
-  function miniRoo(x, y, sc = 1) {
+  function miniFrog(x, y, sc = 1) {
     return `<g class="anim-bob" transform="translate(${x}, ${y}) scale(${sc})">
-      <path d="M10,16 C28,20 36,6 32,-4 C26,-4 22,10 10,10 Z" fill="#d98943"/>
-      <ellipse cx="-4" cy="28" rx="14" ry="6" fill="#c47430"/>
-      <ellipse cx="2" cy="10" rx="16" ry="20" fill="#e69a54"/>
-      <ellipse cx="-2" cy="12" rx="9" ry="12" fill="#fae0b8" stroke="none"/>
-      <ellipse cx="-6" cy="-22" rx="5" ry="12" transform="rotate(-15 -6 -22)" fill="#e69a54"/>
-      <ellipse cx="8" cy="-22" rx="5" ry="12" transform="rotate(15 8 -22)" fill="#e69a54"/>
-      <circle cx="0" cy="-10" r="13" fill="#e69a54"/>
-      <circle cx="-4" cy="-12" r="3" fill="${INK}" stroke="none"/>
-      <circle cx="5" cy="-12" r="3" fill="${INK}" stroke="none"/>
-      <circle cx="0" cy="-6" r="3.5" fill="${INK}" stroke="none"/>
+      <!-- Green pond lilypad -->
+      <path d="M-32,18 C-34,34 34,34 32,18 C32,6 10,6 4,14 L0,6 L-4,14 C-12,6 -32,8 -32,18 Z" fill="#46c963"/>
+      <!-- Plump mossy frog & cream belly -->
+      <ellipse cx="0" cy="8" rx="22" ry="17" fill="#52d15b"/>
+      <ellipse cx="0" cy="13" rx="14" ry="10" fill="#d8f999" stroke="none"/>
+      <!-- Big bulging top frog eyes -->
+      <circle cx="-12" cy="-10" r="9.5" fill="#52d15b"/>
+      <circle cx="12" cy="-10" r="9.5" fill="#52d15b"/>
+      <circle cx="-12" cy="-10" r="6" fill="#ffffff"/>
+      <circle cx="12" cy="-10" r="6" fill="#ffffff"/>
+      <circle cx="-11" cy="-10" r="3.2" fill="${INK}" stroke="none"/>
+      <circle cx="11" cy="-10" r="3.2" fill="${INK}" stroke="none"/>
+      <!-- Cheerful frog smile & cheeks -->
+      <ellipse cx="-14" cy="3" rx="4.5" ry="2.8" fill="#ff8598" stroke="none" opacity="0.8"/>
+      <ellipse cx="14" cy="3" rx="4.5" ry="2.8" fill="#ff8598" stroke="none" opacity="0.8"/>
+      <path d="M-10,4 Q0,13 10,4" fill="none" stroke-width="4"/>
     </g>`;
   }
 
-  function miniPlatypus(x, y, sc = 1) {
+  function miniWoodlandBee(x, y, sc = 1) {
     return `<g class="anim-bob" transform="translate(${x}, ${y}) scale(${sc})">
-      <!-- Paddle beaver-like tail -->
-      <ellipse cx="26" cy="4" rx="14" ry="9" fill="#6b442a"/>
-      <!-- Sleek brown body -->
-      <ellipse cx="0" cy="4" rx="22" ry="14" fill="#8f5b38"/>
-      <!-- Duck bill -->
-      <ellipse cx="-24" cy="6" rx="13" ry="8" fill="#ffb838"/>
-      <circle cx="-12" cy="-1" r="3.2" fill="${INK}" stroke="none"/>
-      <circle cx="-3" cy="-1" r="3.2" fill="${INK}" stroke="none"/>
+      <!-- Fluttering translucent wings -->
+      <ellipse class="anim-flap" style="transform-origin: -4px -8px" cx="-8" cy="-18" rx="8" ry="13" transform="rotate(-20 -8 -18)" fill="#d6f5ff"/>
+      <ellipse class="anim-flap" style="transform-origin: 6px -8px" cx="10" cy="-18" rx="8" ry="13" transform="rotate(20 10 -18)" fill="#d6f5ff"/>
+      <!-- Stinger & striped golden bee body -->
+      <polygon points="18,0 28,2 18,6" fill="${INK}"/>
+      <ellipse cx="0" cy="2" rx="19" ry="14" fill="#ffe03b"/>
+      <rect x="-2" y="-11" width="6" height="26" rx="2" fill="${INK}" stroke="none"/>
+      <rect x="8" y="-9" width="5" height="22" rx="2" fill="${INK}" stroke="none"/>
+      <circle cx="-11" cy="-1" r="3" fill="${INK}" stroke="none"/>
+      <path d="M-14,5 Q-10,9 -6,5" fill="none" stroke-width="3"/>
     </g>`;
   }
 
-  function miniKoala(x, y, sc = 1) {
-    return `<g transform="translate(${x}, ${y}) scale(${sc})">
-      <!-- Fluffy round ears -->
-      <circle cx="-16" cy="-8" r="10" fill="#8e9aaf"/>
-      <circle cx="-16" cy="-8" r="5" fill="#e8eef5" stroke="none"/>
-      <circle cx="16" cy="-8" r="10" fill="#8e9aaf"/>
-      <circle cx="16" cy="-8" r="5" fill="#e8eef5" stroke="none"/>
-      <!-- Chubby body & head -->
-      <ellipse cx="0" cy="16" rx="14" ry="13" fill="#9aa6ba"/>
-      <circle cx="0" cy="0" r="15" fill="#adb8ca"/>
-      <!-- Iconic oval black koala nose -->
-      <ellipse cx="0" cy="2" rx="5" ry="7" fill="#2c303a"/>
-      <circle cx="-7" cy="-3" r="2.6" fill="${INK}" stroke="none"/>
-      <circle cx="7" cy="-3" r="2.6" fill="${INK}" stroke="none"/>
+  function miniLadybug(x, y, sc = 1, rot = 0) {
+    return `<g transform="translate(${x}, ${y}) rotate(${rot}) scale(${sc})">
+      <!-- Tiny legs & golden-tipped antennae -->
+      <path d="M-8,-18 C-14,-28 -20,-28 -20,-22 M8,-18 C14,-28 20,-28 20,-22" fill="none" stroke-width="3.5"/>
+      <circle cx="-20" cy="-22" r="2.8" fill="#ffe03b"/>
+      <circle cx="20" cy="-22" r="2.8" fill="#ffe03b"/>
+      <!-- Head & crimson spotted shell -->
+      <circle cx="0" cy="-14" r="11" fill="#2d3240"/>
+      <ellipse cx="0" cy="6" rx="20" ry="21" fill="#ff3b47"/>
+      <line x1="0" y1="-12" x2="0" y2="26" stroke-width="4"/>
+      <circle cx="-9" cy="-1" r="4.2" fill="${INK}" stroke="none"/>
+      <circle cx="-8" cy="14" r="4.2" fill="${INK}" stroke="none"/>
+      <circle cx="9" cy="-1" r="4.2" fill="${INK}" stroke="none"/>
+      <circle cx="8" cy="14" r="4.2" fill="${INK}" stroke="none"/>
+      <circle cx="-4" cy="-16" r="2.5" fill="#ffffff" stroke="none"/>
+      <circle cx="4" cy="-16" r="2.5" fill="#ffffff" stroke="none"/>
     </g>`;
   }
 
-  function miniPossum(x, y, sc = 1) {
+  function miniMushroom(x, y, sc = 1) {
     return `<g class="anim-bob" transform="translate(${x}, ${y}) scale(${sc})">
-      <!-- Curled ringtail -->
-      <path d="M12,12 C26,14 28,-2 18,-4" fill="none" stroke="#c78d65" stroke-width="5"/>
-      <ellipse cx="0" cy="10" rx="14" ry="11" fill="#9e8270"/>
-      <circle cx="-11" cy="-8" r="7" fill="#ff9eb5"/>
-      <circle cx="11" cy="-8" r="7" fill="#ff9eb5"/>
-      <circle cx="0" cy="-2" r="13" fill="#b39684"/>
-      <circle cx="-5" cy="-3" r="3.2" fill="${INK}" stroke="none"/>
-      <circle cx="5" cy="-3" r="3.2" fill="${INK}" stroke="none"/>
-      <circle cx="0" cy="3" r="3" fill="#ff6b8b" stroke="none"/>
+      <!-- Plump cream stalk -->
+      <path d="M-10,0 L-12,24 C-12,29 12,29 12,24 L10,0 Z" fill="#fff5df"/>
+      <!-- Glowing storybook red cap with cream spots -->
+      <path d="M-24,4 C-24,-22 24,-22 24,4 Z" fill="#ff4747"/>
+      <circle cx="-11" cy="-7" r="4.5" fill="#fff9eb" stroke="none"/>
+      <circle cx="4" cy="-12" r="5" fill="#fff9eb" stroke="none"/>
+      <circle cx="13" cy="-3" r="3.6" fill="#fff9eb" stroke="none"/>
+      <!-- Friendly tiny mushroom eyes -->
+      <circle cx="-4" cy="12" r="2.4" fill="${INK}" stroke="none"/>
+      <circle cx="4" cy="12" r="2.4" fill="${INK}" stroke="none"/>
+      <path d="M-3,17 Q0,20 3,17" fill="none" stroke-width="3"/>
     </g>`;
   }
 
-  function miniWombat(x, y, sc = 1) {
+  function miniFirefly(x, y, sc = 1) {
+    return `<g class="anim-bob" transform="translate(${x}, ${y}) scale(${sc})">
+      <!-- Warm lantern halo -->
+      <circle cx="-8" cy="8" r="18" fill="#ffe866" stroke="none" opacity="0.42"/>
+      <!-- Fluttering wings -->
+      <ellipse class="anim-flap" cx="-4" cy="-12" rx="10" ry="6" transform="rotate(-25 -4 -12)" fill="#d9f4ff"/>
+      <ellipse class="anim-flap" cx="6" cy="-12" rx="10" ry="6" transform="rotate(25 6 -12)" fill="#d9f4ff"/>
+      <!-- Glowing lantern tail & twilight head -->
+      <ellipse cx="-7" cy="8" rx="11" ry="9" fill="#ffe759"/>
+      <circle cx="9" cy="3" r="9.5" fill="#3a4a78"/>
+      <circle cx="12" cy="1" r="2.8" fill="#ffffff" stroke="none"/>
+      <circle cx="12.5" cy="1" r="1.4" fill="${INK}" stroke="none"/>
+      <path d="M12,-6 C16,-14 22,-14 23,-10" fill="none" stroke-width="3"/>
+    </g>`;
+  }
+
+  function miniAcorn(x, y, sc = 1) {
     return `<g transform="translate(${x}, ${y}) scale(${sc})">
-      <!-- Chubby wombat body -->
-      <ellipse cx="0" cy="12" rx="19" ry="14" fill="#8c6243"/>
-      <circle cx="-12" cy="-6" r="5.5" fill="#755035"/>
-      <circle cx="12" cy="-6" r="5.5" fill="#755035"/>
-      <ellipse cx="0" cy="2" rx="16" ry="13" fill="#9e7150"/>
-      <!-- Yellow worker hardhat ("Nine Wombats Working"!) -->
-      <path d="M-15,-5 C-15,-20 15,-20 15,-5 Z" fill="#ffe03b"/>
-      <line x1="-18" y1="-5" x2="18" y2="-5" stroke="#ffa822" stroke-width="5"/>
-      <ellipse cx="0" cy="4" rx="6" ry="4.5" fill="#3a281c"/>
-      <circle cx="-7" cy="-1" r="2.5" fill="${INK}" stroke="none"/>
-      <circle cx="7" cy="-1" r="2.5" fill="${INK}" stroke="none"/>
+      <!-- Gleaming golden oak nut -->
+      <path d="M-16,-2 C-16,18 -4,26 0,29 C4,26 16,18 16,-2 Z" fill="#f3b648"/>
+      <ellipse cx="-6" cy="8" rx="3.5" ry="7" transform="rotate(-12 -6 8)" fill="#ffe9a3" stroke="none"/>
+      <!-- Ribbed oak cap & stem -->
+      <path d="M0,-14 L0,-24" fill="none" stroke="#6f4518" stroke-width="5"/>
+      <path d="M-20,0 C-20,-15 20,-15 20,0 Z" fill="#8b542b"/>
+      <line x1="-10" y1="-8" x2="-4" y2="0" stroke="#5c3518" stroke-width="2.5"/>
+      <line x1="0" y1="-10" x2="6" y2="0" stroke="#5c3518" stroke-width="2.5"/>
+      <line x1="10" y1="-8" x2="14" y2="0" stroke="#5c3518" stroke-width="2.5"/>
     </g>`;
   }
 
@@ -617,7 +635,7 @@
       <line x1="78" y1="184" x2="186" y2="184" stroke="${INK}" stroke-width="4"/>
     `),
 
-    U: () => wrapSvg('Magical unicorn with rainbow mane and gold horn', `
+    U: () => wrapSvg('Mythic unicorn with rainbow mane and gold horn', `
       <path d="M84,74 C40,78 30,122 58,136" fill="#ff5c8a"/>
       <path d="M82,100 C36,112 32,154 62,164" fill="#ffe042"/>
       <path d="M84,128 C44,144 44,184 74,190" fill="#4dd8ff"/>
@@ -720,137 +738,138 @@
     `),
 
     // =========================================================================
-    // NUMBERS 0-9: "Zero to Hero" (0) + Australian 12 Days of Christmas (1-9)
-    // Every illustration displays the exact countable number of Aussie animals!
+    // NUMBERS 0-9: Woodland Forest (0 = Empty Acorn Basket, 1-9 = Countable!)
+    // Every illustration displays the exact countable number of woodland items!
     // =========================================================================
 
-    '0': () => wrapSvg('Zero to Hero flying cartoon superhero', `
-      <!-- Billowing Red Superhero Cape -->
-      <path class="anim-flap" style="transform-origin: 112px 116px" d="M82,106 C36,122 22,178 46,210 C72,202 88,214 114,202 C132,216 164,196 164,166 Z" fill="#ff3347"/>
-      <!-- Flying Blue Hero Suit -->
-      <ellipse cx="122" cy="144" rx="34" ry="42" transform="rotate(20 122 144)" fill="#2f88ff"/>
-      <!-- Red Boots -->
-      <rect x="78" y="176" width="22" height="32" rx="9" transform="rotate(22 89 192)" fill="#ff3347"/>
-      <rect x="110" y="182" width="22" height="32" rx="9" transform="rotate(22 121 198)" fill="#ff3347"/>
-      <!-- Golden Star Emblem on Chest -->
-      <polygon points="124,122 130,136 145,138 134,148 137,162 124,154 111,162 114,148 103,138 118,136" fill="#ffe03b" stroke-width="3.5"/>
-      <!-- Raised Hero Fist Zooming Upward! -->
+    '0': () => wrapSvg('Empty woven acorn basket showing zero acorns inside', `
+      <!-- Soft woodland mossy ground -->
+      <ellipse cx="120" cy="204" rx="88" ry="20" fill="#6cc474"/>
+      <!-- Playful upturned empty woven basket -->
       <g class="anim-bob">
-        <path d="M148,122 L188,68" stroke="#2f88ff" stroke-width="20"/>
-        <path d="M148,122 L188,68" stroke="${INK}" stroke-width="5.5"/>
-        <circle cx="194" cy="60" r="15" fill="#ffd438"/>
+        <path d="M56,118 C64,46 176,46 184,118" fill="none" stroke="#a66c38" stroke-width="11"/>
+        <path d="M56,118 C64,46 176,46 184,118" fill="none" stroke="${INK}" stroke-width="5"/>
+        <polygon points="48,118 192,118 172,188 68,188" fill="#dfb06a"/>
+        <!-- Hollow dark interior clearly showing empty zero! -->
+        <ellipse cx="120" cy="118" rx="68" ry="18" fill="#6b4423"/>
+        <line x1="78" y1="138" x2="162" y2="138" stroke="#9e6632" stroke-width="4"/>
+        <line x1="82" y1="158" x2="158" y2="158" stroke="#9e6632" stroke-width="4"/>
+        <line x1="86" y1="174" x2="154" y2="174" stroke="#9e6632" stroke-width="4"/>
+        <line x1="94" y1="136" x2="98" y2="184" stroke="#9e6632" stroke-width="4"/>
+        <line x1="120" y1="136" x2="120" y2="184" stroke="#9e6632" stroke-width="4"/>
+        <line x1="146" y1="136" x2="142" y2="184" stroke="#9e6632" stroke-width="4"/>
       </g>
-      <!-- Cheerful Hero Head with Mask & Hair Curl -->
-      <circle cx="126" cy="76" r="36" fill="#ffd4b2"/>
-      <rect x="92" y="62" width="68" height="22" rx="11" fill="#ff3347"/>
-      ${cartoonEyes(112, 140, 73, 7.5, 9.5)}
-      <path d="M112,92 Q126,104 140,92" fill="none" stroke-width="4.5"/>
-      <path d="M110,42 C126,22 158,30 156,50" fill="#4a2e1b"/>
-      ${sparkle(48, 66, 12)}
-      ${sparkle(204, 126, 10)}
+      <!-- Two falling autumn leaves & golden sparkles ("Zero acorns!") -->
+      <path class="anim-flap" d="M36,78 C24,60 44,44 58,58 C56,74 44,82 36,78 Z" fill="#f27a35"/>
+      <path class="anim-flap" d="M204,86 C190,68 208,52 222,66 C220,82 210,88 204,86 Z" fill="#f3b648"/>
+      ${sparkle(48, 108, 10)}
+      ${sparkle(194, 114, 10)}
     `),
 
-    '1': () => wrapSvg('One Kookaburra perched in an Australian gum tree', `
-      <!-- Eucalyptus Gum Tree Branch & Leaves -->
-      <path d="M18,188 Q116,172 222,194" fill="none" stroke="#8a5a36" stroke-width="16"/>
-      <path d="M18,188 Q116,172 222,194" fill="none" stroke="${INK}" stroke-width="5.5"/>
-      <path class="anim-flap" d="M44,182 C22,158 26,126 48,126 C64,142 60,168 44,182 Z" fill="#52b788"/>
-      <path class="anim-flap" d="M188,186 C206,162 226,144 222,122 C200,124 184,154 188,186 Z" fill="#74c69d"/>
-      <circle cx="64" cy="194" r="9" fill="#9c6644"/>
-      <!-- 1 Laughing Kookaburra -->
-      <polygon points="146,154 196,176 178,194 136,172" fill="#8d5524"/>
-      <ellipse cx="122" cy="142" rx="42" ry="44" fill="#f6ead7"/>
-      <path d="M118,112 C154,112 168,146 154,172 C132,168 118,144 118,112 Z" fill="#7f5539"/>
-      <path d="M126,128 Q144,134 152,148" fill="none" stroke="#5cc8ff" stroke-width="6"/>
-      <!-- Fluffy Crested Head & Big Laughing Beak -->
-      <path d="M88,82 C82,42 146,34 158,72 C164,96 146,114 118,114 C94,114 86,98 88,82 Z" fill="#fff5e6"/>
-      <path d="M116,68 C136,66 156,74 156,88" fill="none" stroke="#6f4518" stroke-width="10"/>
-      <polygon points="94,78 34,68 92,94" fill="#4a4e59"/>
-      <polygon points="92,94 42,102 96,108" fill="#e6ccb2"/>
-      <circle cx="112" cy="78" r="8" fill="#ffffff"/>
-      <circle cx="111" cy="78" r="4.5" fill="${INK}" stroke="none"/>
-      <line x1="106" y1="180" x2="104" y2="192" stroke="#f4a261" stroke-width="6"/>
-      <line x1="130" y1="180" x2="132" y2="192" stroke="#f4a261" stroke-width="6"/>
-      ${sparkle(48, 44, 11)}
+    '1': () => wrapSvg('One wise horned owl perched on a moonlit oak branch', `
+      <!-- Crescent moon & night sky sparkle -->
+      <path d="M52,32 C34,40 34,68 54,76 C44,64 46,44 52,32 Z" fill="#ffe474"/>
+      ${sparkle(196, 44, 11)}
+      <!-- Mossy oak branch -->
+      <path d="M22,190 Q120,174 218,192" fill="none" stroke="#7f512d" stroke-width="16"/>
+      <path d="M22,190 Q120,174 218,192" fill="none" stroke="${INK}" stroke-width="5.5"/>
+      <path class="anim-flap" d="M192,188 C206,162 226,154 222,134 C202,134 186,158 192,188 Z" fill="#52b788"/>
+      <!-- 1 Wise Woodland Owl -->
+      <polygon points="82,58 72,30 104,48" fill="#8b5e3c"/>
+      <polygon points="158,58 168,30 136,48" fill="#8b5e3c"/>
+      <ellipse class="anim-flap" style="transform-origin: 84px 128px" cx="70" cy="138" rx="18" ry="34" transform="rotate(14 70 138)" fill="#754c2e"/>
+      <ellipse class="anim-flap" style="transform-origin: 156px 128px" cx="170" cy="138" rx="18" ry="34" transform="rotate(-14 170 138)" fill="#754c2e"/>
+      <ellipse cx="120" cy="136" rx="46" ry="52" fill="#9c6b45"/>
+      <ellipse cx="120" cy="146" rx="31" ry="38" fill="#fae5c6"/>
+      <path d="M104,132 Q110,138 116,132 M124,132 Q130,138 136,132 M112,150 Q120,156 128,150" fill="none" stroke="#b07d52" stroke-width="3.5"/>
+      <!-- Owl facial disc & big golden eyes -->
+      <circle cx="101" cy="84" r="22" fill="#f3d8b4"/>
+      <circle cx="139" cy="84" r="22" fill="#f3d8b4"/>
+      ${cartoonEyes(101, 139, 84, 11, 13)}
+      <polygon points="112,92 128,92 120,108" fill="#ffb627"/>
+      <path d="M102,184 L96,196 M108,184 L108,196 M132,184 L132,196 M138,184 L144,196" fill="none" stroke="#ff9f29" stroke-width="5"/>
     `),
 
-    '2': () => wrapSvg('Two Pink Galahs on a branch', `
-      <path d="M22,190 Q120,178 218,190" fill="none" stroke="#7f5539" stroke-width="12"/>
-      <path d="M22,190 Q120,178 218,190" fill="none" stroke="${INK}" stroke-width="5"/>
-      ${miniGalah(76, 140, 1.08, 1)}
-      ${miniGalah(164, 140, 1.08, -1)}
-      ${sparkle(120, 54, 10)}
+    '2': () => wrapSvg('Two red foxes playing on a mossy woodland meadow', `
+      <ellipse cx="120" cy="198" rx="94" ry="20" fill="#63be6f"/>
+      ${miniFox(74, 142, 1.05, 1)}
+      ${miniFox(166, 142, 1.05, -1)}
+      ${sparkle(120, 48, 10)}
     `),
 
-    '3': () => wrapSvg('Three Australian Jabirus wading in a billabong', `
-      <path d="M18,198 Q70,186 120,198 T222,198 L222,220 L18,220 Z" fill="#5ce1ff"/>
-      ${miniJabiru(60, 142, 0.88)}
-      ${miniJabiru(124, 134, 0.94)}
-      ${miniJabiru(188, 142, 0.88)}
+    '3': () => wrapSvg('Three spiky woodland hedgehogs', `
+      <ellipse cx="120" cy="204" rx="96" ry="18" fill="#7fc96b"/>
+      ${miniHedgehog(120, 80, 1.02)}
+      ${miniHedgehog(68, 166, 1.02)}
+      ${miniHedgehog(172, 166, 1.02)}
+      ${sparkle(46, 54, 9)}
+      ${sparkle(194, 54, 9)}
     `),
 
-    '4': () => wrapSvg('Four Australian Lyrebirds with lyre tails', `
-      ${miniLyrebird(66, 74, 0.82)}
-      ${miniLyrebird(170, 74, 0.82)}
-      ${miniLyrebird(66, 172, 0.82)}
-      ${miniLyrebird(170, 172, 0.82)}
+    '4': () => wrapSvg('Four green frogs hopping on forest pond lilypads', `
+      <ellipse cx="120" cy="126" rx="104" ry="92" fill="#9de8ff" stroke-width="4.5"/>
+      ${miniFrog(72, 82, 0.92)}
+      ${miniFrog(168, 82, 0.92)}
+      ${miniFrog(72, 170, 0.92)}
+      ${miniFrog(168, 170, 0.92)}
     `),
 
-    '5': () => wrapSvg('Five bounding Australian Kangaroos', `
-      ${miniRoo(68, 72, 0.78)}
-      ${miniRoo(168, 72, 0.78)}
-      ${miniRoo(46, 168, 0.76)}
-      ${miniRoo(118, 168, 0.78)}
-      ${miniRoo(190, 168, 0.76)}
+    '5': () => wrapSvg('Five busy honeybees buzzing around a golden blossom', `
+      <!-- Woodland flower center -->
+      <circle cx="120" cy="120" r="14" fill="#ffb82e"/>
+      ${miniWoodlandBee(64, 64, 1.02)}
+      ${miniWoodlandBee(176, 64, 1.02)}
+      ${miniWoodlandBee(120, 124, 1.04)}
+      ${miniWoodlandBee(64, 182, 1.02)}
+      ${miniWoodlandBee(176, 182, 1.02)}
     `),
 
-    '6': () => wrapSvg('Six Australian Platypuses swimming', `
-      <ellipse cx="120" cy="126" rx="104" ry="92" fill="#bdf0ff" stroke-width="4.5"/>
-      ${miniPlatypus(74, 72, 0.76)}
-      ${miniPlatypus(168, 72, 0.76)}
-      ${miniPlatypus(74, 126, 0.76)}
-      ${miniPlatypus(168, 126, 0.76)}
-      ${miniPlatypus(74, 180, 0.76)}
-      ${miniPlatypus(168, 180, 0.76)}
+    '6': () => wrapSvg('Six spotted red ladybugs on forest fern leaves', `
+      <ellipse cx="120" cy="76" rx="102" ry="38" fill="#68c973" stroke-width="4.5"/>
+      <ellipse cx="120" cy="172" rx="102" ry="38" fill="#52b788" stroke-width="4.5"/>
+      ${miniLadybug(56, 76, 0.86, -8)}
+      ${miniLadybug(120, 72, 0.86, 4)}
+      ${miniLadybug(184, 76, 0.86, 10)}
+      ${miniLadybug(56, 172, 0.86, 8)}
+      ${miniLadybug(120, 168, 0.86, -4)}
+      ${miniLadybug(184, 172, 0.86, -8)}
     `),
 
-    '7': () => wrapSvg('Seven Koalas climbing gum trees', `
-      <!-- Three Eucalyptus Gum Trunks -->
-      <line x1="56" y1="24" x2="56" y2="216" stroke="#c9ada7" stroke-width="18"/>
-      <line x1="120" y1="20" x2="120" y2="216" stroke="#c9ada7" stroke-width="18"/>
-      <line x1="184" y1="24" x2="184" y2="216" stroke="#c9ada7" stroke-width="18"/>
-      ${miniKoala(56, 72, 0.78)}
-      ${miniKoala(56, 162, 0.78)}
-      ${miniKoala(120, 52, 0.78)}
-      ${miniKoala(120, 122, 0.78)}
-      ${miniKoala(120, 190, 0.78)}
-      ${miniKoala(184, 72, 0.78)}
-      ${miniKoala(184, 162, 0.78)}
+    '7': () => wrapSvg('Seven forest mushrooms in a mossy clearing', `
+      <ellipse cx="120" cy="206" rx="96" ry="18" fill="#58b96a"/>
+      ${miniMushroom(84, 62, 0.92)}
+      ${miniMushroom(156, 62, 0.92)}
+      ${miniMushroom(54, 130, 0.92)}
+      ${miniMushroom(120, 126, 0.92)}
+      ${miniMushroom(186, 130, 0.92)}
+      ${miniMushroom(84, 192, 0.92)}
+      ${miniMushroom(156, 192, 0.92)}
     `),
 
-    '8': () => wrapSvg('Eight Possums playing on branches', `
-      <line x1="18" y1="92" x2="222" y2="92" stroke="#7f5539" stroke-width="8"/>
-      <line x1="18" y1="184" x2="222" y2="184" stroke="#7f5539" stroke-width="8"/>
-      ${miniPossum(42, 68, 0.74)}
-      ${miniPossum(94, 68, 0.74)}
-      ${miniPossum(146, 68, 0.74)}
-      ${miniPossum(198, 68, 0.74)}
-      ${miniPossum(42, 160, 0.74)}
-      ${miniPossum(94, 160, 0.74)}
-      ${miniPossum(146, 160, 0.74)}
-      ${miniPossum(198, 160, 0.74)}
+    '8': () => wrapSvg('Eight glowing fireflies in a twilight woodland clearing', `
+      <ellipse cx="120" cy="124" rx="106" ry="88" fill="#233158" stroke-width="4.5"/>
+      ${miniFirefly(44, 84, 0.86)}
+      ${miniFirefly(96, 84, 0.86)}
+      ${miniFirefly(148, 84, 0.86)}
+      ${miniFirefly(198, 84, 0.86)}
+      ${miniFirefly(44, 164, 0.86)}
+      ${miniFirefly(96, 164, 0.86)}
+      ${miniFirefly(148, 164, 0.86)}
+      ${miniFirefly(198, 164, 0.86)}
+      ${sparkle(120, 124, 9)}
     `),
 
-    '9': () => wrapSvg('Nine Wombats working in yellow hardhats', `
-      ${miniWombat(52, 56, 0.78)}
-      ${miniWombat(120, 56, 0.78)}
-      ${miniWombat(188, 56, 0.78)}
-      ${miniWombat(52, 122, 0.78)}
-      ${miniWombat(120, 122, 0.78)}
-      ${miniWombat(188, 122, 0.78)}
-      ${miniWombat(52, 188, 0.78)}
-      ${miniWombat(120, 188, 0.78)}
-      ${miniWombat(188, 188, 0.78)}
+    '9': () => wrapSvg('Nine golden acorns arranged neatly in three rows', `
+      <ellipse cx="120" cy="124" rx="102" ry="90" fill="#f7e3b5" stroke-width="4.5"/>
+      ${miniAcorn(56, 62, 0.88)}
+      ${miniAcorn(120, 62, 0.88)}
+      ${miniAcorn(184, 62, 0.88)}
+      ${miniAcorn(56, 124, 0.88)}
+      ${miniAcorn(120, 124, 0.88)}
+      ${miniAcorn(184, 124, 0.88)}
+      ${miniAcorn(56, 186, 0.88)}
+      ${miniAcorn(120, 186, 0.88)}
+      ${miniAcorn(184, 186, 0.88)}
     `)
   };
 

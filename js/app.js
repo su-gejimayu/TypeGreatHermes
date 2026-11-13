@@ -1,7 +1,7 @@
 /**
  * Type Great Hermes — Main Game Controller
  * - Permanent 4-row Hermes keyboard (1-0 + QWERTY + Spacebar)
- * - Modes: Letters (A-Z), Numbers (0-9 Aussie 12 Days + Zero to Hero), Both, and 3-Letter Words (+ Bonus JUMP)
+ * - Modes: Letters (A-Z), Numbers (0-9 Woodland), Both, and 3-Letter Words (+ Bonus JUMP)
  * - Progressive Timed Key Hints: 0s B&W pulse -> 5s Vibrant Colour Key -> 10s Bouncing Red Arrow -> 15s Hermes' Hand Glides Toward Key!
  * - Instant single-key response (no Enter/Return confirmation needed)
  */
@@ -128,6 +128,10 @@
   const soundBtn = document.getElementById('sound-toggle-btn');
   const musicBtn = document.getElementById('music-toggle-btn');
   const fullscreenBtn = document.getElementById('fullscreen-btn');
+  const streakPill = document.getElementById('streak-pill');
+  const streakCountEl = document.getElementById('streak-count');
+  const bestStreakPill = document.getElementById('best-streak-pill');
+  const bestStreakCountEl = document.getElementById('best-streak-count');
   const optionsBtn = document.getElementById('options-btn');
   const optionsPopover = document.getElementById('parent-options');
   const modeSelect = document.getElementById('mode-select');
@@ -152,6 +156,10 @@
   // 0 = B&W, 1..10 = 10 intermediary colour stages, 11 = full colour parity
   const FULL_COLOR_STAGE_COUNT = 11;
 
+  function randomStreakInterval() {
+    return 3 + Math.floor(Math.random() * 3); // 3, 4, or 5 correct answers
+  }
+
   // State
   const state = {
     phase: 'prompting', // 'prompting' | 'buzzing' | 'celebrating'
@@ -164,6 +172,11 @@
     showHint: true,
     hasInteracted: false,
     correctCount: 0,
+    bestStreak: 0,
+    hasResetStreak: false,
+    isNewBestRun: false,
+    nextStreakMentionAt: randomStreakInterval(),
+    pendingStreakSpeechCount: 0,
     deck: [],
     seqIndex: 0,
     currentItem: null,
@@ -182,7 +195,9 @@
     pendingPlayerName: '',
     hasGreeted: false,
     affirmationDeck: [],
-    lastAffirmationIndex: -1
+    lastAffirmationIndex: -1,
+    streakAffirmationDeck: [],
+    lastStreakAffirmationIndex: -1
   };
 
   const keyButtonsByChar = new Map();
@@ -281,11 +296,16 @@
       if (typeof saved.playerName === 'string' && saved.playerName.trim()) {
         state.playerName = saved.playerName.trim();
       }
+      if (Number.isInteger(saved.bestStreak) && saved.bestStreak > 0) {
+        state.bestStreak = saved.bestStreak;
+        state.hasResetStreak = true;
+      }
     } catch (_) {
       // Ignore storage errors in private/file contexts
     }
     syncFastModeUI();
     syncSoundUI();
+    updateStreakUI();
   }
 
   function saveSettings() {
@@ -300,7 +320,8 @@
           musicOn: state.musicOn,
           voiceOn: state.voiceOn,
           showHint: state.showHint,
-          playerName: state.playerName
+          playerName: state.playerName,
+          bestStreak: state.bestStreak
         })
       );
     } catch (_) {
@@ -420,8 +441,25 @@
     return /^\d$/.test(ch) ? `the number ${ch}` : `the letter ${spokenLetter(ch)}`;
   }
 
+  /** Spell out small streak counts cleanly for natural speech cadence ("six", "twenty-four") */
+  function spokenStreakCount(n) {
+    const ones = [
+      'zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine',
+      'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen',
+      'seventeen', 'eighteen', 'nineteen'
+    ];
+    const tens = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+    if (n < 20) return ones[n] || String(n);
+    if (n < 100) {
+      const t = Math.floor(n / 10);
+      const r = n % 10;
+      return r ? `${tens[t]}-${ones[r]}` : tens[t];
+    }
+    return String(n);
+  }
+
   /** Build the prompt context object passed to each post-answer affirmation template */
-  function buildAffirmationContext(item) {
+  function buildAffirmationContext(item, streakCount = 0) {
     const multiChar = isMultiCharItem(item);
     const isDigit = !multiChar && /^\d$/.test(item.key);
     const kind = multiChar ? (item.isBonus ? 'bonus word' : 'word') : isDigit ? 'number' : 'letter';
@@ -437,119 +475,183 @@
       kind,
       nextPrompt,
       shortPrompt,
-      actionVerb
+      actionVerb,
+      streakCount,
+      streakWord: spokenStreakCount(streakCount)
     };
   }
 
   /**
-   * 16 post-answer voice affirmations (10 using the player's name placeholder "John", 6 without).
+   * 8 wise-old-man scholastic streak voice lines (spoken every 3-5 correct answers)
+   */
+  const STREAK_AFFIRMATIONS = [
+    {
+      usesName: true,
+      format: ({ name, streakWord, nextPrompt }) =>
+        `Capital! That's ${streakWord} in a row, young ${name}! Now seek out ${nextPrompt}.`
+    },
+    {
+      usesName: true,
+      format: ({ name, streakWord, actionVerb, nextPrompt }) =>
+        `Splendid scholarship, ${name}! ${streakWord} correct answers in a row! Can you ${actionVerb} ${nextPrompt}?`
+    },
+    {
+      usesName: true,
+      format: ({ name, streakWord, nextPrompt }) =>
+        `Top marks, ${name}! You have answered ${streakWord} in a row! Let us study ${nextPrompt}.`
+    },
+    {
+      usesName: true,
+      format: ({ name, streakWord, actionVerb, nextPrompt }) =>
+        `Most impressive, my dear ${name}! That makes ${streakWord} in a row! Now ${actionVerb} ${nextPrompt}.`
+    },
+    {
+      usesName: true,
+      format: ({ name, streakWord, nextPrompt }) =>
+        `Bravo, young scholar ${name}! ${streakWord} in a row without a single slip! What about ${nextPrompt}?`
+    },
+    {
+      usesName: true,
+      format: ({ name, streakWord, nextPrompt }) =>
+        `Distinguished work, ${name}! ${streakWord} consecutive triumphs! Next on our parchment is ${nextPrompt}.`
+    },
+    {
+      usesName: false,
+      format: ({ streakWord, actionVerb, nextPrompt }) =>
+        `Exemplary! That is ${streakWord} in a row! Now shall we ${actionVerb} ${nextPrompt}?`
+    },
+    {
+      usesName: false,
+      format: ({ streakWord, kind, shortPrompt }) =>
+        `By my inkwell, ${streakWord} in a row! The next ${kind} is ${shortPrompt}.`
+    }
+  ];
+
+  /**
+   * 16 wise-old-man scholastic post-answer voice affirmations
+   * (10 using the player's name placeholder "John", 6 without).
    */
   const POST_ANSWER_AFFIRMATIONS = [
     // --- 10 affirmations that use the player's name (placeholder: "John") ---
     {
       usesName: true,
-      format: ({ name, nextPrompt }) => `Awesome, ${name}. Now find ${nextPrompt}.`
+      format: ({ name, nextPrompt }) =>
+        `Splendid scholarship, ${name}! Now seek out ${nextPrompt}.`
     },
     {
       usesName: true,
-      format: ({ name, nextPrompt }) => `Amazing. ${name}, can you find ${nextPrompt}?`
+      format: ({ name, nextPrompt }) =>
+        `Ah, wondrously done, ${name}! Can you spot ${nextPrompt}?`
     },
     {
       usesName: true,
       format: ({ name, actionVerb, nextPrompt }) =>
-        `Great job, ${name}. Can you ${actionVerb} ${nextPrompt}?`
+        `Wise fingers indeed, ${name}! Can you ${actionVerb} ${nextPrompt}?`
     },
     {
       usesName: true,
       format: ({ name, kind, shortPrompt }) =>
-        `Well done, ${name}! The next ${kind} is ${shortPrompt}.`
+        `Bravo, my dear ${name}! The next ${kind} is ${shortPrompt}.`
     },
     {
       usesName: true,
-      format: ({ name, nextPrompt }) => `Way to go, ${name}! Let's try ${nextPrompt}.`
-    },
-    {
-      usesName: true,
-      format: ({ name, actionVerb, nextPrompt }) =>
-        `Super typing, ${name}! Now ${actionVerb} ${nextPrompt}.`
-    },
-    {
-      usesName: true,
-      format: ({ name, nextPrompt }) => `Fantastic, ${name}! What about ${nextPrompt}?`
+      format: ({ name, nextPrompt }) =>
+        `Aha, first-class work, ${name}! Let us study ${nextPrompt}.`
     },
     {
       usesName: true,
       format: ({ name, actionVerb, nextPrompt }) =>
-        `You're a star, ${name}! Can you ${actionVerb} ${nextPrompt}?`
+        `Clever young scholar, ${name}! Now ${actionVerb} ${nextPrompt}.`
     },
     {
       usesName: true,
-      format: ({ name, nextPrompt }) => `Brilliant work, ${name}. Next up is ${nextPrompt}.`
+      format: ({ name, nextPrompt }) =>
+        `Marvelous, ${name}! What say we examine ${nextPrompt}?`
     },
     {
       usesName: true,
       format: ({ name, actionVerb, nextPrompt }) =>
-        `Hooray, ${name}! Now can you ${actionVerb} ${nextPrompt}?`
+        `Quite the bright mind, ${name}! Can you ${actionVerb} ${nextPrompt}?`
+    },
+    {
+      usesName: true,
+      format: ({ name, nextPrompt }) =>
+        `Distinguished work, ${name}! Next on our parchment is ${nextPrompt}.`
+    },
+    {
+      usesName: true,
+      format: ({ name, actionVerb, nextPrompt }) =>
+        `Ho ho, top marks, ${name}! Now can you ${actionVerb} ${nextPrompt}?`
     },
 
     // --- 6 affirmations without the player's name ---
     {
       usesName: false,
-      format: ({ kind, shortPrompt }) => `You did it! The next ${kind} is ${shortPrompt}.`
+      format: ({ kind, shortPrompt }) =>
+        `Grand scholarship! The next ${kind} is ${shortPrompt}.`
     },
     {
       usesName: false,
-      format: ({ nextPrompt }) => `Correct! What about ${nextPrompt}?`
+      format: ({ nextPrompt }) => `Spot on, young scholar! What about ${nextPrompt}?`
     },
     {
       usesName: false,
-      format: ({ actionVerb, nextPrompt }) => `Great! Now ${actionVerb} ${nextPrompt}?`
+      format: ({ actionVerb, nextPrompt }) =>
+        `Exemplary! Now shall we ${actionVerb} ${nextPrompt}?`
     },
     {
       usesName: false,
-      format: ({ kind, shortPrompt }) => `Woohoo! The next ${kind} is ${shortPrompt}.`
+      format: ({ kind, shortPrompt }) =>
+        `By my inkwell, well done! The next ${kind} is ${shortPrompt}.`
     },
     {
       usesName: false,
-      format: ({ actionVerb, nextPrompt }) => `Spot on! Can you ${actionVerb} ${nextPrompt}?`
+      format: ({ actionVerb, nextPrompt }) =>
+        `Most scholarly! Can you ${actionVerb} ${nextPrompt}?`
     },
     {
       usesName: false,
-      format: ({ nextPrompt }) => `Yay! Let's do ${nextPrompt} next.`
+      format: ({ nextPrompt }) =>
+        `Ho ho, capital work! Let us turn the page to ${nextPrompt}.`
     }
   ];
 
-  function pickNextAffirmationTemplate() {
-    if (state.affirmationDeck.length === 0) {
-      const indices = POST_ANSWER_AFFIRMATIONS.map((_, i) => i);
-      state.affirmationDeck = shuffleArray(indices);
-      if (
-        state.affirmationDeck.length > 1 &&
-        state.affirmationDeck[state.affirmationDeck.length - 1] === state.lastAffirmationIndex
-      ) {
-        const topIdx = state.affirmationDeck.length - 1;
-        const tmp = state.affirmationDeck[topIdx];
-        state.affirmationDeck[topIdx] = state.affirmationDeck[0];
-        state.affirmationDeck[0] = tmp;
+  /** Draw the next template from a shuffled deck without immediate repeats across reshuffles */
+  function pickNextTemplate(templates, deckKey, lastIndexKey) {
+    if (state[deckKey].length === 0) {
+      const deck = shuffleArray(templates.map((_, i) => i));
+      if (deck.length > 1 && deck[deck.length - 1] === state[lastIndexKey]) {
+        const topIdx = deck.length - 1;
+        [deck[topIdx], deck[0]] = [deck[0], deck[topIdx]];
       }
+      state[deckKey] = deck;
     }
-    const chosenIdx = state.affirmationDeck.pop();
-    state.lastAffirmationIndex = chosenIdx;
-    return POST_ANSWER_AFFIRMATIONS[chosenIdx];
+    const chosenIdx = state[deckKey].pop();
+    state[lastIndexKey] = chosenIdx;
+    return templates[chosenIdx];
   }
 
   const VoiceScript = {
     affirmations: POST_ANSWER_AFFIRMATIONS,
+    streakAffirmations: STREAK_AFFIRMATIONS,
 
     resetAffirmationDeck() {
       state.affirmationDeck = [];
       state.lastAffirmationIndex = -1;
+      state.streakAffirmationDeck = [];
+      state.lastStreakAffirmationIndex = -1;
     },
 
     /** Format a specific affirmation template (0..15) for a given prompt item */
     formatAffirmation(index, item) {
       const entry = POST_ANSWER_AFFIRMATIONS[index];
       return entry ? entry.format(buildAffirmationContext(item)) : '';
+    },
+
+    /** Format a specific streak affirmation template (0..7) for a streak count & item */
+    formatStreakAffirmation(index, streakCount, item) {
+      const entry = STREAK_AFFIRMATIONS[index];
+      return entry ? entry.format(buildAffirmationContext(item, streakCount)) : '';
     },
 
     /** Fresh challenge (first of the session, mode change, or skip) */
@@ -560,10 +662,13 @@
       return state.hasGreeted ? line : `Hi ${playerName()}! ${line}`;
     },
 
-    /** Follow-on challenge straight after a correct answer (cycles through all 16 affirmations) */
-    afterSuccess(item) {
-      const entry = pickNextAffirmationTemplate();
-      return entry.format(buildAffirmationContext(item));
+    /** Follow-on challenge straight after a correct answer (referencing streak every 3-5 wins) */
+    afterSuccess(item, streakCount = 0) {
+      const isStreak = typeof streakCount === 'number' && streakCount >= 3;
+      const entry = isStreak
+        ? pickNextTemplate(STREAK_AFFIRMATIONS, 'streakAffirmationDeck', 'lastStreakAffirmationIndex')
+        : pickNextTemplate(POST_ANSWER_AFFIRMATIONS, 'affirmationDeck', 'lastAffirmationIndex');
+      return entry.format(buildAffirmationContext(item, isStreak ? streakCount : 0));
     },
 
     /** Echo each correctly typed letter inside a word ("f", "o", ...) without saying "Capital" or "Next" */
@@ -571,7 +676,7 @@
       return spokenLetter(ch);
     },
 
-    /** Single letter / number solved: "d is for Dog!" / "1! A Kookaburra in a Gum Tree!" */
+    /** Single letter / number solved: "d is for Dog!" / "1! One Wise Owl!" */
     singleSolved(item) {
       if (item.key.length === 1 && !/^\d$/.test(item.key)) {
         return `${spokenLetter(item.key)} is for ${item.word}!`;
@@ -704,8 +809,8 @@
 
   /** Compute elliptical pupil offset (in SVG viewBox units) from an eye center to a target */
   function computePupilOffset(eyeX, eyeY, targetX, targetY) {
-    const MAX_X = 12.6;
-    const MAX_Y = 19.6;
+    const MAX_X = 9.5;
+    const MAX_Y = 14.5;
     const dx = targetX - eyeX;
     const dy = targetY - eyeY;
 
@@ -742,12 +847,12 @@
     }
   }
 
-  /** Animate Hermes's wide-set eyes (462,56 & 818,56) to look at the next key to press */
+  /** Animate Hermes's bespectacled eyes (582,106 & 698,106) to look at the next key to press */
   function updateEyeGaze() {
     if (!pupilLeft || !pupilRight) return;
 
-    const LEFT_EYE = { x: 462, y: 56 };
-    const RIGHT_EYE = { x: 818, y: 56 };
+    const LEFT_EYE = { x: 582, y: 106 };
+    const RIGHT_EYE = { x: 698, y: 106 };
 
     if (state.phase === 'celebrating') {
       // Look cheerfully up toward the rainbow word & bounding critter on the paper!
@@ -1451,7 +1556,7 @@
     if (item.count === 0) {
       const pill = document.createElement('span');
       pill.className = 'zero-hero-pill';
-      pill.textContent = '0 ★ ZERO TO HERO!';
+      pill.textContent = '0 • ZERO ACORNS!';
       paperCountBadges.appendChild(pill);
       return;
     }
@@ -1539,9 +1644,12 @@
     updateKeyHighlights();
     announce(multiChar ? `Spell ${item.word}: ${item.key}` : `Type ${item.key}`);
 
+    const streakSpeechCount = afterSuccess ? state.pendingStreakSpeechCount : 0;
+    state.pendingStreakSpeechCount = 0;
+
     if (speakPrompt && state.hasInteracted) {
       const promptSpeech = afterSuccess
-        ? VoiceScript.afterSuccess(item)
+        ? VoiceScript.afterSuccess(item, streakSpeechCount)
         : VoiceScript.opening(item);
       state.hasGreeted = true;
       // After a win, queue behind the celebration line so it is never clipped
@@ -1624,7 +1732,19 @@
     state.phase = 'celebrating';
     state.hintStage = 'bw';
     state.correctCount += 1;
+    if (state.correctCount > state.bestStreak) {
+      if (state.hasResetStreak && state.bestStreak > 0) {
+        state.isNewBestRun = true;
+      }
+      state.bestStreak = state.correctCount;
+      saveSettings();
+    }
+    if (state.correctCount >= state.nextStreakMentionAt) {
+      state.pendingStreakSpeechCount = state.correctCount;
+      state.nextStreakMentionAt = state.correctCount + randomStreakInterval();
+    }
     updateBackgroundColorProgress();
+    updateStreakUI({ bumped: true });
     buzzFeedback.hidden = true;
 
     promptPrefix.textContent = 'Yay!';
@@ -1684,8 +1804,15 @@
 
     state.phase = 'buzzing';
     state.wrongCountThisTurn += 1;
+    if (state.bestStreak > 0) {
+      state.hasResetStreak = true;
+    }
     state.correctCount = 0;
+    state.isNewBestRun = false;
+    state.pendingStreakSpeechCount = 0;
+    state.nextStreakMentionAt = randomStreakInterval();
     updateBackgroundColorProgress();
+    updateStreakUI();
 
     const item = state.currentItem;
     const targetChar = getActiveTargetChar();
@@ -2016,12 +2143,15 @@
   let hasRetriedGreetingOnGesture = false;
 
   function speakInitialGreeting() {
-    window.hermesAudio.speak('Welcome. My name is Hermes. What is your name?', {
-      mood: 'prompt',
-      onStart: () => {
-        hasSpokenInitialGreeting = true;
+    window.hermesAudio.speak(
+      'Well hello there, young scholar! I am Hermes the wise old typewriter. Pray tell, what is your name?',
+      {
+        mood: 'prompt',
+        onStart: () => {
+          hasSpokenInitialGreeting = true;
+        }
       }
-    });
+    );
   }
 
   function maybeSpeakGreetingOnFirstGesture() {
@@ -2065,6 +2195,23 @@
     );
   }
 
+  function updateStreakUI({ bumped = false } = {}) {
+    if (streakCountEl) {
+      streakCountEl.textContent = String(state.correctCount);
+    }
+    if (streakPill && bumped) {
+      streakPill.classList.remove('is-bump');
+      void streakPill.offsetWidth;
+      streakPill.classList.add('is-bump');
+    }
+    if (bestStreakPill && bestStreakCountEl) {
+      const showBest = state.hasResetStreak && state.bestStreak > 0;
+      bestStreakPill.hidden = !showBest;
+      bestStreakCountEl.textContent = String(state.bestStreak);
+      bestStreakPill.classList.toggle('is-new-record', state.isNewBestRun);
+    }
+  }
+
   function updateBackgroundColorProgress() {
     const stage = Math.min(state.correctCount, FULL_COLOR_STAGE_COUNT);
     const ratio = stage / FULL_COLOR_STAGE_COUNT;
@@ -2094,7 +2241,7 @@
     state.namePromptPhase = 'done';
     namePromptDialog?.close();
     if (state.currentItem) {
-      window.hermesAudio.speak(`Hi ${playerName()}!`, {
+      window.hermesAudio.speak(`Ah, splendid! Welcome, ${playerName()}!`, {
         mood: 'cheer',
         fast: state.fastMode
       });

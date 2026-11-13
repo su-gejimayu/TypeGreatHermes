@@ -1,7 +1,7 @@
 /**
  * Curated vocabulary for Type Great Hermes:
  * - Letters A-Z (including B=Baby, D=Dog, F=Food, H=Hippo)
- * - Numbers 0-9 ("Zero to Hero" for 0 + Australian 12 Days of Christmas for 1-9)
+ * - Numbers 0-9 (Woodland countable forest theme)
  * - 3-Letter Words (50 curated words across Animals, Objects/Food, Nature, and Action Verbs)
  * - 4-Letter Words (30 curated words across Animals, Objects/Food, Nature, and Action Verbs)
  */
@@ -88,7 +88,7 @@ letters: [
     { key: 'R', word: 'Rocket', phrase: 'R is for Rocket!', callouts: ['ZOOM!', 'BLAST!'], sfx: 'rocket', accentHue: 12 },
     { key: 'S', word: 'Sun', phrase: 'S is for Sun!', callouts: ['SHINE!', 'BRIGHT!'], sfx: 'sparkle', accentHue: 50 },
     { key: 'T', word: 'Train', phrase: 'T is for Train!', callouts: ['CHOO!', 'CHUGGA!'], sfx: 'train', accentHue: 4 },
-    { key: 'U', word: 'Unicorn', phrase: 'U is for Unicorn!', callouts: ['MAGIC!', 'SPARKLE!'], sfx: 'sparkle', accentHue: 305 },
+    { key: 'U', word: 'Unicorn', phrase: 'U is for Unicorn!', callouts: ['SHIMMER!', 'SPARKLE!'], sfx: 'sparkle', accentHue: 305 },
     { key: 'V', word: 'Volcano', phrase: 'V is for Volcano!', callouts: ['BOOM!', 'RUMBLE!'], sfx: 'roar', accentHue: 14 },
     { key: 'W', word: 'Whale', phrase: 'W is for Whale!', callouts: ['SPOUT!', 'SPLASH!'], sfx: 'splash', accentHue: 208 },
     { key: 'X', word: 'Xylophone', phrase: 'X is for Xylophone!', callouts: ['TING!', 'PLINK!'], sfx: 'xylophone', accentHue: 140 },
@@ -96,108 +96,108 @@ letters: [
     { key: 'Z', word: 'Zebra', phrase: 'Z is for Zebra!', callouts: ['GALLOP!', 'ZOOM!'], sfx: 'boing', accentHue: 175 }
   ],
 
-  // 0 = Zero to Hero, 1-9 = Australian 12 Days of Christmas!,
+  // 0-9 = Woodland countable creatures & treasures!,
 
 numbers: [
     {
       key: '1',
       count: 1,
-      word: 'Kookaburra in a Gum Tree',
-      phrase: '1 Kookaburra in a Gum Tree!',
-      spoken: '1! A Kookaburra in a Gum Tree!',
-      callouts: ['KOO-KOO!', 'ONE!'],
-      sfx: 'kookaburra',
-      accentHue: 145
+      word: 'One Wise Owl',
+      phrase: '1 Wise Owl!',
+      spoken: '1! One Wise Owl!',
+      callouts: ['HOO-HOO!', 'ONE!'],
+      sfx: 'hoot',
+      accentHue: 265
     },
     {
       key: '2',
       count: 2,
-      word: 'Two Pink Galahs',
-      phrase: '2 Pink Galahs!',
-      spoken: '2! Two Pink Galahs!',
-      callouts: ['SQUAWK!', 'TWO!'],
-      sfx: 'chirp',
-      accentHue: 335
+      word: 'Two Red Foxes',
+      phrase: '2 Red Foxes!',
+      spoken: '2! Two Red Foxes!',
+      callouts: ['BOING!', 'TWO!'],
+      sfx: 'boing',
+      accentHue: 22
     },
     {
       key: '3',
       count: 3,
-      word: 'Three Jabirus',
-      phrase: '3 Jabirus!',
-      spoken: '3! Three Jabirus!',
-      callouts: ['FLAP!', 'THREE!'],
-      sfx: 'splash',
-      accentHue: 195
+      word: 'Three Spiky Hedgehogs',
+      phrase: '3 Spiky Hedgehogs!',
+      spoken: '3! Three Spiky Hedgehogs!',
+      callouts: ['SNIFF!', 'THREE!'],
+      sfx: 'crunch',
+      accentHue: 35
     },
     {
       key: '4',
       count: 4,
-      word: 'Four Lyrebirds',
-      phrase: '4 Lyrebirds!',
-      spoken: '4! Four Lyrebirds!',
-      callouts: ['SING!', 'FOUR!'],
-      sfx: 'chirp',
-      accentHue: 34
+      word: 'Four Hopping Frogs',
+      phrase: '4 Hopping Frogs!',
+      spoken: '4! Four Hopping Frogs!',
+      callouts: ['RIBBIT!', 'FOUR!'],
+      sfx: 'ribbit',
+      accentHue: 138
     },
     {
       key: '5',
       count: 5,
-      word: 'Five Kangaroos',
-      phrase: '5 Kangaroos!',
-      spoken: '5! Five Kangaroos!',
-      callouts: ['BOING!', 'FIVE!'],
-      sfx: 'boing',
-      accentHue: 28
+      word: 'Five Busy Bees',
+      phrase: '5 Busy Bees!',
+      spoken: '5! Five Busy Bees!',
+      callouts: ['BZZZ!', 'FIVE!'],
+      sfx: 'bee',
+      accentHue: 48
     },
     {
       key: '6',
       count: 6,
-      word: 'Six Platypuses',
-      phrase: '6 Platypuses!',
-      spoken: '6! Six Platypuses!',
-      callouts: ['SPLISH!', 'SIX!'],
-      sfx: 'splash',
-      accentHue: 202
+      word: 'Six Spotted Ladybugs',
+      phrase: '6 Spotted Ladybugs!',
+      spoken: '6! Six Spotted Ladybugs!',
+      callouts: ['FLUTTER!', 'SIX!'],
+      sfx: 'chirp',
+      accentHue: 355
     },
     {
       key: '7',
       count: 7,
-      word: 'Seven Koalas Climbing',
-      phrase: '7 Koalas Climbing!',
-      spoken: '7! Seven Koalas Climbing!',
-      callouts: ['CLIMB!', 'SEVEN!'],
-      sfx: 'giggle',
-      accentHue: 155
+      word: 'Seven Forest Mushrooms',
+      phrase: '7 Forest Mushrooms!',
+      spoken: '7! Seven Forest Mushrooms!',
+      callouts: ['BOING!', 'SEVEN!'],
+      sfx: 'boing',
+      accentHue: 14
     },
     {
       key: '8',
       count: 8,
-      word: 'Eight Possums Playing',
-      phrase: '8 Possums Playing!',
-      spoken: '8! Eight Possums Playing!',
-      callouts: ['PLAY!', 'EIGHT!'],
-      sfx: 'boing',
-      accentHue: 280
+      word: 'Eight Glowing Fireflies',
+      phrase: '8 Glowing Fireflies!',
+      spoken: '8! Eight Glowing Fireflies!',
+      callouts: ['TWINKLE!', 'EIGHT!'],
+      sfx: 'sparkle',
+      accentHue: 78
     },
     {
       key: '9',
       count: 9,
-      word: 'Nine Wombats Working',
-      phrase: '9 Wombats Working!',
-      spoken: '9! Nine Wombats Working!',
-      callouts: ['DIG-DIG!', 'NINE!'],
+      word: 'Nine Golden Acorns',
+      phrase: '9 Golden Acorns!',
+      spoken: '9! Nine Golden Acorns!',
+      callouts: ['CRUNCH!', 'NINE!'],
       sfx: 'crunch',
-      accentHue: 42
+      accentHue: 40
     },
     {
       key: '0',
       count: 0,
-      word: 'Zero to Hero',
-      phrase: 'Zero to Hero!',
-      spoken: '0! Zero to Hero!',
-      callouts: ['HERO!', 'POW!'],
-      sfx: 'rocket',
-      accentHue: 4
+      word: 'Empty Acorn Basket',
+      phrase: '0 Acorns in the Basket!',
+      spoken: '0! Zero Acorns in the Basket!',
+      callouts: ['ZERO!', 'EMPTY!'],
+      sfx: 'sparkle',
+      accentHue: 36
     }
   ],
 

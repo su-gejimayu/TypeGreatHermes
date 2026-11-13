@@ -6,16 +6,202 @@
   <title>Type Great Hermes — Kid's Keyboard Adventure</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,800&family=Fredoka:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body data-state="prompting">
   <!-- Centralized polite live region for assistive technology -->
   <div id="sr-announcer" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
 
-  <!-- LAYER 0: Black & White Comic Prompting Backdrop -->
+  <!-- LAYER 0: Cozy Scholar's Library Study Backdrop (blooms from B&W ink-wash to full colour!) -->
   <div class="bg-bw" aria-hidden="true">
-    <div class="halftone-vignette"></div>
+    <div class="study-room-layer">
+      <svg class="study-backdrop-svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <linearGradient id="study-wall-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#222742"/>
+            <stop offset="55%" stop-color="#191d32"/>
+            <stop offset="100%" stop-color="#101322"/>
+          </linearGradient>
+          <radialGradient id="candle-halo" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#ffe78c" stop-opacity="0.88"/>
+            <stop offset="40%" stop-color="#ffaa3b" stop-opacity="0.34"/>
+            <stop offset="100%" stop-color="#ffaa3b" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+
+        <!-- Deep Twilight Study Wall -->
+        <rect width="1600" height="900" fill="url(#study-wall-grad)"/>
+
+        <!-- Recessed Center Library Bookcase Behind Paper -->
+        <g opacity="0.72" stroke="#121420" stroke-width="3.5" stroke-linejoin="round">
+          <rect x="430" y="25" width="740" height="720" rx="10" fill="#231b2c"/>
+          <rect x="455" y="55" width="690" height="665" fill="#181322"/>
+          <!-- Back Shelf Planks -->
+          <rect x="448" y="210" width="704" height="22" fill="#462d22"/>
+          <rect x="448" y="385" width="704" height="22" fill="#462d22"/>
+          <rect x="448" y="555" width="704" height="22" fill="#462d22"/>
+          <!-- Softened Background Book Spines (Low Contrast so Paper Pops) -->
+          <g fill="#343854">
+            <rect x="470" y="96" width="32" height="114" rx="4" fill="#4a3846"/>
+            <rect x="504" y="108" width="26" height="102" rx="4" fill="#2e4548"/>
+            <rect x="532" y="88" width="36" height="122" rx="4" fill="#4a4033"/>
+            <rect x="570" y="102" width="28" height="108" rx="4" fill="#3a3354"/>
+            <rect x="600" y="95" width="34" height="115" rx="4" fill="#4f3538"/>
+            <rect x="965" y="98" width="32" height="112" rx="4" fill="#32464b"/>
+            <rect x="999" y="88" width="36" height="122" rx="4" fill="#4a3c32"/>
+            <rect x="1037" y="106" width="28" height="104" rx="4" fill="#4b3349"/>
+            <rect x="1067" y="94" width="34" height="116" rx="4" fill="#354059"/>
+            <rect x="1103" y="104" width="30" height="106" rx="4" fill="#4e3d31"/>
+            <!-- Middle Back Books -->
+            <rect x="468" y="268" width="34" height="117" rx="4" fill="#3c3147"/>
+            <rect x="504" y="280" width="28" height="105" rx="4" fill="#4a3a30"/>
+            <rect x="534" y="260" width="36" height="125" rx="4" fill="#2d4243"/>
+            <rect x="1035" y="272" width="32" height="113" rx="4" fill="#48363a"/>
+            <rect x="1069" y="260" width="36" height="125" rx="4" fill="#33434e"/>
+            <rect x="1107" y="278" width="28" height="107" rx="4" fill="#4d3d30"/>
+          </g>
+        </g>
+
+        <!-- LEFT TALL OAK BOOKCASE & STACKED TOMES -->
+        <g stroke="#14131a" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+          <rect x="-15" y="-10" width="420" height="860" fill="#3f271b"/>
+          <rect x="16" y="20" width="358" height="790" fill="#241612"/>
+          <!-- Shelf Boards -->
+          <rect x="0" y="188" width="398" height="26" fill="#5e3a25"/>
+          <rect x="0" y="425" width="398" height="28" fill="#5e3a25"/>
+          <rect x="0" y="660" width="398" height="28" fill="#5e3a25"/>
+
+          <!-- Left Top Shelf Books -->
+          <rect x="26" y="42" width="44" height="146" rx="5" fill="#7c2e34"/>
+          <path d="M32,68 H64 M32,162 H64" stroke="#d8a852" stroke-width="3"/>
+          <rect x="73" y="56" width="36" height="132" rx="4" fill="#345c4c"/>
+          <path d="M79,82 H103 M79,165 H103" stroke="#d8a852" stroke-width="3"/>
+          <rect x="112" y="34" width="48" height="154" rx="5" fill="#9a6830"/>
+          <path d="M118,64 H154 M118,160 H154" stroke="#f0d386" stroke-width="3.5"/>
+          <rect x="163" y="64" width="34" height="124" rx="4" fill="#3c4c76"/>
+          <rect x="200" y="48" width="42" height="140" rx="5" fill="#5b345c"/>
+          <path d="M206,74 H236" stroke="#d8a852" stroke-width="3"/>
+          <!-- Leaning Book & Hanging Scroll -->
+          <path d="M250,188 L278,60 L318,69 L290,188 Z" fill="#884134"/>
+          <rect x="330" y="88" width="36" height="100" rx="5" fill="#3b5e54"/>
+
+          <!-- Left Middle Shelf: Leather Tomes + Glowing Wax Candle -->
+          <rect x="26" y="254" width="48" height="171" rx="5" fill="#8d3934"/>
+          <path d="M33,286 H67 M33,395 H67" stroke="#e4b75d" stroke-width="3.5"/>
+          <rect x="78" y="272" width="38" height="153" rx="4" fill="#415278"/>
+          <path d="M84,298 H110" stroke="#e4b75d" stroke-width="3"/>
+          <rect x="120" y="246" width="46" height="179" rx="5" fill="#2f5a47"/>
+          <path d="M126,278 H160 M126,396 H160" stroke="#e4b75d" stroke-width="3.5"/>
+          <!-- Rolled Scroll on Shelf -->
+          <g transform="translate(178, 376)">
+            <rect x="0" y="8" width="84" height="36" rx="14" fill="#e2c994"/>
+            <ellipse cx="8" cy="26" rx="7" ry="18" fill="#c7a568"/>
+            <rect x="36" y="6" width="12" height="40" rx="4" fill="#8e3535"/>
+          </g>
+          <!-- Glowing Candle (Left Shelf) -->
+          <circle cx="316" cy="306" r="108" fill="url(#candle-halo)" stroke="none"/>
+          <g class="study-candle">
+            <ellipse cx="316" cy="420" rx="30" ry="9" fill="#b88d48"/>
+            <path d="M294,418 V344 C294,339 338,339 338,344 V418 Z" fill="#f6ead0"/>
+            <path d="M296,348 Q304,376 312,354 Q322,384 330,352 L336,346" fill="#fff7e2"/>
+            <path d="M316,342 V332" stroke="#181818" stroke-width="3"/>
+            <g class="candle-flame">
+              <path d="M316,286 C328,306 330,324 316,332 C302,324 304,306 316,286 Z" fill="#ffae34"/>
+              <path d="M316,302 C322,312 323,324 316,329 C309,324 310,312 316,302 Z" fill="#fff8be"/>
+            </g>
+          </g>
+
+          <!-- Left Lower Shelf: Chunky Stacked Volumes -->
+          <rect x="24" y="608" width="215" height="52" rx="8" fill="#7d3b32"/>
+          <rect x="36" y="616" width="190" height="36" rx="4" fill="#efe2c4"/>
+          <rect x="42" y="558" width="186" height="50" rx="8" fill="#3a5e4e"/>
+          <rect x="54" y="566" width="162" height="34" rx="4" fill="#e9dac0"/>
+          <rect x="58" y="512" width="152" height="46" rx="8" fill="#9a6c30"/>
+          <path d="M74,524 H194" stroke="#f3d284" stroke-width="3.5"/>
+          <rect x="260" y="502" width="44" height="158" rx="5" fill="#493b6b"/>
+          <rect x="308" y="518" width="40" height="142" rx="5" fill="#7a3444"/>
+        </g>
+
+        <!-- RIGHT WOODEN WALL SHELVES, GLOBE, VOLUMES & CANDLES -->
+        <g stroke="#14131a" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+          <!-- Upper Right Shelf & Brackets -->
+          <path d="M1230,224 L1254,284 M1530,224 L1506,284" stroke="#3c2317" stroke-width="14"/>
+          <rect x="1192" y="200" width="418" height="28" rx="6" fill="#684129"/>
+          <!-- Upper Right Scrolls & Antique Books -->
+          <rect x="1220" y="156" width="104" height="44" rx="14" fill="#e2c792"/>
+          <ellipse cx="1228" cy="178" rx="8" ry="22" fill="#c7a568"/>
+          <rect x="1272" y="76" width="48" height="124" rx="10" fill="#dfc48f"/>
+          <!-- Standing Leather Books -->
+          <rect x="1442" y="72" width="40" height="128" rx="5" fill="#365e50"/>
+          <path d="M1448,96 H1476 M1448,176 H1476" stroke="#e4b75d" stroke-width="3"/>
+          <rect x="1485" y="58" width="44" height="142" rx="5" fill="#823438"/>
+          <path d="M1491,86 H1523 M1491,176 H1523" stroke="#e4b75d" stroke-width="3"/>
+          <rect x="1532" y="84" width="38" height="116" rx="4" fill="#9a6b30"/>
+          <!-- Upper Right Candle -->
+          <circle cx="1378" cy="94" r="102" fill="url(#candle-halo)" stroke="none"/>
+          <g class="study-candle">
+            <path d="M1356,200 V132 C1356,127 1400,127 1400,132 V200 Z" fill="#f6ead0"/>
+            <path d="M1378,128 V118" stroke="#181818" stroke-width="3"/>
+            <g class="candle-flame">
+              <path d="M1378,74 C1390,94 1392,112 1378,120 C1364,112 1366,94 1378,74 Z" fill="#ffae34"/>
+              <path d="M1378,90 C1384,100 1385,112 1378,117 C1371,112 1372,100 1378,90 Z" fill="#fff8be"/>
+            </g>
+          </g>
+
+          <!-- Middle Right Scholarly Shelf: Brass Globe & Leather Encyclopedia Stack -->
+          <path d="M1230,456 L1254,516 M1530,456 L1506,516" stroke="#3c2317" stroke-width="14"/>
+          <rect x="1192" y="430" width="418" height="28" rx="6" fill="#684129"/>
+          <!-- Antique Wooden Stand & Brass Terrestrial Globe -->
+          <g transform="translate(1318, 352)">
+            <ellipse cx="0" cy="70" rx="34" ry="8" fill="#6c4527"/>
+            <rect x="-7" y="48" width="14" height="20" rx="3" fill="#c99944"/>
+            <path d="M-28,-38 A54,54 0 1 1 28,44" fill="none" stroke="#d5a64e" stroke-width="6.5"/>
+            <circle cx="0" cy="0" r="46" fill="#4f998a"/>
+            <!-- Stylized Map Continents -->
+            <path d="M-24,-22 C-10,-28 6,-18 2,-4 C-2,8 -16,20 -26,12 C-34,4 -32,-16 -24,-22 Z" fill="#dfc48d" stroke-width="3"/>
+            <path d="M14,-14 C28,-16 38,-2 34,14 C28,26 14,24 12,10 C10,-2 6,-12 14,-14 Z" fill="#d3b47a" stroke-width="3"/>
+            <ellipse cx="-16" cy="-16" rx="10" ry="6" transform="rotate(-30 -16 -16)" fill="#ffffff" stroke="none" opacity="0.28"/>
+          </g>
+
+          <!-- Brass Hourglass & Standing Tome -->
+          <g transform="translate(1454, 344)">
+            <rect x="-30" y="74" width="60" height="12" rx="4" fill="#6c4527"/>
+            <rect x="-30" y="-44" width="60" height="12" rx="4" fill="#6c4527"/>
+            <line x1="-22" y1="-32" x2="-22" y2="74" stroke="#d5a64e" stroke-width="5"/>
+            <line x1="22" y1="-32" x2="22" y2="74" stroke="#d5a64e" stroke-width="5"/>
+            <path d="M-16,-32 H16 C16,-4 4,8 0,20 C4,32 16,44 16,74 H-16 C-16,44 -4,32 0,20 C-4,8 -16,-4 -16,-32 Z" fill="#e6f2ef" fill-opacity="0.72"/>
+            <path d="M-13,50 C-8,42 8,42 13,50 L14,72 H-14 Z" fill="#e6be6c" stroke="none"/>
+            <path d="M-10,-8 Q0,4 10,-8 Z" fill="#e6be6c" stroke="none"/>
+          </g>
+
+          <!-- Lower Right Stacked Books -->
+          <rect x="1290" y="610" width="228" height="54" rx="8" fill="#325b4b"/>
+          <rect x="1302" y="618" width="204" height="38" rx="4" fill="#ebe0c4"/>
+          <rect x="1312" y="560" width="194" height="50" rx="8" fill="#8f3b38"/>
+          <rect x="1324" y="568" width="170" height="34" rx="4" fill="#ebe0c4"/>
+          <rect x="1332" y="514" width="160" height="46" rx="8" fill="#9b6f32"/>
+          <path d="M1350,526 H1474" stroke="#f5d488" stroke-width="3.5"/>
+        </g>
+
+        <!-- Warm Candlelight Floating Dust Motes (twinkle & drift when background animates!) -->
+        <g class="study-motes" fill="#ffe89c" stroke="none">
+          <circle class="mote mote-a" cx="220" cy="210" r="3.5"/>
+          <circle class="mote mote-b" cx="385" cy="145" r="2.8"/>
+          <circle class="mote mote-c" cx="440" cy="390" r="4"/>
+          <circle class="mote mote-a" cx="510" cy="120" r="3"/>
+          <circle class="mote mote-b" cx="620" cy="80" r="2.4"/>
+          <circle class="mote mote-c" cx="995" cy="95" r="3.2"/>
+          <circle class="mote mote-a" cx="1115" cy="220" r="3.8"/>
+          <circle class="mote mote-b" cx="1185" cy="370" r="3"/>
+          <circle class="mote mote-c" cx="1290" cy="130" r="3.5"/>
+          <circle class="mote mote-a" cx="1395" cy="260" r="2.8"/>
+          <circle class="mote mote-b" cx="1490" cy="240" r="3.4"/>
+          <circle class="mote mote-c" cx="285" cy="495" r="3.2"/>
+        </g>
+      </svg>
+    </div>
+    <div class="study-candle-aura"></div>
   </div>
 
   <!-- LAYER 1: Vibrant Radial Colour Burst Backdrop (Revealed on Success!) -->
@@ -88,6 +274,20 @@
     </div>
 
     <div class="hud-right">
+      <div id="streak-tracker" class="streak-tracker" aria-live="polite">
+        <div id="streak-pill" class="streak-pill" title="Correct answers in a row">
+          <svg class="streak-icon" aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M12 2.6l2.8 5.7 6.3.9-4.5 4.4 1.1 6.2L12 16.9l-5.7 2.9 1.1-6.2L2.9 9.2l6.3-.9z" fill="currentColor" stroke="#181818" stroke-width="1.8" stroke-linejoin="round"/>
+          </svg>
+          <span class="streak-label">In a row</span>
+          <span id="streak-count" class="streak-value">0</span>
+        </div>
+        <div id="best-streak-pill" class="best-streak-pill" title="High score to beat" hidden>
+          <span class="best-label">Best</span>
+          <span id="best-streak-count" class="streak-value">0</span>
+        </div>
+      </div>
+
       <button
         type="button"
         id="fullscreen-btn"
@@ -111,7 +311,7 @@
       <label class="options-label" for="mode-select">Practice Mode</label>
       <select id="mode-select" class="options-select">
         <option value="letters" selected>Letters (A – Z)</option>
-        <option value="numbers">Numbers (0 – 9 Aussie 12 Days)</option>
+        <option value="numbers">Numbers (0 – 9 Woodland)</option>
         <option value="both">Letters &amp; Numbers</option>
         <option value="words3">3-Letter Words (50 Words)</option>
         <option value="words4">4-Letter Words (30 Words)</option>
@@ -233,9 +433,27 @@
         </g>
       </svg>
 
-      <!-- UPPER STAGE: PAPER EMERGING FROM PLATEN + LEAPING CRITTER -->
+      <!-- UPPER STAGE: DECKLE-EDGED PARCHMENT EMERGING FROM PLATEN + LEAPING CRITTER -->
       <div class="paper-stage">
         <div id="paper-sheet" class="paper-sheet">
+          <!-- Hand-inked deckle-edged storybook parchment silhouette -->
+          <svg class="paper-parchment-svg" viewBox="0 0 420 260" preserveAspectRatio="none" aria-hidden="true">
+            <path
+              class="paper-parchment-shape"
+              d="M14,256 L8,196 L18,188 L8,176 L14,108 L4,96 L14,82 L10,22 Q10,12 22,12 L108,8 L116,18 L128,8 L292,10 L306,20 L318,8 L398,12 Q408,12 408,24 L402,94 L412,106 L402,118 L408,198 L398,210 L406,222 L404,256 Z"
+              stroke="#181818"
+              stroke-width="5"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M22,22 Q110,16 118,22 M314,18 Q365,16 398,22"
+              fill="none"
+              stroke="#ffffff"
+              stroke-width="3"
+              opacity="0.45"
+              stroke-linecap="round"
+            />
+          </svg>
           <!-- Shared rainbow gradient (always rendered so both single & word SVGs resolve it) -->
           <svg class="shared-svg-defs" width="0" height="0" aria-hidden="true">
             <defs>
@@ -249,9 +467,6 @@
               </linearGradient>
             </defs>
           </svg>
-
-          <!-- Folded top-right dog-ear corner -->
-          <span class="paper-dogear" aria-hidden="true"></span>
 
           <!-- Crisp SVG Outlined / Rainbow Single Letter or Number -->
           <svg id="paper-single-svg" class="paper-letter-svg" aria-hidden="true" viewBox="0 0 240 190">
@@ -288,8 +503,76 @@
         <div id="critter-stage" class="critter-stage"></div>
       </div>
 
-      <!-- LOWER STAGE: HERMES 3000 VINTAGE CARTOON TYPEWRITER (WHISKERED MUZZLE + EYE-TRACKING + LARGE KEYS) -->
+      <!-- LOWER STAGE: WOODEN STUDY DESK + WISE OLD MAN HERMES 3000 TYPEWRITER -->
       <div class="hermes-typewriter">
+        <!-- Wooden Desk, Inkwell & Feather Quill, Desk Candles & Stacked Books -->
+        <svg class="study-desk-svg" aria-hidden="true" viewBox="0 0 1280 612">
+          <defs>
+            <radialGradient id="desk-candle-halo" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#ffe78f" stop-opacity="0.9"/>
+              <stop offset="38%" stop-color="#ffba42" stop-opacity="0.36"/>
+              <stop offset="100%" stop-color="#ff9922" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <g stroke="#181818" stroke-width="4.5" stroke-linejoin="round" stroke-linecap="round">
+            <!-- Warm Carved Oak Desk Surface & Thick Front Bevel (spans full viewport width) -->
+            <polygon points="-580,455 1860,455 2040,602 -760,602" fill="#8b5530"/>
+            <rect x="-760" y="602" width="2800" height="44" fill="#633a1f"/>
+            <rect x="-760" y="646" width="2800" height="750" fill="#462714"/>
+            <!-- Subtle Desk Wood Grain & Edge Highlight -->
+            <path d="M-740,602 H2020" stroke="#b3784c" stroke-width="3.5" opacity="0.65"/>
+            <path d="M-420,510 Q-180,502 60,515 M1190,520 Q1380,512 1620,524 M-280,558 Q-60,552 88,564 M1180,572 Q1340,566 1560,576" fill="none" stroke="#5a3319" stroke-width="3" opacity="0.55"/>
+            <path d="M-400,624 H320 M600,624 H1720" fill="none" stroke="#3c2110" stroke-width="3" opacity="0.6"/>
+
+            <!-- Left Desk Edge: Cozy Stacked Scholar's Volumes -->
+            <g transform="translate(-140, 442)">
+              <rect x="0" y="58" width="208" height="42" rx="7" fill="#3a5e4e"/>
+              <rect x="12" y="65" width="184" height="28" rx="4" fill="#eadbc0"/>
+              <rect x="16" y="16" width="186" height="42" rx="7" fill="#7d3b32"/>
+              <rect x="28" y="23" width="162" height="28" rx="4" fill="#f1e4cb"/>
+              <path d="M40,30 H170" stroke="#e4b75d" stroke-width="3"/>
+            </g>
+
+            <!-- Right Desk Edge: Glass Inkwell & Feather Quill -->
+            <g transform="translate(1152, 260)">
+              <!-- Soft desk shadow under inkwell -->
+              <ellipse cx="48" cy="248" rx="44" ry="12" fill="#2a160c" stroke="none" opacity="0.45"/>
+              <!-- Feather Quill -->
+              <path d="M52,195 Q76,105 138,14 C146,38 142,84 114,132 L124,138 Q104,158 92,162 L98,172 Q76,184 56,198 Z" fill="#efe2c4"/>
+              <path d="M52,198 Q84,118 138,14" fill="none" stroke="#9d8356" stroke-width="3.2"/>
+              <path d="M84,134 L106,120 M96,106 L120,94 M108,82 L130,72" fill="none" stroke="#c8b082" stroke-width="2.4"/>
+              <!-- Dark Glass Inkwell -->
+              <path d="M22,202 H74 L84,234 C86,244 76,252 48,252 C20,252 10,244 12,234 Z" fill="#283546"/>
+              <rect x="30" y="188" width="36" height="16" rx="5" fill="#465970"/>
+              <ellipse cx="48" cy="188" rx="14" ry="5" fill="#18202c"/>
+              <path d="M25,214 Q22,232 34,242" fill="none" stroke="#8ab0d4" stroke-width="3" opacity="0.6"/>
+            </g>
+
+            <!-- Right Desk Edge: Pair of Melted Glowing Candles -->
+            <g transform="translate(1248, 396)">
+              <ellipse cx="52" cy="158" rx="46" ry="12" fill="#2a160c" stroke="none" opacity="0.45"/>
+              <circle cx="34" cy="48" r="70" fill="url(#desk-candle-halo)" stroke="none"/>
+              <circle cx="72" cy="76" r="64" fill="url(#desk-candle-halo)" stroke="none"/>
+              <!-- Taller Rear Candle -->
+              <path d="M16,154 V78 C16,73 52,73 52,78 V154 Z" fill="#f7ebd2"/>
+              <path d="M18,82 Q26,104 34,86 Q42,108 50,84" fill="#fff7e2"/>
+              <path d="M34,76 V67" stroke="#181818" stroke-width="2.8"/>
+              <g class="candle-flame">
+                <path d="M34,28 C44,44 46,60 34,67 C22,60 24,44 34,28 Z" fill="#ffae34"/>
+                <path d="M34,42 C39,50 40,60 34,64 C28,60 29,50 34,42 Z" fill="#fff8be"/>
+              </g>
+              <!-- Shorter Front Candle -->
+              <path d="M54,158 V104 C54,99 90,99 90,104 V158 Z" fill="#f2e2c0"/>
+              <path d="M56,108 Q64,126 72,112 Q80,128 88,108" fill="#fff7e2"/>
+              <path d="M72,102 V93" stroke="#181818" stroke-width="2.8"/>
+              <g class="candle-flame">
+                <path d="M72,56 C82,72 84,86 72,93 C60,86 62,72 72,56 Z" fill="#ffae34"/>
+                <path d="M72,70 C77,78 78,86 72,90 C66,86 67,78 72,70 Z" fill="#fff8be"/>
+              </g>
+            </g>
+          </g>
+        </svg>
+
         <svg id="hermes-svg" class="hermes-svg" aria-hidden="true" viewBox="0 0 1280 612">
           <defs>
             <!-- Vintage 1930s Comic Ben-Day Halftone Shading Pattern -->
@@ -298,10 +581,10 @@
             </pattern>
             <!-- Sclera Clip Paths so Eye-Tracking Pupils Glide Cleanly Inside Eye Outlines -->
             <clipPath id="eye-clip-left">
-              <ellipse cx="462" cy="56" rx="26.8" ry="42.8"/>
+              <ellipse cx="582" cy="106" rx="23.5" ry="34.5"/>
             </clipPath>
             <clipPath id="eye-clip-right">
-              <ellipse cx="818" cy="56" rx="26.8" ry="42.8"/>
+              <ellipse cx="698" cy="106" rx="23.5" ry="34.5"/>
             </clipPath>
           </defs>
 
@@ -328,7 +611,7 @@
             </g>
           </g>
 
-          <!-- FRONT PAPER BAIL & PLATEN CLAMP BAR (Sits across bottom edge of Paper behind Eyes) -->
+          <!-- FRONT PAPER BAIL & PLATEN CLAMP BAR (Sits across bottom edge of Paper behind Hood) -->
           <g class="paper-bail" stroke="#181818" stroke-width="4.4" stroke-linejoin="round" stroke-linecap="round">
             <rect x="314" y="34" width="652" height="18" rx="6" class="tw-platen"/>
             <rect x="328" y="30" width="624" height="8" rx="4" class="tw-metal"/>
@@ -364,7 +647,7 @@
               class="tw-body-main"
             />
 
-            <!-- Recessed Lower-Left & Lower-Right Metal Deck Triangles (Matches Reference Bevels) -->
+            <!-- Recessed Lower-Left & Lower-Right Metal Deck Triangles -->
             <path
               d="M158,398 L124,556 Q122,566 134,566 H372 M1122,398 L1156,556 Q1158,566 1146,566 H908"
               fill="none"
@@ -380,38 +663,37 @@
               opacity="0.58"
             />
 
-            <!-- Sculpted Rounded Upper Hood with Removable Ribbon-Cover Seams -->
+            <!-- Sculpted Rounded Upper Hood Framing Hermes's Wise Face -->
             <path
-              d="M222,102 C232,60 272,50 328,50 L952,50 C1008,50 1048,60 1058,102 L1068,156 L212,156 Z"
+              d="M222,102 C232,60 272,50 328,50 L952,50 C1008,50 1048,60 1058,102 L1068,184 C1068,200 1054,210 1030,210 L250,210 C226,210 212,200 212,184 Z"
               class="tw-body-hood"
             />
-            <!-- Curved Hermes Hood Panel Seam Lines Framing the Face -->
-            <path d="M380,50 C358,84 354,122 362,156 M900,50 C922,84 926,122 918,156" fill="none" stroke-width="4.4"/>
+            <!-- Hood Panel Seam Lines & Typebar Recess Slot at Top -->
+            <path d="M406,58 C465,68 815,68 874,58" fill="none" stroke-width="5.2"/>
+            <path d="M358,54 C338,94 334,142 342,206 M922,54 C942,94 946,142 938,206" fill="none" stroke-width="4" opacity="0.65"/>
             <!-- Thick Glossy White Curved Shoulder Highlights on Left & Right Hood -->
             <path
-              d="M246,132 C252,76 286,66 346,66 M1034,132 C1028,76 994,66 934,66"
+              d="M246,136 C252,78 286,66 346,66 M1034,136 C1028,78 994,66 934,66"
               fill="none"
               stroke="#ffffff"
               stroke-width="7.5"
-              opacity="0.74"
+              opacity="0.72"
             />
 
-            <!-- Iconic Hermes 3000 Ribbon-Cover Faceplate ("=HERMES=" Trim Strip) -->
-            <rect x="206" y="160" width="868" height="54" rx="16" class="tw-front-panel"/>
-            <path d="M226,168 H1054" fill="none" stroke="#ffffff" stroke-width="3" opacity="0.62"/>
+            <!-- Mechanical Indicator / Margin Gauge Slots on Left & Right Cheeks (Concept Art Detail!) -->
+            <g stroke="#181818" stroke-width="3.2">
+              <rect x="276" y="138" width="12" height="54" rx="6" class="tw-keywell"/>
+              <path d="M270,152 H274 M270,165 H274 M270,178 H274" stroke-width="2.4"/>
+              <circle cx="282" cy="176" r="4" class="tw-metal" stroke-width="2.4"/>
 
-            <!-- Left & Right Pill Hood Latches (Matches Reference Keyhole/Latch Icons) -->
-            <circle cx="265" cy="173" r="4" class="tw-metal" stroke-width="3.4"/>
-            <rect x="256" y="175" width="18" height="28" rx="9" class="tw-metal" stroke-width="3.8"/>
-            <path d="M256,189 H274" fill="none" stroke-width="3.6"/>
+              <rect x="992" y="138" width="12" height="54" rx="6" class="tw-keywell"/>
+              <path d="M1006,152 H1010 M1006,165 H1010 M1006,178 H1010" stroke-width="2.4"/>
+              <circle cx="998" cy="158" r="4" class="tw-metal" stroke-width="2.4"/>
+            </g>
 
-            <circle cx="1015" cy="173" r="4" class="tw-metal" stroke-width="3.4"/>
-            <rect x="1006" y="175" width="18" height="28" rx="9" class="tw-metal" stroke-width="3.8"/>
-            <path d="M1006,189 H1024" fill="none" stroke-width="3.6"/>
-
-            <!-- Vintage Ribbon Color Selector Dots (Left of Right Latch) -->
-            <circle cx="972" cy="179" r="4.5" class="tw-ribbon-dot-a" stroke-width="2.8"/>
-            <circle cx="972" cy="196" r="4.5" class="tw-ribbon-dot-b" stroke-width="2.8"/>
+            <!-- Vintage Ribbon Color Selector Dots (Above Right Keywell) -->
+            <circle cx="958" cy="186" r="4.5" class="tw-ribbon-dot-a" stroke-width="2.8"/>
+            <circle cx="958" cy="201" r="4.5" class="tw-ribbon-dot-b" stroke-width="2.8"/>
 
             <!-- CONTOURED DARK STEPPED KEYWELL BEZEL RIM (Follows 10 -> 10 -> 9 -> 7 -> Spacebar Pyramid!) -->
             <path
@@ -433,120 +715,100 @@
             <rect x="284" y="507" width="712" height="18" rx="6" class="tw-terrace" stroke-width="2.8"/>
           </g>
 
-          <!-- HERMES VINTAGE WINGED SCRIPT EMBLEM ("== HERMES ==") -->
+          <!-- SUBTLE HERMES CREST BELOW MUSTACHE -->
           <g class="hermes-badge-group">
-            <path d="M510,183 H556 M518,191 H556 M724,183 H770 M724,191 H762" stroke="#181818" stroke-width="2.6" stroke-linecap="round" opacity="0.52"/>
-            <text x="640" y="198" font-size="32" text-anchor="middle" class="hermes-logo-text">HERMES</text>
+            <text x="640" y="211" font-size="22" text-anchor="middle" class="hermes-logo-text">HERMES</text>
           </g>
 
-          <!-- HERMES' WHISKERED MUZZLE & WIDE-SET EYE-TRACKING 1930s PIE-CUT EYES! -->
+          <!-- HERMES' WISE OLD MAN FACE: SPECTACLES, BUSHY BROWS, EYE-TRACKING EYES & GRAND MUSTACHE! -->
           <g class="hermes-face" stroke="#181818" stroke-linecap="round" stroke-linejoin="round">
-            <!-- Soft Cheek Ovals under Outer Whiskers -->
-            <ellipse cx="542" cy="122" rx="34" ry="12" class="tw-cheek" stroke="none"/>
-            <ellipse cx="738" cy="122" rx="34" ry="12" class="tw-cheek" stroke="none"/>
+            <!-- Soft Rosy Cheeks under Mustache Curves -->
+            <ellipse cx="484" cy="182" rx="30" ry="11" class="tw-cheek" stroke="none"/>
+            <ellipse cx="796" cy="182" rx="30" ry="11" class="tw-cheek" stroke="none"/>
 
-            <!-- Wide Dark Typebar-Basket / Whisker Cavity Recess -->
-            <path
-              d="M496,105 C536,80 744,80 784,105 C748,131 532,131 496,105 Z"
-              class="tw-muzzle-slot"
-              stroke-width="4.4"
-            />
-            <!-- Subtle Fanned Mechanical Typebars inside Recess -->
-            <g stroke="#6d6e69" stroke-width="2" opacity="0.7">
-              <line x1="528" y1="103" x2="574" y2="118"/>
-              <line x1="556" y1="95" x2="592" y2="118"/>
-              <line x1="724" y1="95" x2="688" y2="118"/>
-              <line x1="752" y1="103" x2="706" y2="118"/>
-            </g>
+            <!-- Mechanical Type Guide Bridge Between Spectacle Lenses -->
+            <rect x="620" y="64" width="40" height="24" rx="4" class="tw-metal" stroke-width="3.8"/>
+            <path d="M625,73 H655 M629,64 V88 M651,64 V88" fill="none" stroke-width="2.4"/>
 
-            <!-- Mechanical Center Ribbon-Vibrator Type Guide (Bridge of Nose!) -->
-            <rect x="613" y="50" width="54" height="38" rx="5" class="tw-metal" stroke-width="4.2"/>
-            <path d="M619,60 H661 M622,69 H658 M624,50 V84 M656,50 V84" fill="none" stroke-width="2.8"/>
-
-            <!-- Mouth State 2 (Behind Muzzle Pads): Joyful Celebrating Laugh! -->
-            <g class="mouth-celebrate" stroke-width="4.6">
-              <path d="M604,118 C610,154 670,154 676,118 Z" fill="#701924"/>
-              <path d="M618,140 C628,131 652,131 662,140 C652,149 628,149 618,140 Z" fill="#ff758f" stroke="none"/>
-            </g>
-
-            <!-- Plump Twin Whiskered Muzzle Pads (:3 Cat / Otter Cheeks) -->
-            <path
-              d="M640,86 C616,76 575,82 574,104 C573,124 615,131 640,108 C665,131 707,124 706,104 C705,82 664,76 640,86 Z"
-              class="tw-muzzle-pad"
-              stroke-width="4.6"
-            />
-
-            <!-- Sculpted Dark Cartoon Animal Nose + Philtrum -->
-            <path
-              d="M640,103 C634,103 631,95 622,93 C614,91 614,79 626,78 Q640,76 654,78 C666,79 666,91 658,93 C649,95 646,103 640,103 Z"
-              class="tw-nose"
-              stroke-width="4.2"
-            />
-            <ellipse cx="634" cy="83" rx="5" ry="2.2" fill="#ffffff" stroke="none" opacity="0.45"/>
-
-            <!-- 3 Cute Whisker Freckle Dots on Each Muzzle Pad -->
-            <g fill="#181818" stroke="none">
-              <circle cx="595" cy="98" r="2.5"/>
-              <circle cx="607" cy="104" r="2.5"/>
-              <circle cx="592" cy="109" r="2.5"/>
-              <circle cx="685" cy="98" r="2.5"/>
-              <circle cx="673" cy="104" r="2.5"/>
-              <circle cx="688" cy="109" r="2.5"/>
-            </g>
-
-            <!-- 3 Crisp Fanning Whiskers on Each Side -->
-            <g class="tw-whiskers" fill="none" stroke="#f2f2ec" stroke-width="3" opacity="0.92">
-              <path d="M582,102 Q540,97 503,99"/>
-              <path d="M584,108 Q542,109 507,116"/>
-              <path d="M588,114 Q552,120 523,129"/>
-              <path d="M698,102 Q740,97 777,99"/>
-              <path d="M696,108 Q738,109 773,116"/>
-              <path d="M692,114 Q728,120 757,129"/>
-            </g>
-
-            <!-- Mouth State 1: Gentle Curious Lower Lip Smile under Muzzle -->
-            <path class="mouth-prompt" d="M622,135 Q640,144 658,135" fill="none" stroke-width="4.6"/>
-
-            <!-- Mouth State 3: Silly Wavy Buzz Mouth -->
-            <path class="mouth-buzz" d="M614,137 Q627,129 640,137 T666,137" fill="none" stroke-width="4.8"/>
-
-            <!-- WIDE-SET 1930s PIE-CUT EYES ASTRIDE THE PLATEN (Track Next Key!) -->
+            <!-- WIDE-SET 1930s PIE-CUT EYES BEHIND THE ROUND SPECTACLES (Track Next Key!) -->
             <g class="eyes-open">
               <!-- Left Eye Socket & Clipped Gaze-Tracking Pupil -->
               <g id="eye-left" class="eye-unit">
-                <ellipse cx="462" cy="56" rx="29" ry="45" fill="#ffffff" stroke-width="5.2"/>
+                <ellipse cx="582" cy="106" rx="25" ry="36" fill="#ffffff" stroke-width="4.8"/>
                 <g clip-path="url(#eye-clip-left)">
                   <g id="pupil-left" class="eye-pupil">
-                    <ellipse cx="462" cy="56" rx="15" ry="22" fill="#181818" stroke="none"/>
-                    <polygon points="461,56 480,43 480,65" fill="#ffffff" stroke="none"/>
+                    <ellipse cx="582" cy="106" rx="13" ry="19" fill="#181818" stroke="none"/>
+                    <polygon points="581,106 599,95 599,114" fill="#ffffff" stroke="none"/>
                   </g>
                 </g>
               </g>
 
               <!-- Right Eye Socket & Clipped Gaze-Tracking Pupil -->
               <g id="eye-right" class="eye-unit">
-                <ellipse cx="818" cy="56" rx="29" ry="45" fill="#ffffff" stroke-width="5.2"/>
+                <ellipse cx="698" cy="106" rx="25" ry="36" fill="#ffffff" stroke-width="4.8"/>
                 <g clip-path="url(#eye-clip-right)">
                   <g id="pupil-right" class="eye-pupil">
-                    <ellipse cx="818" cy="56" rx="15" ry="22" fill="#181818" stroke="none"/>
-                    <polygon points="817,56 836,43 836,65" fill="#ffffff" stroke="none"/>
+                    <ellipse cx="698" cy="106" rx="13" ry="19" fill="#181818" stroke="none"/>
+                    <polygon points="697,106 715,95 715,114" fill="#ffffff" stroke="none"/>
                   </g>
                 </g>
               </g>
-
-              <!-- Curved Lower-Cheek / Hood Eyelid Creases tucking Eyes into the Hood -->
-              <path d="M426,104 Q462,90 492,104 L492,116 L426,116 Z" class="tw-body-hood" stroke="none"/>
-              <path d="M788,104 Q818,90 854,104 L854,116 L788,116 Z" class="tw-body-hood" stroke="none"/>
-              <path d="M426,104 Q462,90 492,104" fill="none" stroke-width="5.2"/>
-              <path d="M788,104 Q818,90 854,104" fill="none" stroke-width="5.2"/>
             </g>
 
-            <!-- BUZZING / OOPS SQUINTING WIDE-SET EYES (> <) -->
-            <g class="eyes-buzz" fill="none" stroke-width="7.2">
-              <path d="M436,38 L482,56 L436,74"/>
-              <path d="M844,38 L798,56 L844,74"/>
+            <!-- BUZZING / OOPS SQUINTING EYES (> <) INSIDE GLASSES -->
+            <g class="eyes-buzz" fill="none" stroke-width="6.5">
+              <path d="M562,90 L598,106 L562,122"/>
+              <path d="M718,90 L682,106 L718,122"/>
               <!-- Comic Sweat Drop -->
-              <path d="M876,26 C866,46 872,60 882,60 C892,60 898,46 876,26 Z" fill="#ffffff" stroke-width="4.4"/>
+              <path d="M766,68 C756,88 762,102 772,102 C782,102 788,88 766,68 Z" fill="#ffffff" stroke-width="4.2"/>
+            </g>
+
+            <!-- ROUND WIRE-RIMMED SPECTACLES (WITH SUBTLE LENS GLARE & TEMPLE ARMS) -->
+            <g class="tw-glasses">
+              <!-- Temple Arms sweeping back onto Hermes's hood -->
+              <path d="M526,104 L346,144" fill="none" stroke="#222220" stroke-width="5.5"/>
+              <path d="M754,104 L934,144" fill="none" stroke="#222220" stroke-width="5.5"/>
+              <!-- Translucent Spectacle Lenses -->
+              <circle cx="578" cy="108" r="50" fill="#ffffff" fill-opacity="0.16" stroke="#222220" stroke-width="6.2"/>
+              <circle cx="702" cy="108" r="50" fill="#ffffff" fill-opacity="0.16" stroke="#222220" stroke-width="6.2"/>
+              <!-- Inner Metallic Rim Highlight -->
+              <circle cx="578" cy="108" r="46" fill="none" stroke="#80827c" stroke-width="1.6" opacity="0.6"/>
+              <circle cx="702" cy="108" r="46" fill="none" stroke="#80827c" stroke-width="1.6" opacity="0.6"/>
+              <!-- Subtle Diagonal Glass Specular Glare -->
+              <path d="M546,84 L564,72 M542,97 L574,77" fill="none" stroke="#ffffff" stroke-width="3.2" opacity="0.55"/>
+              <path d="M670,84 L688,72 M666,97 L698,77" fill="none" stroke="#ffffff" stroke-width="3.2" opacity="0.55"/>
+              <!-- Curved Nose Bridge -->
+              <path d="M626,104 Q640,94 654,104" fill="none" stroke="#222220" stroke-width="6"/>
+            </g>
+
+            <!-- BUSHY SILVER-WHITE WISE EYEBROWS -->
+            <g class="tw-brows" stroke="#181818" stroke-width="4.2">
+              <path d="M532,68 C538,44 576,40 598,54 C580,58 552,64 532,68 Z" class="tw-hair-fill"/>
+              <path d="M748,68 C742,44 704,40 682,54 C700,58 728,64 748,68 Z" class="tw-hair-fill"/>
+            </g>
+
+            <!-- EXPRESSIVE MOUTHS PEEKING UNDER MUSTACHE CENTER -->
+            <!-- Mouth State 1: Gentle Warm Wise Smile -->
+            <path class="mouth-prompt" d="M624,180 Q640,189 656,180" fill="none" stroke-width="4.4"/>
+
+            <!-- Mouth State 2: Joyful Celebrating Laugh! -->
+            <g class="mouth-celebrate" stroke-width="4.4">
+              <path d="M610,164 C614,199 666,199 670,164 Z" fill="#701924"/>
+              <path d="M622,184 C631,176 649,176 658,184 C649,192 631,192 622,184 Z" fill="#ff758f" stroke="none"/>
+            </g>
+
+            <!-- Mouth State 3: Silly Wavy Buzz Mouth -->
+            <path class="mouth-buzz" d="M614,181 Q627,173 640,181 T666,181" fill="none" stroke-width="4.6"/>
+
+            <!-- MAGNIFICENT CURLED HANDLEBAR MUSTACHE -->
+            <g class="tw-mustache" stroke="#181818" stroke-width="4.6">
+              <!-- Left & Right Handlebar Plumes with Curled Tips -->
+              <path
+                d="M640,148 C622,126 572,130 544,156 C514,182 470,174 456,144 C448,128 468,118 476,132 C482,144 470,152 464,145 C478,162 508,158 524,142 C502,148 468,156 452,148 C464,186 520,196 566,180 C600,168 624,168 640,164 C656,168 680,168 714,180 C760,196 816,186 828,148 C812,156 778,148 756,142 C772,158 802,162 816,145 C810,152 798,144 804,132 C812,118 832,128 824,144 C810,174 766,182 736,156 C708,130 658,126 640,148 Z"
+                class="tw-hair-fill"
+              />
+              <!-- Crisp Mustache Hair Texture Accents -->
+              <path d="M604,150 Q574,158 548,172 M676,150 Q706,158 732,172 M640,148 V163" fill="none" stroke="#8b908b" stroke-width="2.6"/>
             </g>
           </g>
 

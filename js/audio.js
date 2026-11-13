@@ -82,7 +82,7 @@
       this.isCelebrating = false;
       this.isSpeechDucking = false;
       this.preferredVoice = null;
-      this.voiceProfile = { pitch: 1.38, rate: 1.02 };
+      this.voiceProfile = { pitch: 1.46, rate: 0.95 };
       this.lastBuzzSpeechAt = 0;
 
       this.musicBus = null;
@@ -104,39 +104,43 @@
 
         const enVoices = voices.filter((v) => /^en(-|_|$)/i.test(v.lang));
 
-        // Exclude known female voices and creepy/robotic novelty voices so Hermes is always a playful male/boy voice
+        // Exclude known female voices and creepy/robotic novelty voices so Hermes is always a whimsical male voice
         const femaleOrNoveltyExclude =
           /\b(samantha|karen|victoria|fiona|moira|tessa|veena|allison|ava|susan|zoe|nicky|monica|paulina|satu|kyoko|mei-jia|sin-ji|ting-ting|lekha|mariska|milena|laura|ellen|luciana|joana|ioana|alva|kanya|damayanti|alice|amelie|anna|carmit|sara|nora|melina|yelda|zosia|uzma|zira|hazel|heera|aria|jenny|michelle|sonia|libby|maisie|natasha|clara|molly|leah|yan|neerja|female|woman|girl|albert|bad news|bahh|bells|boing|bubbles|cellos|deranged|good news|hysterical|jester|organ|pipe organ|superstar|trinoids|whisper|wobble|zarvox|grandma|kathy|princess|sandy|shelley|flo)\b/i;
 
         const nonFemalePool = enVoices.filter((v) => !femaleOrNoveltyExclude.test(v.name));
 
-        // Playful young-boy / pitched-up male voice profiles in priority order.
-        // Adult male voices get a ~1.38x pitch lift so they sound like a cheerful, energetic young boy.
-        const boyAndMaleProfiles = [
-          { match: 'Lee', pitch: 1.38, rate: 1.02 }, // Aussie male -> pitched up into playful boy voice
-          { match: 'Gordon', pitch: 1.38, rate: 1.02 },
-          { match: 'Junior', pitch: 1.16, rate: 1.02 }, // macOS young boy voice
-          { match: 'Oliver', pitch: 1.38, rate: 1.02 },
-          { match: 'Daniel', pitch: 1.4, rate: 1.02 },
-          { match: 'Aaron', pitch: 1.38, rate: 1.02 },
-          { match: 'Alex', pitch: 1.38, rate: 1.02 },
-          { match: 'Rishi', pitch: 1.36, rate: 1.02 },
-          { match: 'Microsoft William', pitch: 1.38, rate: 1.02 },
-          { match: 'Microsoft Liam', pitch: 1.36, rate: 1.02 },
-          { match: 'Microsoft Ryan', pitch: 1.38, rate: 1.02 },
-          { match: 'Microsoft Thomas', pitch: 1.38, rate: 1.02 },
-          { match: 'Microsoft Guy', pitch: 1.38, rate: 1.02 },
-          { match: 'Microsoft Mark', pitch: 1.4, rate: 1.02 },
-          { match: 'Microsoft David', pitch: 1.42, rate: 1.02 },
-          { match: 'Google UK English Male', pitch: 1.38, rate: 1.02 },
-          { match: 'Eddy', pitch: 1.36, rate: 1.02 },
-          { match: 'Reed', pitch: 1.36, rate: 1.02 },
-          { match: 'Rocko', pitch: 1.36, rate: 1.02 },
-          { match: 'Fred', pitch: 1.36, rate: 1.02 },
-          { match: 'Ralph', pitch: 1.38, rate: 1.02 }
+        // Higher-pitched whimsical wise-old-man voice profiles in priority order.
+        // Warm storyteller/elder voices get a lively pitch lift (1.42-1.50x) and slightly
+        // unhurried scholarly cadence (0.95x) so Hermes sounds whimsical, sage-like, and bright.
+        const wiseWhimsicalProfiles = [
+          { match: 'Grandpa', pitch: 1.42, rate: 0.95 }, // Elderly quaver + high whimsical pitch
+          { match: 'Arthur', pitch: 1.48, rate: 0.95 }, // Distinguished British storyteller lifted high
+          { match: 'Oliver', pitch: 1.48, rate: 0.95 },
+          { match: 'Daniel', pitch: 1.48, rate: 0.95 },
+          { match: 'Lee', pitch: 1.46, rate: 0.95 },
+          { match: 'Gordon', pitch: 1.46, rate: 0.95 },
+          { match: 'Google UK English Male', pitch: 1.46, rate: 0.95 },
+          { match: 'Microsoft George', pitch: 1.46, rate: 0.95 },
+          { match: 'Microsoft Ryan', pitch: 1.46, rate: 0.95 },
+          { match: 'Microsoft William', pitch: 1.46, rate: 0.95 },
+          { match: 'Microsoft Thomas', pitch: 1.46, rate: 0.95 },
+          { match: 'Microsoft Liam', pitch: 1.44, rate: 0.95 },
+          { match: 'Microsoft Guy', pitch: 1.46, rate: 0.95 },
+          { match: 'Microsoft Mark', pitch: 1.48, rate: 0.95 },
+          { match: 'Microsoft David', pitch: 1.5, rate: 0.95 },
+          { match: 'Aaron', pitch: 1.46, rate: 0.95 },
+          { match: 'Alex', pitch: 1.46, rate: 0.95 },
+          { match: 'Rishi', pitch: 1.44, rate: 0.95 },
+          { match: 'Ralph', pitch: 1.44, rate: 0.95 },
+          { match: 'Reed', pitch: 1.42, rate: 0.95 },
+          { match: 'Rocko', pitch: 1.42, rate: 0.95 },
+          { match: 'Eddy', pitch: 1.42, rate: 0.95 },
+          { match: 'Fred', pitch: 1.42, rate: 0.95 },
+          { match: 'Junior', pitch: 1.24, rate: 0.95 }
         ];
 
-        for (const profile of boyAndMaleProfiles) {
+        for (const profile of wiseWhimsicalProfiles) {
           const found = nonFemalePool.find((v) => v.name.includes(profile.match));
           if (found) {
             this.preferredVoice = found;
@@ -149,7 +153,7 @@
         const labeledMale = nonFemalePool.find((v) => /\bmale\b/i.test(v.name));
         this.preferredVoice =
           labeledMale || nonFemalePool[0] || enVoices[0] || voices[0];
-        this.voiceProfile = { pitch: 1.38, rate: 1.02 };
+        this.voiceProfile = { pitch: 1.46, rate: 0.95 };
       };
 
       this._pickVoice();
@@ -211,7 +215,7 @@
     }
 
     /**
-     * Speak in Hermes's high, bouncy kid-friendly voice.
+     * Speak in Hermes's whimsical, higher-pitched wise-old-man voice.
      * @param {string} text
      * @param {object} [opts]
      * @param {'prompt'|'cheer'|'echo'|'oops'} [opts.mood] Expressive tone preset
@@ -250,7 +254,7 @@
         oops: { pitch: -0.06, rate: 0.97 }
       };
       const moodAdj = MOODS[mood] || MOODS.prompt;
-      const base = this.voiceProfile || { pitch: 1.38, rate: 1.02 };
+      const base = this.voiceProfile || { pitch: 1.46, rate: 0.95 };
       const pitch = Math.min(2, Math.max(0.5, base.pitch + moodAdj.pitch));
       const rate = base.rate * moodAdj.rate * (fast ? 1.12 : 1);
 
@@ -491,10 +495,14 @@
       };
 
       switch (type) {
-        case 'kookaburra': // Iconic laughing Aussie kookaburra "Koo-koo-ka-ka!"
-          [0, 0.09, 0.18, 0.27, 0.36].forEach((dt, i) => {
-            const base = 760 + (i % 2) * 260;
-            tone(base, base * 1.32, start + dt, 0.075, 'triangle', 0.16);
+        case 'ribbit': // Two bubbly pond frog croaks "Rib-bit!"
+          tone(165, 295, start, 0.08, 'triangle', 0.18);
+          tone(205, 390, start + 0.11, 0.11, 'triangle', 0.2);
+          break;
+        case 'crunch': // Crispy woodland acorn & autumn leaf nibble
+          [0, 0.06, 0.13, 0.19].forEach((dt, i) => {
+            const base = i % 2 === 0 ? 340 : 275;
+            tone(base, base * 0.42, start + dt, 0.05, 'triangle', 0.17);
           });
           break;
         case 'bark': // Playful "Arf! Arf!"
