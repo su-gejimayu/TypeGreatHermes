@@ -598,6 +598,39 @@
     </div>
   </main>
 
+  <!-- Startup Player Name Modal -->
+  <dialog id="name-prompt-dialog" class="name-prompt-dialog" closedby="none" aria-labelledby="name-prompt-title">
+    <div id="name-entry-step" class="name-prompt-step">
+      <h2 id="name-prompt-title" class="name-prompt-title">What is your name?</h2>
+      <form id="name-entry-form" class="name-entry-form" novalidate>
+        <label class="visually-hidden" for="player-name-input">Your name</label>
+        <input
+          id="player-name-input"
+          class="name-prompt-input"
+          type="text"
+          maxlength="24"
+          autocomplete="given-name"
+          placeholder="Type your name..."
+          autofocus
+          required
+        >
+        <p id="name-entry-error" class="name-prompt-error" hidden>Please type your name first!</p>
+        <div class="name-prompt-actions">
+          <button type="submit" id="name-submit-btn" class="name-prompt-btn name-prompt-btn-primary">OK</button>
+        </div>
+      </form>
+    </div>
+
+    <div id="name-confirm-step" class="name-prompt-step" hidden>
+      <h2 id="name-confirm-title" class="name-prompt-title"><span id="name-confirm-value"></span>? Is that right?</h2>
+      <p class="name-confirm-hint">Press <strong>Y</strong> for Yes or <strong>N</strong> for No</p>
+      <div class="name-prompt-actions">
+        <button type="button" id="name-yes-btn" class="name-prompt-btn name-prompt-btn-yes">Yes (Y)</button>
+        <button type="button" id="name-no-btn" class="name-prompt-btn name-prompt-btn-no">No (N)</button>
+      </div>
+    </div>
+  </dialog>
+
   <script defer src="js/words.js"></script>
   <script defer src="js/illustrations.js"></script>
   <script defer src="js/audio.js"></script>

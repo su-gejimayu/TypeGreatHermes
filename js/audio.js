@@ -222,7 +222,14 @@
      */
     speak(
       text,
-      { mood = 'prompt', fast = false, queue = false, delayMs = 0, isBuzz = false } = {}
+      {
+        mood = 'prompt',
+        fast = false,
+        queue = false,
+        delayMs = 0,
+        isBuzz = false,
+        onStart = null
+      } = {}
     ) {
       if (!this.soundEnabled || !this.voiceEnabled) return;
       if (!('speechSynthesis' in window)) return;
@@ -285,7 +292,10 @@
           utter.rate = rate;
           utter.pitch = pitch;
           utter.volume = 1;
-          utter.onstart = duckMusic;
+          utter.onstart = () => {
+            duckMusic();
+            onStart?.();
+          };
           utter.onend = () => {
             if (window.speechSynthesis.pending) return;
             clearTimeout(this._speechDuckTimer);

@@ -138,6 +138,16 @@
   const hintCheckbox = document.getElementById('hint-checkbox');
   const skipBtn = document.getElementById('skip-letter-btn');
 
+  const namePromptDialog = document.getElementById('name-prompt-dialog');
+  const nameEntryStep = document.getElementById('name-entry-step');
+  const nameConfirmStep = document.getElementById('name-confirm-step');
+  const nameEntryForm = document.getElementById('name-entry-form');
+  const playerNameInput = document.getElementById('player-name-input');
+  const nameEntryError = document.getElementById('name-entry-error');
+  const nameConfirmValue = document.getElementById('name-confirm-value');
+  const nameYesBtn = document.getElementById('name-yes-btn');
+  const nameNoBtn = document.getElementById('name-no-btn');
+
   // State
   const state = {
     phase: 'prompting', // 'prompting' | 'buzzing' | 'celebrating'
@@ -163,6 +173,8 @@
     handHintTimer: null,
     isInitialLoad: true,
     playerName: PLACEHOLDER_PLAYER_NAME,
+    namePromptPhase: 'entry', // 'entry' | 'confirm' | 'done'
+    pendingPlayerName: '',
     hasGreeted: false,
     affirmationDeck: [],
     lastAffirmationIndex: -1
@@ -1674,6 +1686,7 @@
 
   // Global Single-Key Listener (No Enter/Return confirmation required!)
   window.addEventListener('keydown', (e) => {
+    if (state.namePromptPhase !== 'done') return;
     if (e.metaKey || e.ctrlKey || e.altKey) return;
     if (IGNORED_KEYS.has(e.key)) return;
 
@@ -1820,6 +1833,7 @@
       state.hasInteracted = true;
       if (state.soundOn) {
         window.hermesAudio.unlock();
+        maybeSpeakGreetingOnFirstGesture();
       }
     },
     { passive: true }
@@ -1918,8 +1932,157 @@
     }
   });
 
+  /* =========================================================
+     STARTUP PLAYER NAME PROMPT
+     ========================================================= */
+  let hasSpokenInitialGreeting = false;
+  let hasRetriedGreetingOnGesture = false;
+
+  function speakInitialGreeting() {
+    window.hermesAudio.speak('Welcome. My name is Hermes. What is your name?', {
+      mood: 'prompt',
+      onStart: () => {
+        hasSpokenInitialGreeting = true;
+      }
+    });
+  }
+
+  function maybeSpeakGreetingOnFirstGesture() {
+    if (
+      state.namePromptPhase === 'entry' &&
+      !hasSpokenInitialGreeting &&
+      !hasRetriedGreetingOnGesture
+    ) {
+      hasRetriedGreetingOnGesture = true;
+      speakInitialGreeting();
+    }
+  }
+
+  function showNameEntryStep({ speakGreeting = false } = {}) {
+    state.namePromptPhase = 'entry';
+    state.pendingPlayerName = '';
+    if (nameConfirmStep) nameConfirmStep.hidden = true;
+    if (nameEntryStep) nameEntryStep.hidden = false;
+    if (nameEntryError) nameEntryError.hidden = true;
+    if (playerNameInput) {
+      playerNameInput.value = '';
+      playerNameInput.focus();
+    }
+    if (speakGreeting) {
+      speakInitialGreeting();
+    } else {
+      window.hermesAudio.speak('What is your name?', { mood: 'prompt' });
+    }
+  }
+
+  function showNameConfirmStep(name) {
+    state.namePromptPhase = 'confirm';
+    state.pendingPlayerName = name;
+    if (nameEntryStep) nameEntryStep.hidden = true;
+    if (nameConfirmStep) nameConfirmStep.hidden = false;
+    if (nameConfirmValue) nameConfirmValue.textContent = name;
+    nameYesBtn?.focus();
+    window.hermesAudio.speak(
+      `${name}? Is that right? Press Y for Yes or N for No`,
+      { mood: 'prompt' }
+    );
+  }
+
+  function confirmPlayerName() {
+    if (state.namePromptPhase !== 'confirm') return;
+    state.hasInteracted = true;
+    window.hermesAudio.unlock();
+    window.hermesAudio.playClack();
+    window.setHermesPlayerName(state.pendingPlayerName);
+    state.namePromptPhase = 'done';
+    namePromptDialog?.close();
+    startNewPrompt({ speakPrompt: true, animateFeed: true });
+  }
+
+  function rejectPlayerName() {
+    if (state.namePromptPhase !== 'confirm') return;
+    state.hasInteracted = true;
+    window.hermesAudio.unlock();
+    window.hermesAudio.playClack();
+    showNameEntryStep({ speakGreeting: false });
+  }
+
+  function openNamePrompt() {
+    if (!namePromptDialog || typeof namePromptDialog.showModal !== 'function') {
+      state.namePromptPhase = 'done';
+      startNewPrompt({ speakPrompt: false, animateFeed: false });
+      return;
+    }
+    if (!namePromptDialog.open) {
+      namePromptDialog.showModal();
+    }
+    showNameEntryStep({ speakGreeting: true });
+  }
+
+  if (namePromptDialog) {
+    // Keep the startup name prompt open until confirmed via Y/Yes
+    namePromptDialog.addEventListener('cancel', (e) => {
+      e.preventDefault();
+    });
+
+    namePromptDialog.addEventListener('keydown', (e) => {
+      if (state.namePromptPhase !== 'confirm') return;
+      if (e.metaKey || e.ctrlKey || e.altKey || e.repeat) return;
+      const key = e.key.toLowerCase();
+      if (key === 'y') {
+        e.preventDefault();
+        e.stopPropagation();
+        confirmPlayerName();
+      } else if (key === 'n') {
+        e.preventDefault();
+        e.stopPropagation();
+        rejectPlayerName();
+      }
+    });
+  }
+
+  if (nameEntryForm) {
+    nameEntryForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      state.hasInteracted = true;
+      window.hermesAudio.unlock();
+      window.hermesAudio.playClack();
+      const rawName = playerNameInput ? playerNameInput.value.trim() : '';
+      if (!rawName) {
+        if (nameEntryError) nameEntryError.hidden = false;
+        playerNameInput?.focus();
+        window.hermesAudio.speak('Please type your name.', { mood: 'oops' });
+        return;
+      }
+      showNameConfirmStep(rawName);
+    });
+  }
+
+  if (playerNameInput) {
+    playerNameInput.addEventListener('keydown', (e) => {
+      if (e.metaKey || e.ctrlKey || e.altKey || e.repeat) return;
+      if (e.key.length === 1 || e.key === 'Backspace') {
+        state.hasInteracted = true;
+        window.hermesAudio.unlock();
+        window.hermesAudio.playClack();
+        maybeSpeakGreetingOnFirstGesture();
+      }
+    });
+    playerNameInput.addEventListener('input', () => {
+      if (nameEntryError) nameEntryError.hidden = true;
+    });
+  }
+
+  if (nameYesBtn) {
+    nameYesBtn.addEventListener('click', confirmPlayerName);
+  }
+
+  if (nameNoBtn) {
+    nameNoBtn.addEventListener('click', rejectPlayerName);
+  }
+
   // Boot!
   loadSettings();
   renderTypewriterKeys();
-  startNewPrompt({ speakPrompt: false, animateFeed: false });
+  openNamePrompt();
 })();
