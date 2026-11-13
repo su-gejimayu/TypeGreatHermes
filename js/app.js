@@ -2,7 +2,7 @@
  * Type Great Hermes — Main Game Controller
  * - Permanent 4-row Hermes keyboard (1-0 + QWERTY + Spacebar)
  * - Modes: Letters (A-Z), Numbers (0-9 Aussie 12 Days + Zero to Hero), Both, and 3-Letter Words (+ Bonus JUMP)
- * - Progressive Timed Key Hints: 0s B&W pulse -> 5s Vibrant Colour Key -> 10s Bouncing Red Arrow!
+ * - Progressive Timed Key Hints: 0s B&W pulse -> 5s Vibrant Colour Key -> 10s Bouncing Red Arrow -> 15s Hermes' Hand Glides Toward Key!
  * - Instant single-key response (no Enter/Return confirmation needed)
  */
 (function () {
@@ -15,9 +15,24 @@
   // Hermes permanently features the number row as part of his character design!
   const ALL_KEY_ROWS = [NUMBER_ROW, ...QWERTY_LETTER_ROWS];
 
+  // Standard QWERTY touch-typing hand halves (left half = left hand, right half = right hand)
+  const LEFT_HAND_KEYS = new Set([
+    '1', '2', '3', '4', '5',
+    'Q', 'W', 'E', 'R', 'T',
+    'A', 'S', 'D', 'F', 'G',
+    'Z', 'X', 'C', 'V', 'B'
+  ]);
+  const RIGHT_HAND_KEYS = new Set([
+    '6', '7', '8', '9', '0',
+    'Y', 'U', 'I', 'O', 'P',
+    'H', 'J', 'K', 'L',
+    'N', 'M'
+  ]);
+
   const VALID_MODES = ['letters', 'numbers', 'both', 'words', 'words3', 'words4'];
   const COLOR_HINT_DELAY_MS = 5000;
   const RED_ARROW_DELAY_MS = 10000;
+  const HAND_HINT_DELAY_MS = 15000;
 
   // TODO(player-name): Placeholder until the "enter your name" feature lands.
   // Replace with the saved player name; every voice line reads it via playerName().
@@ -100,6 +115,12 @@
   const eyeRight = document.getElementById('eye-right');
   const pupilLeft = document.getElementById('pupil-left');
   const pupilRight = document.getElementById('pupil-right');
+  const armLeftHose = document.getElementById('arm-left-hose');
+  const armLeftHighlight = document.getElementById('arm-left-highlight');
+  const gloveLeftEl = document.getElementById('glove-left');
+  const armRightHose = document.getElementById('arm-right-hose');
+  const armRightHighlight = document.getElementById('arm-right-highlight');
+  const gloveRightEl = document.getElementById('glove-right');
   const keysContainer = document.getElementById('typewriter-keys');
   const keyRowsMount = document.getElementById('key-rows-mount') || keysContainer;
   const keyRedArrow = document.getElementById('key-red-arrow');
@@ -132,12 +153,14 @@
     seqIndex: 0,
     currentItem: null,
     charIndex: 0, // Active character index within currentItem.key (0..len-1)
-    hintStage: 'bw', // 'bw' (0-5s) | 'color' (5-10s) | 'arrow' (10s+)
+    hintStage: 'bw', // 'bw' (0-5s) | 'color' (5-10s) | 'arrow' (10-15s) | 'hand' (15s+)
     wrongCountThisTurn: 0,
     buzzTimer: null,
     celebrateTimer: null,
+    celebrateArmsTimer: null,
     colorHintTimer: null,
     arrowHintTimer: null,
+    handHintTimer: null,
     isInitialLoad: true,
     playerName: PLACEHOLDER_PLAYER_NAME,
     hasGreeted: false,
@@ -147,6 +170,7 @@
 
   const keyButtonsByChar = new Map();
   const keySvgCoordsByChar = new Map();
+  const keyPressTimers = new Map();
   let spacebarEl = null;
   let supportsDisplayTransition;
 
@@ -757,22 +781,390 @@
     keyRedArrow.style.setProperty('--arrow-y', `${y}px`);
   }
 
+  // =========================================================
+  // HERMES RUBBER-HOSE ARMS & GLOVES (TOUCH-TYPING + LAST-STAGE HINT)
+  // =========================================================
+  const REST_HAND_POSE = {
+    left: { wx: 158, wy: 498, deg: 0 },
+    right: { wx: 1122, wy: 498, deg: 0 }
+  };
+
+  const handEls = {
+    left: { hose: armLeftHose, highlight: armLeftHighlight, glove: gloveLeftEl },
+    right: { hose: armRightHose, highlight: armRightHighlight, glove: gloveRightEl }
+  };
+
+  const handsState = {
+    left: {
+      mode: 'idle', // 'idle' | 'pressing' | 'hinting' | 'returning'
+      curr: { ...REST_HAND_POSE.left },
+      startPose: { ...REST_HAND_POSE.left },
+      keyChar: null,
+      phaseStart: 0,
+      hintDuration: 2200,
+      returnDuration: 220
+    },
+    right: {
+      mode: 'idle',
+      curr: { ...REST_HAND_POSE.right },
+      startPose: { ...REST_HAND_POSE.right },
+      keyChar: null,
+      phaseStart: 0,
+      hintDuration: 2200,
+      returnDuration: 220
+    }
+  };
+
+  let handRafId = null;
+
+  function prefersReducedMotion() {
+    return Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
+  }
+
+  function clamp(val, min, max) {
+    return Math.min(max, Math.max(min, val));
+  }
+
+  function lerp(a, b, t) {
+    return a + (b - a) * t;
+  }
+
+  function lerpPose(a, b, t) {
+    return {
+      wx: lerp(a.wx, b.wx, t),
+      wy: lerp(a.wy, b.wy, t),
+      deg: lerp(a.deg, b.deg, t)
+    };
+  }
+
+  function easeOutCubic(t) {
+    return 1 - (1 - t) ** 3;
+  }
+
+  function easeInOutCubic(t) {
+    return t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
+  }
+
+  function easeInOutQuad(t) {
+    return t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2;
+  }
+
+  /** Map a letter or number to Hermes' closest touch-typing hand ('left' | 'right' | null) */
+  function getHandSideForKey(rawChar) {
+    if (!rawChar) return null;
+    const ch = String(rawChar).toUpperCase();
+    if (LEFT_HAND_KEYS.has(ch)) return 'left';
+    if (RIGHT_HAND_KEYS.has(ch)) return 'right';
+    return null;
+  }
+
+  /** Convert desired fingertip SVG point (40, 10 in local glove coords) + tilt into wrist pose */
+  function fingertipToWrist(side, tipX, tipY, deg) {
+    const rad = (deg * Math.PI) / 180;
+    const cos = Math.cos(rad);
+    const sin = Math.sin(rad);
+    const rx = 40 * cos - 10 * sin;
+    const ry = 40 * sin + 10 * cos;
+    return {
+      wx: side === 'left' ? tipX - rx : tipX + rx,
+      wy: tipY - ry,
+      deg
+    };
+  }
+
+  /** Build rubber-hose cubic Bezier paths & glove transform symmetrically for either arm */
+  function buildArmGeometry(side, pose) {
+    const mWx = side === 'left' ? pose.wx : 1280 - pose.wx;
+    const rad = (pose.deg * Math.PI) / 180;
+    const cos = Math.cos(rad);
+    const sin = Math.sin(rad);
+
+    // Connect hose cleanly into the rotated glove wrist cuff (-5, 3 in local glove coords)
+    const ex = mWx + (-5 * cos - 3 * sin);
+    const ey = pose.wy + (-5 * sin + 3 * cos);
+
+    const reachX = clamp((mWx - 158) / 540, 0, 1);
+    const sx = 108;
+    const sy = 354;
+    const c1x = lerp(28, 44, reachX);
+    const c1y = lerp(342, 468, reachX);
+    const c2x = lerp(20, ex - 185, reachX);
+    const elbowY = Math.min(545, Math.max(ey + 36, 445));
+    const c2y = lerp(ey - 26, elbowY, reachX);
+
+    const mapX = (x) => (side === 'left' ? x : 1280 - x);
+    const f = (n) => n.toFixed(1);
+
+    const hosePath = `M${f(mapX(sx))},${f(sy)} C${f(mapX(c1x))},${f(c1y)} ${f(mapX(c2x))},${f(c2y)} ${f(mapX(ex))},${f(ey)}`;
+    const highlightPath = `M${f(mapX(sx - 4))},${f(sy - 5)} C${f(mapX(c1x + 8))},${f(c1y - 2)} ${f(mapX(c2x + 10))},${f(c2y - 6)} ${f(mapX(ex - 4))},${f(ey - 6)}`;
+    const gloveTransform =
+      side === 'left'
+        ? `translate(${f(pose.wx)}, ${f(pose.wy)}) rotate(${f(pose.deg)})`
+        : `translate(${f(pose.wx)}, ${f(pose.wy)}) scale(-1, 1) rotate(${f(pose.deg)})`;
+
+    return { hosePath, highlightPath, gloveTransform };
+  }
+
+  function renderHandPose(side, pose, isAnimating) {
+    const els = handEls[side];
+    if (!els?.hose || !els?.highlight || !els?.glove) return;
+    const geom = buildArmGeometry(side, pose);
+    els.hose.setAttribute('d', geom.hosePath);
+    els.highlight.setAttribute('d', geom.highlightPath);
+    els.glove.setAttribute('transform', geom.gloveTransform);
+    els.glove.classList.toggle('is-animating', isAnimating);
+  }
+
+  function getHintHandPose(side, char) {
+    const pt = getKeySvgPoint(char);
+    if (!pt) return { ...REST_HAND_POSE[side] };
+    // Hover at the lower-left / lower-right edge of the keycap so the letter & red arrow stay clear
+    const edgeOffsetX = side === 'left' ? -28 : 28;
+    return fingertipToWrist(side, pt.x + edgeOffsetX, pt.y + 16, -10);
+  }
+
+  function startHandHint(side, char, durationOverride = null) {
+    const hand = handsState[side];
+    if (!hand || !char) return;
+    const targetPose = getHintHandPose(side, char);
+    const dist = Math.hypot(
+      targetPose.wx - hand.curr.wx,
+      targetPose.wy - hand.curr.wy
+    );
+
+    hand.mode = 'hinting';
+    hand.keyChar = char;
+    hand.startPose = { ...hand.curr };
+    hand.phaseStart = performance.now();
+    hand.hintDuration =
+      durationOverride ?? Math.round(1850 + Math.min(950, dist * 1.4));
+    ensureHandLoop();
+  }
+
+  function startHandReturn(side) {
+    const hand = handsState[side];
+    if (!hand || hand.mode === 'idle') return;
+    hand.mode = 'returning';
+    hand.keyChar = null;
+    hand.startPose = { ...hand.curr };
+    hand.phaseStart = performance.now();
+    hand.returnDuration = state.fastMode ? 170 : 230;
+    ensureHandLoop();
+  }
+
+  function triggerHandKeyPress(rawChar) {
+    const ch = String(rawChar || '').toUpperCase();
+    const side = getHandSideForKey(ch);
+    if (!side || !getKeySvgPoint(ch)) return;
+
+    const hand = handsState[side];
+    hand.mode = 'pressing';
+    hand.keyChar = ch;
+    hand.startPose = { ...hand.curr };
+    hand.phaseStart = performance.now();
+    ensureHandLoop();
+  }
+
+  /** Sync Hermes' hands with the current hint stage without interrupting an active button push */
+  function syncHandHint() {
+    const activeChar = getActiveTargetChar();
+    const shouldHint =
+      state.phase !== 'celebrating' &&
+      state.hintStage === 'hand' &&
+      Boolean(activeChar);
+    const hintSide = shouldHint ? getHandSideForKey(activeChar) : null;
+
+    ['left', 'right'].forEach((side) => {
+      const hand = handsState[side];
+      if (hand.mode === 'pressing') return;
+
+      if (hintSide === side) {
+        if (hand.mode !== 'hinting' || hand.keyChar !== activeChar) {
+          startHandHint(side, activeChar);
+        }
+      } else if (hand.mode === 'hinting') {
+        startHandReturn(side);
+      }
+    });
+  }
+
+  function returnAllHandsToRest() {
+    ['left', 'right'].forEach((side) => {
+      const hand = handsState[side];
+      if (hand.mode !== 'idle') {
+        startHandReturn(side);
+      }
+    });
+  }
+
+  function resetHandsImmediate() {
+    if (handRafId !== null) {
+      cancelAnimationFrame(handRafId);
+      handRafId = null;
+    }
+    ['left', 'right'].forEach((side) => {
+      const hand = handsState[side];
+      hand.mode = 'idle';
+      hand.keyChar = null;
+      hand.curr = { ...REST_HAND_POSE[side] };
+      renderHandPose(side, hand.curr, false);
+    });
+  }
+
+  function ensureHandLoop() {
+    if (handRafId === null) {
+      handRafId = requestAnimationFrame(stepHands);
+    }
+  }
+
+  function stepSingleHand(side, now) {
+    const hand = handsState[side];
+    if (hand.mode === 'idle') return false;
+
+    const reduced = prefersReducedMotion();
+
+    if (hand.mode === 'pressing') {
+      const pt = hand.keyChar ? getKeySvgPoint(hand.keyChar) : null;
+      if (!pt) {
+        startHandReturn(side);
+        return true;
+      }
+
+      const reachMs = state.fastMode ? 55 : 75;
+      const downMs = state.fastMode ? 45 : 55;
+      const holdMs = state.fastMode ? 60 : 85;
+      const totalMs = reachMs + downMs + holdMs;
+      const elapsed = now - hand.phaseStart;
+
+      const hoverPose = fingertipToWrist(side, pt.x, pt.y - 7, 10);
+      const downPose = fingertipToWrist(side, pt.x, pt.y + 4, 15);
+
+      if (reduced) {
+        hand.curr = downPose;
+      } else if (elapsed < reachMs) {
+        hand.curr = lerpPose(
+          hand.startPose,
+          hoverPose,
+          easeOutCubic(clamp(elapsed / reachMs, 0, 1))
+        );
+      } else if (elapsed < reachMs + downMs) {
+        hand.curr = lerpPose(
+          hoverPose,
+          downPose,
+          easeInOutQuad(clamp((elapsed - reachMs) / downMs, 0, 1))
+        );
+      } else {
+        hand.curr = downPose;
+      }
+
+      if (elapsed >= totalMs) {
+        const activeChar = getActiveTargetChar();
+        if (
+          state.phase !== 'celebrating' &&
+          state.hintStage === 'hand' &&
+          activeChar &&
+          getHandSideForKey(activeChar) === side
+        ) {
+          startHandHint(side, activeChar, 1100);
+        } else {
+          startHandReturn(side);
+        }
+      }
+
+      renderHandPose(side, hand.curr, true);
+      return true;
+    }
+
+    if (hand.mode === 'hinting') {
+      const activeChar = getActiveTargetChar();
+      if (state.phase === 'celebrating' || state.hintStage !== 'hand' || !activeChar) {
+        startHandReturn(side);
+        return true;
+      }
+
+      const targetPose = getHintHandPose(side, activeChar);
+      if (reduced) {
+        hand.curr = targetPose;
+        renderHandPose(side, hand.curr, true);
+        return false;
+      }
+
+      const elapsed = now - hand.phaseStart;
+      const progress = clamp(elapsed / hand.hintDuration, 0, 1);
+      const basePose = lerpPose(
+        hand.startPose,
+        targetPose,
+        easeInOutCubic(progress)
+      );
+
+      if (progress >= 1) {
+        // Gentle beckoning hover toward the target key after arriving
+        const bob =
+          Math.sin((elapsed - hand.hintDuration) * 0.0046) * 0.5 + 0.5;
+        hand.curr = {
+          wx: basePose.wx + (side === 'left' ? 4 : -4) * bob,
+          wy: basePose.wy - 3.5 * bob,
+          deg: basePose.deg + 3.5 * bob
+        };
+      } else {
+        hand.curr = basePose;
+      }
+
+      renderHandPose(side, hand.curr, true);
+      return true;
+    }
+
+    if (hand.mode === 'returning') {
+      const restPose = REST_HAND_POSE[side];
+      const elapsed = now - hand.phaseStart;
+      const progress = reduced
+        ? 1
+        : clamp(elapsed / hand.returnDuration, 0, 1);
+
+      if (progress >= 1) {
+        hand.mode = 'idle';
+        hand.curr = { ...restPose };
+        renderHandPose(side, hand.curr, false);
+        return false;
+      }
+
+      hand.curr = lerpPose(hand.startPose, restPose, easeOutCubic(progress));
+      renderHandPose(side, hand.curr, true);
+      return true;
+    }
+
+    return false;
+  }
+
+  function stepHands(now) {
+    const leftActive = stepSingleHand('left', now);
+    const rightActive = stepSingleHand('right', now);
+    if (leftActive || rightActive) {
+      handRafId = requestAnimationFrame(stepHands);
+    } else {
+      handRafId = null;
+    }
+  }
+
   function clearHintTimers() {
     clearTimeout(state.colorHintTimer);
     clearTimeout(state.arrowHintTimer);
+    clearTimeout(state.handHintTimer);
   }
 
   /**
-   * Start progressive 5s / 10s timers for the currently active target character:
+   * Start progressive 5s / 10s / 15s timers for the currently active target character:
    * - 0s..5s: Black & White key pulse
-   * - 5s: Key turns to vibrant Colour!
-   * - 10s: Bold Red Arrow points directly at the key!
+   * - 5s..10s: Key turns to vibrant Colour!
+   * - 10s..15s: Bold Red Arrow points directly at the key!
+   * - 15s+: Hermes' closest hand slowly glides toward the target key!
    * Note: Wrong keypresses do NOT reset these timers so a child hunting for a key still gets help.
    */
   function startHintTimersForActiveChar() {
     clearHintTimers();
     state.hintStage = 'bw';
     hideArrow(true);
+    syncHandHint();
 
     state.colorHintTimer = setTimeout(() => {
       if (state.phase === 'celebrating') return;
@@ -787,6 +1179,13 @@
       updateKeyHighlights();
       showArrow();
     }, RED_ARROW_DELAY_MS);
+
+    state.handHintTimer = setTimeout(() => {
+      if (state.phase === 'celebrating') return;
+      state.hintStage = 'hand';
+      updateKeyHighlights();
+      syncHandHint();
+    }, HAND_HINT_DELAY_MS);
   }
 
   function updateKeyHighlights() {
@@ -802,8 +1201,12 @@
       );
       const isColorStage =
         isActiveTarget &&
-        (state.hintStage === 'color' || state.hintStage === 'arrow');
-      const isArrowStage = isActiveTarget && state.hintStage === 'arrow';
+        (state.hintStage === 'color' ||
+          state.hintStage === 'arrow' ||
+          state.hintStage === 'hand');
+      const isArrowStage =
+        isActiveTarget &&
+        (state.hintStage === 'arrow' || state.hintStage === 'hand');
       const isBwHint =
         isActiveTarget &&
         !isColorStage &&
@@ -818,7 +1221,10 @@
       );
     });
 
-    if (!isCelebrating && state.hintStage === 'arrow') {
+    if (
+      !isCelebrating &&
+      (state.hintStage === 'arrow' || state.hintStage === 'hand')
+    ) {
       syncArrowCoordinates();
     }
     updateEyeGaze();
@@ -828,13 +1234,25 @@
     if (char === ' ') {
       if (!spacebarEl) return;
       spacebarEl.classList.add('is-pressed');
-      setTimeout(() => spacebarEl.classList.remove('is-pressed'), 140);
+      clearTimeout(keyPressTimers.get(' '));
+      keyPressTimers.set(
+        ' ',
+        setTimeout(() => spacebarEl.classList.remove('is-pressed'), 160)
+      );
       return;
     }
-    const btn = keyButtonsByChar.get(char.toUpperCase());
+    const upper = char.toUpperCase();
+    const btn = keyButtonsByChar.get(upper);
     if (!btn) return;
     btn.classList.add('is-pressed');
-    setTimeout(() => btn.classList.remove('is-pressed'), 140);
+    clearTimeout(keyPressTimers.get(upper));
+    keyPressTimers.set(
+      upper,
+      setTimeout(() => btn.classList.remove('is-pressed'), 200)
+    );
+    if (state.phase !== 'celebrating') {
+      triggerHandKeyPress(upper);
+    }
   }
 
   function announce(msg) {
@@ -969,6 +1387,13 @@
   } = {}) {
     clearTimeout(state.buzzTimer);
     clearTimeout(state.celebrateTimer);
+    clearTimeout(state.celebrateArmsTimer);
+    body.classList.remove('is-pressing-celebrate');
+    if (afterSuccess) {
+      resetHandsImmediate();
+    } else {
+      returnAllHandsToRest();
+    }
 
     state.phase = 'prompting';
     state.wrongCountThisTurn = 0;
@@ -1106,6 +1531,7 @@
   function triggerCelebration() {
     clearTimeout(state.buzzTimer);
     clearTimeout(state.celebrateTimer);
+    clearTimeout(state.celebrateArmsTimer);
     clearHintTimers();
     hideArrow();
 
@@ -1119,6 +1545,20 @@
       syncWordProgressUI(item.key.length - 1);
     } else {
       promptTarget.textContent = item.key;
+    }
+
+    const activeSide = getHandSideForKey(item.key[item.key.length - 1]);
+    if (activeSide && handsState[activeSide].mode === 'pressing') {
+      // Let Hermes finish pushing the winning button down before throwing arms up to cheer
+      body.classList.add('is-pressing-celebrate');
+      const finishMs = state.fastMode ? 160 : 215;
+      state.celebrateArmsTimer = setTimeout(() => {
+        body.classList.remove('is-pressing-celebrate');
+        resetHandsImmediate();
+      }, finishMs);
+    } else {
+      body.classList.remove('is-pressing-celebrate');
+      resetHandsImmediate();
     }
 
     body.dataset.state = 'celebrating';
@@ -1280,12 +1720,18 @@
     }
   });
 
-  // Keep eye gaze & Red Arrow fallback coordinates aligned on viewport/fullscreen resize
+  // Keep eye gaze, Red Arrow & Hermes' hinting hand aligned on viewport/fullscreen resize
   if ('ResizeObserver' in window && keysContainer) {
     const ro = new ResizeObserver(() => {
       updateEyeGaze();
-      if (state.hintStage === 'arrow' && state.phase !== 'celebrating') {
+      if (
+        (state.hintStage === 'arrow' || state.hintStage === 'hand') &&
+        state.phase !== 'celebrating'
+      ) {
         syncArrowCoordinates();
+      }
+      if (state.hintStage === 'hand' && state.phase !== 'celebrating') {
+        syncHandHint();
       }
     });
     ro.observe(keysContainer);

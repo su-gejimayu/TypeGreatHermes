@@ -962,6 +962,18 @@
     filter: drop-shadow(0 8px 0 rgb(24 24 24 / 0.18));
   }
 
+  .hermes-arms-svg {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    display: block;
+    overflow: visible;
+    pointer-events: none;
+    z-index: 10;
+    filter: drop-shadow(0 4px 0 rgb(24 24 24 / 0.16));
+  }
+
   /* Default B&W Typewriter Fills (Prompting / Buzzing) */
   .tw-paper-table {
     fill: #a8a9a4;
@@ -1089,6 +1101,9 @@
 
   .glove-left {
     animation: glove-hover-l 2.2s ease-in-out infinite;
+    &.is-animating {
+      animation: none;
+    }
     @media (prefers-reduced-motion: reduce) {
       animation: none;
     }
@@ -1096,6 +1111,9 @@
 
   .glove-right {
     animation: glove-hover-r 2.2s ease-in-out infinite 0.4s;
+    &.is-animating {
+      animation: none;
+    }
     @media (prefers-reduced-motion: reduce) {
       animation: none;
     }
@@ -1571,25 +1589,31 @@
       opacity: 1;
     }
 
-    /* Cheering Face & Raised Rubber-Hose Arms! */
-    & .arms-prompting,
+    /* Cheering Face & Raised Rubber-Hose Arms (after brief winning key push!) */
     & .mouth-prompt,
     & .eyes-buzz,
     & .mouth-buzz {
       display: none;
     }
 
-    & .arms-celebrating,
     & .mouth-celebrate {
       display: block;
     }
 
-    & .arms-celebrating {
-      transform-origin: 640px 264px;
-      animation: arms-cheer-bounce 0.55s ease-in-out infinite alternate;
+    &:not(.is-pressing-celebrate) {
+      & .arms-prompting,
+      & .arms-prompting-sockets {
+        display: none;
+      }
 
-      @media (prefers-reduced-motion: reduce) {
-        animation: none;
+      & .arms-celebrating {
+        display: block;
+        transform-origin: 640px 264px;
+        animation: arms-cheer-bounce 0.55s ease-in-out infinite alternate;
+
+        @media (prefers-reduced-motion: reduce) {
+          animation: none;
+        }
       }
     }
 
