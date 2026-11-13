@@ -147,6 +147,10 @@
   const nameConfirmValue = document.getElementById('name-confirm-value');
   const nameYesBtn = document.getElementById('name-yes-btn');
   const nameNoBtn = document.getElementById('name-no-btn');
+  const changeNameBtn = document.getElementById('change-name-btn');
+
+  // 0 = B&W, 1..10 = 10 intermediary colour stages, 11 = full colour parity
+  const FULL_COLOR_STAGE_COUNT = 11;
 
   // State
   const state = {
@@ -159,6 +163,7 @@
     voiceOn: true,
     showHint: true,
     hasInteracted: false,
+    correctCount: 0,
     deck: [],
     seqIndex: 0,
     currentItem: null,
@@ -884,6 +889,29 @@
     };
   }
 
+  function isMaxCombo() {
+    return state.correctCount >= FULL_COLOR_STAGE_COUNT;
+  }
+
+  function getWaveHandPose(side, now = 0) {
+    const t = now * 0.0065 + (side === 'left' ? 0 : 0.9);
+    const waveX = Math.sin(t) * 18;
+    const waveY = Math.cos(t * 2) * 10;
+    const waveDeg = Math.sin(t) * 23;
+    const baseWx = 58 + waveX;
+    return {
+      wx: side === 'left' ? baseWx : 1280 - baseWx,
+      wy: 118 + waveY,
+      deg: -89 + waveDeg
+    };
+  }
+
+  function getIdleHandPose(side, now = 0) {
+    return isMaxCombo()
+      ? getWaveHandPose(side, prefersReducedMotion() ? 0 : now)
+      : { ...REST_HAND_POSE[side] };
+  }
+
   /** Build rubber-hose cubic Bezier paths & glove transform symmetrically for either arm */
   function buildArmGeometry(side, pose) {
     const mWx = side === 'left' ? pose.wx : 1280 - pose.wx;
@@ -896,19 +924,30 @@
     const ey = pose.wy + (-5 * sin + 3 * cos);
 
     const reachX = clamp((mWx - 158) / 540, 0, 1);
+    const sideRaiseMask = 1 - clamp((mWx - 158) / 140, 0, 1);
+    const raiseT = clamp((354 - ey) / 230, 0, 1) * sideRaiseMask;
     const sx = 108;
     const sy = 354;
-    const c1x = lerp(28, 44, reachX);
-    const c1y = lerp(342, 468, reachX);
-    const c2x = lerp(20, ex - 185, reachX);
+    const downC1x = lerp(28, 44, reachX);
+    const downC1y = lerp(342, 468, reachX);
+    const downC2x = lerp(20, ex - 185, reachX);
     const elbowY = Math.min(545, Math.max(ey + 36, 445));
-    const c2y = lerp(ey - 26, elbowY, reachX);
+    const downC2y = lerp(ey - 26, elbowY, reachX);
+
+    // When raised high beside the hood (excited waving), curve the rubber hose smoothly outward & upward
+    const c1x = lerp(downC1x, 42, raiseT);
+    const c1y = lerp(downC1y, sy - 48, raiseT);
+    const c2x = lerp(downC2x, Math.min(ex - 26, 26), raiseT);
+    const c2y = lerp(downC2y, ey + 68, raiseT);
 
     const mapX = (x) => (side === 'left' ? x : 1280 - x);
     const f = (n) => n.toFixed(1);
 
+    const hlEndX = lerp(ex - 4, ex - 6, raiseT);
+    const hlEndY = lerp(ey - 6, ey + 2, raiseT);
+
     const hosePath = `M${f(mapX(sx))},${f(sy)} C${f(mapX(c1x))},${f(c1y)} ${f(mapX(c2x))},${f(c2y)} ${f(mapX(ex))},${f(ey)}`;
-    const highlightPath = `M${f(mapX(sx - 4))},${f(sy - 5)} C${f(mapX(c1x + 8))},${f(c1y - 2)} ${f(mapX(c2x + 10))},${f(c2y - 6)} ${f(mapX(ex - 4))},${f(ey - 6)}`;
+    const highlightPath = `M${f(mapX(sx - 4))},${f(sy - 5)} C${f(mapX(c1x + 8))},${f(c1y - 2)} ${f(mapX(c2x + 10))},${f(c2y - 6)} ${f(mapX(hlEndX))},${f(hlEndY)}`;
     const gloveTransform =
       side === 'left'
         ? `translate(${f(pose.wx)}, ${f(pose.wy)}) rotate(${f(pose.deg)})`
@@ -1003,6 +1042,7 @@
   function returnAllHandsToRest() {
     ['left', 'right'].forEach((side) => {
       const hand = handsState[side];
+      if (hand.mode === 'waving' && isMaxCombo()) return;
       if (hand.mode !== 'idle') {
         startHandReturn(side);
       }
@@ -1014,13 +1054,25 @@
       cancelAnimationFrame(handRafId);
       handRafId = null;
     }
+    const waving = state.phase !== 'celebrating' && isMaxCombo();
+    const now = performance.now();
+    const reduced = prefersReducedMotion();
     ['left', 'right'].forEach((side) => {
       const hand = handsState[side];
-      hand.mode = 'idle';
       hand.keyChar = null;
-      hand.curr = { ...REST_HAND_POSE[side] };
-      renderHandPose(side, hand.curr, false);
+      if (waving) {
+        hand.mode = 'waving';
+        hand.curr = getWaveHandPose(side, reduced ? 0 : now);
+        renderHandPose(side, hand.curr, true);
+      } else {
+        hand.mode = 'idle';
+        hand.curr = { ...REST_HAND_POSE[side] };
+        renderHandPose(side, hand.curr, false);
+      }
     });
+    if (waving && !reduced) {
+      ensureHandLoop();
+    }
   }
 
   function ensureHandLoop() {
@@ -1126,21 +1178,42 @@
       return true;
     }
 
+    if (hand.mode === 'waving') {
+      if (!isMaxCombo() || state.phase === 'celebrating') {
+        startHandReturn(side);
+        return true;
+      }
+      if (reduced) {
+        hand.curr = getWaveHandPose(side, 0);
+        renderHandPose(side, hand.curr, true);
+        return false;
+      }
+      hand.curr = getWaveHandPose(side, now);
+      renderHandPose(side, hand.curr, true);
+      return true;
+    }
+
     if (hand.mode === 'returning') {
-      const restPose = REST_HAND_POSE[side];
+      const targetPose = getIdleHandPose(side, now);
       const elapsed = now - hand.phaseStart;
       const progress = reduced
         ? 1
         : clamp(elapsed / hand.returnDuration, 0, 1);
 
       if (progress >= 1) {
+        if (state.phase !== 'celebrating' && isMaxCombo()) {
+          hand.mode = 'waving';
+          hand.curr = targetPose;
+          renderHandPose(side, hand.curr, true);
+          return !reduced;
+        }
         hand.mode = 'idle';
-        hand.curr = { ...restPose };
+        hand.curr = { ...REST_HAND_POSE[side] };
         renderHandPose(side, hand.curr, false);
         return false;
       }
 
-      hand.curr = lerpPose(hand.startPose, restPose, easeOutCubic(progress));
+      hand.curr = lerpPose(hand.startPose, targetPose, easeOutCubic(progress));
       renderHandPose(side, hand.curr, true);
       return true;
     }
@@ -1401,13 +1474,13 @@
     clearTimeout(state.celebrateTimer);
     clearTimeout(state.celebrateArmsTimer);
     body.classList.remove('is-pressing-celebrate');
+    state.phase = 'prompting';
     if (afterSuccess) {
       resetHandsImmediate();
     } else {
       returnAllHandsToRest();
     }
 
-    state.phase = 'prompting';
     state.wrongCountThisTurn = 0;
     state.charIndex = 0;
     state.currentItem = nextItem();
@@ -1550,6 +1623,8 @@
     const item = state.currentItem;
     state.phase = 'celebrating';
     state.hintStage = 'bw';
+    state.correctCount += 1;
+    updateBackgroundColorProgress();
     buzzFeedback.hidden = true;
 
     promptPrefix.textContent = 'Yay!';
@@ -1609,6 +1684,8 @@
 
     state.phase = 'buzzing';
     state.wrongCountThisTurn += 1;
+    state.correctCount = 0;
+    updateBackgroundColorProgress();
 
     const item = state.currentItem;
     const targetChar = getActiveTargetChar();
@@ -1988,6 +2065,26 @@
     );
   }
 
+  function updateBackgroundColorProgress() {
+    const stage = Math.min(state.correctCount, FULL_COLOR_STAGE_COUNT);
+    const ratio = stage / FULL_COLOR_STAGE_COUNT;
+    const pct = Math.round(ratio * 1000) / 10;
+    const excitement =
+      stage === 0
+        ? 'calm'
+        : stage <= 3
+          ? 'warm'
+          : stage <= 7
+            ? 'grooving'
+            : 'party';
+    body.style.setProperty('--bg-color-progress', String(ratio));
+    body.style.setProperty('--bg-color-pct', `${pct}%`);
+    body.style.setProperty('--dance-amp', String(ratio));
+    body.dataset.colorStage = String(stage);
+    body.dataset.excitement = excitement;
+    body.classList.toggle('is-bg-animating', stage >= 6);
+  }
+
   function confirmPlayerName() {
     if (state.namePromptPhase !== 'confirm') return;
     state.hasInteracted = true;
@@ -1996,7 +2093,14 @@
     window.setHermesPlayerName(state.pendingPlayerName);
     state.namePromptPhase = 'done';
     namePromptDialog?.close();
-    startNewPrompt({ speakPrompt: true, animateFeed: true });
+    if (state.currentItem) {
+      window.hermesAudio.speak(`Hi ${playerName()}!`, {
+        mood: 'cheer',
+        fast: state.fastMode
+      });
+    } else {
+      startNewPrompt({ speakPrompt: true, animateFeed: true });
+    }
   }
 
   function rejectPlayerName() {
@@ -2007,22 +2111,39 @@
     showNameEntryStep({ speakGreeting: false });
   }
 
-  function openNamePrompt() {
+  function openNamePrompt({ isChange = false } = {}) {
     if (!namePromptDialog || typeof namePromptDialog.showModal !== 'function') {
       state.namePromptPhase = 'done';
-      startNewPrompt({ speakPrompt: false, animateFeed: false });
+      if (!state.currentItem) {
+        startNewPrompt({ speakPrompt: false, animateFeed: false });
+      }
       return;
     }
     if (!namePromptDialog.open) {
       namePromptDialog.showModal();
     }
-    showNameEntryStep({ speakGreeting: true });
+    showNameEntryStep({ speakGreeting: !isChange });
+  }
+
+  if (changeNameBtn) {
+    changeNameBtn.addEventListener('click', () => {
+      state.hasInteracted = true;
+      window.hermesAudio.unlock();
+      window.hermesAudio.playClack();
+      optionsPopover.hidePopover?.();
+      optionsBtn?.blur();
+      openNamePrompt({ isChange: true });
+    });
   }
 
   if (namePromptDialog) {
-    // Keep the startup name prompt open until confirmed via Y/Yes
+    // Keep the startup name prompt open until confirmed via Y/Yes; allow Esc when changing name mid-game
     namePromptDialog.addEventListener('cancel', (e) => {
-      e.preventDefault();
+      if (!state.currentItem) {
+        e.preventDefault();
+        return;
+      }
+      state.namePromptPhase = 'done';
     });
 
     namePromptDialog.addEventListener('keydown', (e) => {
@@ -2083,6 +2204,7 @@
 
   // Boot!
   loadSettings();
+  updateBackgroundColorProgress();
   renderTypewriterKeys();
   openNamePrompt();
 })();
