@@ -513,7 +513,7 @@
     {
       usesName: true,
       format: ({ name, streakWord, nextPrompt }) =>
-        `Distinguished work, ${name}! ${streakWord} consecutive triumphs! Next on our parchment is ${nextPrompt}.`
+        `Distinguished work, ${name}! ${streakWord} consecutive triumphs! Next on our page is ${nextPrompt}.`
     },
     {
       usesName: false,
@@ -576,7 +576,7 @@
     {
       usesName: true,
       format: ({ name, nextPrompt }) =>
-        `Distinguished work, ${name}! Next on our parchment is ${nextPrompt}.`
+        `Distinguished work, ${name}! Next on our page is ${nextPrompt}.`
     },
     {
       usesName: true,
@@ -724,20 +724,20 @@
 
     // Precompute exact 1280x612 viewBox centers per row/col as zero-layout fallback
     const rowStaggers = [
-      { padStart: 0, padEnd: 0.012, y: 264.5 },
-      { padStart: 0.012, padEnd: 0, y: 340.5 },
-      { padStart: 0, padEnd: 0.01, y: 416.6 },
-      { padStart: 0, padEnd: 0.024, y: 492.6 }
+      { padStart: 0, padEnd: 0.012, y: 278.4 },
+      { padStart: 0.012, padEnd: 0, y: 349.7 },
+      { padStart: 0, padEnd: 0.01, y: 421.0 },
+      { padStart: 0, padEnd: 0.024, y: 492.4 }
     ];
-    const boxX0 = 128;
-    const boxW = 1024;
-    const keyW = 88.06;
-    const gapX = 10.5;
+    const boxX0 = 169;
+    const boxW = 942;
+    const keyW = 81.3;
+    const gapX = 9.2;
 
     ALL_KEY_ROWS.forEach((rowKeys, rowIdx) => {
       const rowEl = document.createElement('div');
       rowEl.className = 'key-row';
-      const stagger = rowStaggers[rowIdx] || { padStart: 0, padEnd: 0, y: 340.5 };
+      const stagger = rowStaggers[rowIdx] || { padStart: 0, padEnd: 0, y: 349.7 };
       const usableX0 = boxX0 + stagger.padStart * boxW;
       const usableX1 = boxX0 + boxW - stagger.padEnd * boxW;
       const rowSpan = rowKeys.length * keyW + (rowKeys.length - 1) * gapX;
@@ -809,8 +809,8 @@
 
   /** Compute elliptical pupil offset (in SVG viewBox units) from an eye center to a target */
   function computePupilOffset(eyeX, eyeY, targetX, targetY) {
-    const MAX_X = 9.5;
-    const MAX_Y = 14.5;
+    const MAX_X = 7.0;
+    const MAX_Y = 8.5;
     const dx = targetX - eyeX;
     const dy = targetY - eyeY;
 
@@ -847,12 +847,12 @@
     }
   }
 
-  /** Animate Hermes's bespectacled eyes (582,106 & 698,106) to look at the next key to press */
+  /** Animate Hermes's bespectacled eyes (576,103 & 704,103) to look at the next key to press */
   function updateEyeGaze() {
     if (!pupilLeft || !pupilRight) return;
 
-    const LEFT_EYE = { x: 582, y: 106 };
-    const RIGHT_EYE = { x: 698, y: 106 };
+    const LEFT_EYE = { x: 576, y: 103 };
+    const RIGHT_EYE = { x: 704, y: 103 };
 
     if (state.phase === 'celebrating') {
       // Look cheerfully up toward the rainbow word & bounding critter on the paper!
